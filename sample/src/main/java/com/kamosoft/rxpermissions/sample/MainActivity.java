@@ -13,8 +13,6 @@ import com.kamosoft.rxpermissions.RxPermissions;
 
 import java.io.IOException;
 
-import rx.functions.Action1;
-
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "RxPermissions";
@@ -40,23 +38,20 @@ public class MainActivity extends AppCompatActivity {
 
     public void enableCamera(View v) {
         mRxPermissions.request(Manifest.permission.CAMERA)
-                .subscribe(new Action1<Boolean>() {
-                    @Override
-                    public void call(Boolean granted) {
-                        if (granted) {
-                            releaseCamera();
-                            mCamera = Camera.open(0);
-                            try {
-                                mCamera.setPreviewDisplay(mSurfaceView.getHolder());
-                                mCamera.startPreview();
-                            } catch (IOException e) {
-                                Log.e(TAG, "Error while trying to display the camera preview", e);
-                            }
-                        } else {
-                            Toast.makeText(MainActivity.this,
-                                    "Permission denied, can't enable the camera",
-                                    Toast.LENGTH_SHORT).show();
+                .subscribe(granted -> {
+                    if (granted) {
+                        releaseCamera();
+                        mCamera = Camera.open(0);
+                        try {
+                            mCamera.setPreviewDisplay(mSurfaceView.getHolder());
+                            mCamera.startPreview();
+                        } catch (IOException e) {
+                            Log.e(TAG, "Error while trying to display the camera preview", e);
                         }
+                    } else {
+                        Toast.makeText(MainActivity.this,
+                                "Permission denied, can't enable the camera",
+                                Toast.LENGTH_SHORT).show();
                     }
                 });
     }

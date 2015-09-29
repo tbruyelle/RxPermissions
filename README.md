@@ -4,14 +4,11 @@ This library allows the usage of RxJava with the new Android M permission model.
 
 ```java
  rxPermissions.request(Manifest.permission.CAMERA)
-                .subscribe(new Action1<Boolean>() {
-                    @Override
-                    public void call(Boolean granted) {
-                        if (granted) {
-                           // I can control the camera now
-                        } else {
-                           // Oups permission denied
-                        }
+                .subscribe(granted -> { // With retrolambda
+                    if (granted) {
+                       // I can control the camera now
+                    } else {
+                       // Oups permission denied
                     }
                 });
 ```
