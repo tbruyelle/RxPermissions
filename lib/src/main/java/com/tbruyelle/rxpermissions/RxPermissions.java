@@ -1,4 +1,4 @@
-package com.kamosoft.rxpermissions;
+package com.tbruyelle.rxpermissions;
 
 import android.annotation.TargetApi;
 import android.app.Activity;

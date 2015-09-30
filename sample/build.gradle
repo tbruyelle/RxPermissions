@@ -21,7 +21,7 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        applicationId "com.kamosoft.rxpermissions.sample"
+        applicationId "com.tbruyelle.rxpermissions.sample"
         minSdkVersion rootProject.ext.minSdkVersion
 
         targetSdkVersion rootProject.ext.targetSdkVersion

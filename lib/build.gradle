@@ -8,13 +8,21 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        version = '0.1'
-        group = 'com.kamosoft.rxpermissions'
+        version = '0.1.0'
+        group = 'com.tbruyelle.rxpermissions'
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    testOptions.unitTests.all {
+        // unitTests.returnDefaultValues = true
+        // Always show the result of every unit test, even if it passes.
+        testLogging {
+            events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
         }
     }
 }

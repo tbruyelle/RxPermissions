@@ -1,4 +1,4 @@
-package com.kamosoft.rxpermissions.sample;
+package com.tbruyelle.rxpermissions.sample;
 
 import android.Manifest;
 import android.hardware.Camera;
@@ -9,7 +9,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Toast;
 
-import com.kamosoft.rxpermissions.RxPermissions;
+import com.tbruyelle.rxpermissions.RxPermissions;
 
 import java.io.IOException;
 

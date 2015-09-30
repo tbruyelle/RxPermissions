@@ -14,7 +14,7 @@ subprojects {
 }
 
 ext {
-    minSdkVersion = 14
+    minSdkVersion = 9
     compileSdkVersion = 23
     targetSdkVersion = compileSdkVersion
     buildToolsVersion = '23.0.1'
