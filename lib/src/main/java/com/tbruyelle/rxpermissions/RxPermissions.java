@@ -1,3 +1,17 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.tbruyelle.rxpermissions;
 
 import android.annotation.TargetApi;
@@ -17,17 +31,25 @@ import rx.subjects.PublishSubject;
 
 public class RxPermissions {
 
-    private static RxPermissions sInstance;
-
     private Activity mActivity;
 
+    // Contains all the current permission requests.
+    // Once granted or denied, they are removed from it.
     private Map<String, PublishSubject<Boolean>> mSubjects = new HashMap<>();
-
 
     public RxPermissions(Activity activity) {
         mActivity = activity;
     }
 
+    /**
+     * Register one or several permission requests and returns an observable.
+     * <p/>
+     * For SDK &lt; 23, the observable will immediatly emit true, otherwise
+     * the user response to that request.
+     * <p/>
+     * It handles multiple requests to the same permission, in that case the
+     * same observable will be returned.
+     */
     public Observable<Boolean> request(final String... permissions) {
         if (permissions == null || permissions.length == 0) {
             throw new IllegalArgumentException("RxPermission.request requires at least on input permission");
@@ -45,6 +67,11 @@ public class RxPermissions {
         List<Observable<Boolean>> list = new ArrayList<>(permissions.length);
         List<String> unrequestedPermissions = new ArrayList<>();
 
+        // In case of multiple permissions, we create a observable for each of them.
+        // This helps to handle concurrent requests, for instance when there is one
+        // request for CAMERA and STORAGE, and another request for CAMERA only, only
+        // one observable will be create for the CAMERA.
+        // At the end, the observable are combined to have a unique response.
         for (String permission : permissions) {
             PublishSubject<Boolean> subject = mSubjects.get(permission);
             if (subject == null) {
@@ -61,6 +88,11 @@ public class RxPermissions {
         return Observable.combineLatest(list, combineLatestBools.INSTANCE);
     }
 
+    /**
+     * Returns true if the permissions is already granted.
+     * <p/>
+     * Always true if SDK &lt; 23.
+     */
     public boolean isGranted(String... permissions) {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M || hasPermission_(permissions);
     }
@@ -75,6 +107,12 @@ public class RxPermissions {
         return true;
     }
 
+    /**
+     * Must be invoked in {@code Activity.onRequestPermissionsResult}
+     * <p/>
+     * The method will find the pending requests and emit the response to the
+     * matching observables.
+     */
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         for (int i = 0; i < permissions.length; i++) {
@@ -98,7 +136,6 @@ public class RxPermissions {
         }
         return Math.abs(s.hashCode());
     }
-
 
     private enum combineLatestBools implements FuncN<Boolean> {
         INSTANCE;
