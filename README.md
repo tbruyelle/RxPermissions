@@ -38,7 +38,7 @@ Look at the `sample` app for more.
 This library is at a very early stage of development, so contributions are welcome.
 It should not be used in production, or at your own risk.
 
-The first improvement needed is lifecycle management (see #3). I need some help to find and design a well shaped solution.
+The first improvement needed is lifecycle management (see [#3](https://github.com/tbruyelle/RxPermissions/issues/3)). I need some help to find and design a well shaped solution.
 
 ## Benefits
 
