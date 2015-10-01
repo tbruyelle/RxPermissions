@@ -26,19 +26,32 @@ import java.util.List;
 import java.util.Map;
 
 import rx.Observable;
+import rx.Subscription;
 import rx.functions.FuncN;
 import rx.subjects.PublishSubject;
 
 public class RxPermissions {
+
+    private static RxPermissions sSingleton;
+
+    public static RxPermissions getInstance(Activity activity) {
+        if (sSingleton == null) {
+            sSingleton = new RxPermissions();
+        }
+        // Always take the last given activity, to prevent leaks.
+        sSingleton.mActivity = activity;
+        return sSingleton;
+    }
 
     private Activity mActivity;
 
     // Contains all the current permission requests.
     // Once granted or denied, they are removed from it.
     private Map<String, PublishSubject<Boolean>> mSubjects = new HashMap<>();
+    private Map<String, Subscription> mSubsriptions = new HashMap<>();
 
-    public RxPermissions(Activity activity) {
-        mActivity = activity;
+    private RxPermissions() {
+
     }
 
     /**

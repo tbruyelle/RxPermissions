@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mRxPermissions = new RxPermissions(this);
+        mRxPermissions = RxPermissions.getInstance(this);
 
         setContentView(R.layout.act_main);
         mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView);

@@ -38,7 +38,7 @@ public class RxPermissionsTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        mRxPermissions = spy(new RxPermissions(mActivity));
+        mRxPermissions = spy(RxPermissions.getInstance(mActivity));
     }
 
     @Test
