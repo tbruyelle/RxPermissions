@@ -16,7 +16,8 @@ package com.tbruyelle.rxpermissions;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
@@ -31,14 +32,15 @@ import static org.mockito.Mockito.*;
 
 public class RxPermissionsTest {
 
-    @Mock Activity mActivity;
+    @Mock Context mContext;
 
     RxPermissions mRxPermissions;
 
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        mRxPermissions = spy(new RxPermissions(mActivity));
+        when(mContext.getApplicationContext()).thenReturn(mContext);
+        mRxPermissions = spy(new RxPermissions(mContext));
     }
 
     @Test
@@ -104,9 +106,9 @@ public class RxPermissionsTest {
 
         mRxPermissions.request(permission).subscribe(sub1);
         mRxPermissions.request(permission).subscribe(sub2);
-        mRxPermissions.onRequestPermissionsResult(id, new String[]{permission}, result);
+        mRxPermissions.onRequestPermissionsResult(id, new String[] { permission }, result);
 
-        verify(mActivity).requestPermissions(any(String[].class), anyInt());
+        verify(mContext).startActivity(any(Intent.class));
         for (TestSubscriber sub : new TestSubscriber[]{sub1, sub2}) {
             sub.assertNoErrors();
             sub.assertTerminalEvent();
@@ -165,7 +167,7 @@ public class RxPermissionsTest {
         mRxPermissions.request(permissions).subscribe(sub2);
         mRxPermissions.onRequestPermissionsResult(id, permissions, result);
 
-        verify(mActivity).requestPermissions(any(String[].class), anyInt());
+        verify(mContext).startActivity(any(Intent.class));
         for (TestSubscriber sub : new TestSubscriber[]{sub1, sub2}) {
             sub.assertNoErrors();
             sub.assertTerminalEvent();
@@ -188,7 +190,7 @@ public class RxPermissionsTest {
         mRxPermissions.request(Manifest.permission.CAMERA).subscribe(sub2);
         mRxPermissions.onRequestPermissionsResult(id, permissions, result);
 
-        verify(mActivity).requestPermissions(any(String[].class), anyInt());
+        verify(mContext).startActivity(any(Intent.class));
         for (TestSubscriber sub : new TestSubscriber[]{sub1, sub2}) {
             sub.assertNoErrors();
             sub.assertTerminalEvent();
@@ -210,9 +212,10 @@ public class RxPermissionsTest {
         mRxPermissions.request(Manifest.permission.CAMERA).subscribe(sub1);
         mRxPermissions.request(permissions).subscribe(sub2);
         mRxPermissions.onRequestPermissionsResult(id, new String[]{Manifest.permission.READ_PHONE_STATE}, result);
-        mRxPermissions.onRequestPermissionsResult(id, new String[]{Manifest.permission.CAMERA}, result);
+        mRxPermissions.onRequestPermissionsResult(id, new String[] { Manifest.permission.CAMERA },
+                                                  result);
 
-        verify(mActivity, times(2)).requestPermissions(any(String[].class), anyInt());
+        verify(mContext, times(2)).startActivity(any(Intent.class));
         for (TestSubscriber sub : new TestSubscriber[]{sub1, sub2}) {
             sub.assertNoErrors();
             sub.assertTerminalEvent();
@@ -235,9 +238,10 @@ public class RxPermissionsTest {
         mRxPermissions.request(Manifest.permission.CAMERA).subscribe(sub1);
         mRxPermissions.request(permissions).subscribe(sub2);
         mRxPermissions.onRequestPermissionsResult(id, new String[]{Manifest.permission.READ_PHONE_STATE}, resultDenied);
-        mRxPermissions.onRequestPermissionsResult(id, new String[]{Manifest.permission.CAMERA}, resultGranted);
+        mRxPermissions.onRequestPermissionsResult(id, new String[] { Manifest.permission.CAMERA },
+                                                  resultGranted);
 
-        verify(mActivity, times(2)).requestPermissions(any(String[].class), anyInt());
+        verify(mContext, times(2)).startActivity(any(Intent.class));
         sub1.assertNoErrors();
         sub1.assertTerminalEvent();
         sub1.assertUnsubscribed();

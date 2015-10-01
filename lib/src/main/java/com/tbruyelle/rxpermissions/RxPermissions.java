@@ -14,8 +14,16 @@
 
 package com.tbruyelle.rxpermissions;
 
+import static com.tbruyelle.rxpermissions.ProxyRequestPermissionsActivity.ACTION_PERMISSIONS;
+import static com.tbruyelle.rxpermissions.ProxyRequestPermissionsActivity.EXTRA_GRANT_RESULTS;
+import static com.tbruyelle.rxpermissions.ProxyRequestPermissionsActivity.EXTRA_PERMISSIONS;
+import static com.tbruyelle.rxpermissions.ProxyRequestPermissionsActivity.EXTRA_REQ_CODE;
+
 import android.annotation.TargetApi;
-import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
@@ -31,14 +39,29 @@ import rx.subjects.PublishSubject;
 
 public class RxPermissions {
 
-    private Activity mActivity;
+    private Context mContext;
 
     // Contains all the current permission requests.
     // Once granted or denied, they are removed from it.
     private Map<String, PublishSubject<Boolean>> mSubjects = new HashMap<>();
 
-    public RxPermissions(Activity activity) {
-        mActivity = activity;
+    // Handles permission request results from the proxy activity.
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            context.unregisterReceiver(this);
+            int reqCode = intent.getIntExtra(EXTRA_REQ_CODE, 0);
+            String[] permissions = intent.getStringArrayExtra(EXTRA_PERMISSIONS);
+            int[] grants = intent.getIntArrayExtra(EXTRA_GRANT_RESULTS);
+            onRequestPermissionsResult(reqCode, permissions, grants);
+        }
+    };
+
+    public RxPermissions(Context context) {
+        if (context == null) {
+            throw new NullPointerException("context == null");
+        }
+        mContext = context.getApplicationContext();
     }
 
     /**
@@ -82,7 +105,12 @@ public class RxPermissions {
             list.add(subject);
         }
         if (!unrequestedPermissions.isEmpty()) {
-            mActivity.requestPermissions(unrequestedPermissions.toArray(new String[0]), permissionID(permissions));
+            final Intent intent = ProxyRequestPermissionsActivity.createIntent(
+                    mContext, permissionID(permissions),
+                    unrequestedPermissions.toArray(new String[unrequestedPermissions.size()]));
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            mContext.registerReceiver(mReceiver, new IntentFilter(ACTION_PERMISSIONS));
+            mContext.startActivity(intent);
         }
 
         return Observable.combineLatest(list, combineLatestBools.INSTANCE);
@@ -100,7 +128,7 @@ public class RxPermissions {
     @TargetApi(Build.VERSION_CODES.M)
     private boolean hasPermission_(String... permissions) {
         for (String permission : permissions) {
-            if (mActivity.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+            if (mContext.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
                 return false;
             }
         }
@@ -113,8 +141,7 @@ public class RxPermissions {
      * The method will find the pending requests and emit the response to the
      * matching observables.
      */
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+    void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         for (int i = 0; i < permissions.length; i++) {
             // Find the corresponding subject
             PublishSubject<Boolean> subject = mSubjects.get(permissions[i]);
