@@ -31,11 +31,6 @@ public class MainActivity extends AppCompatActivity {
         mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        mRxPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
     public void enableCamera(View v) {
         mRxPermissions.request(Manifest.permission.CAMERA)
                 .subscribe(granted -> {

@@ -1,2 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.tbruyelle.rxpermissions" />
+<manifest
+    package="com.tbruyelle.rxpermissions"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+    <application>
+        <activity
+            android:name="ShadowActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            />
+    </application>
+</manifest>

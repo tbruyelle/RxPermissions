@@ -15,7 +15,8 @@
 package com.tbruyelle.rxpermissions;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
@@ -26,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import rx.Observable;
-import rx.Subscription;
+import rx.functions.Action0;
 import rx.functions.FuncN;
 import rx.subjects.PublishSubject;
 
@@ -34,21 +35,19 @@ public class RxPermissions {
 
     private static RxPermissions sSingleton;
 
-    public static RxPermissions getInstance(Activity activity) {
+    public static RxPermissions getInstance(Context ctx) {
         if (sSingleton == null) {
             sSingleton = new RxPermissions();
         }
-        // Always take the last given activity, to prevent leaks.
-        sSingleton.mActivity = activity;
+        sSingleton.mCtx = ctx.getApplicationContext();
         return sSingleton;
     }
 
-    private Activity mActivity;
+    private Context mCtx;
 
     // Contains all the current permission requests.
     // Once granted or denied, they are removed from it.
     private Map<String, PublishSubject<Boolean>> mSubjects = new HashMap<>();
-    private Map<String, Subscription> mSubsriptions = new HashMap<>();
 
     private RxPermissions() {
 
@@ -95,10 +94,19 @@ public class RxPermissions {
             list.add(subject);
         }
         if (!unrequestedPermissions.isEmpty()) {
-            mActivity.requestPermissions(unrequestedPermissions.toArray(new String[0]), permissionID(permissions));
+            Intent intent = new Intent(mCtx, ShadowActivity.class);
+            intent.putExtra("permissions", permissions);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            mCtx.startActivity(intent);
+//            mActivity.requestPermissions(unrequestedPermissions.toArray(new String[0]), permissionID(permissions));
         }
 
-        return Observable.combineLatest(list, combineLatestBools.INSTANCE);
+        return Observable.combineLatest(list, combineLatestBools.INSTANCE).doOnSubscribe(new Action0() {
+            @Override
+            public void call() {
+
+            }
+        });
     }
 
     /**
@@ -113,7 +121,7 @@ public class RxPermissions {
     @TargetApi(Build.VERSION_CODES.M)
     private boolean hasPermission_(String... permissions) {
         for (String permission : permissions) {
-            if (mActivity.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+            if (mCtx.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
                 return false;
             }
         }
