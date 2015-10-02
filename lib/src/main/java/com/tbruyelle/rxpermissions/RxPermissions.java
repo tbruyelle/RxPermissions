@@ -21,7 +21,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,8 +37,8 @@ public class RxPermissions {
     public static RxPermissions getInstance(Context ctx) {
         if (sSingleton == null) {
             sSingleton = new RxPermissions();
+            sSingleton.mCtx = ctx.getApplicationContext();
         }
-        sSingleton.mCtx = ctx.getApplicationContext();
         return sSingleton;
     }
 
@@ -83,7 +82,7 @@ public class RxPermissions {
         // This helps to handle concurrent requests, for instance when there is one
         // request for CAMERA and STORAGE, and another request for CAMERA only, only
         // one observable will be create for the CAMERA.
-        // At the end, the observable are combined to have a unique response.
+        // At the end, the observables are combined to have a unique response.
         for (String permission : permissions) {
             PublishSubject<Boolean> subject = mSubjects.get(permission);
             if (subject == null) {
@@ -98,7 +97,6 @@ public class RxPermissions {
             intent.putExtra("permissions", permissions);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             mCtx.startActivity(intent);
-//            mActivity.requestPermissions(unrequestedPermissions.toArray(new String[0]), permissionID(permissions));
         }
 
         return Observable.combineLatest(list, combineLatestBools.INSTANCE).doOnSubscribe(new Action0() {
@@ -147,15 +145,6 @@ public class RxPermissions {
             subject.onNext(grantResults[i] == PackageManager.PERMISSION_GRANTED);
             subject.onCompleted();
         }
-    }
-
-    int permissionID(String... permissions) {
-        Arrays.sort(permissions);
-        String s = "";
-        for (String permission : permissions) {
-            s += permission;
-        }
-        return Math.abs(s.hashCode());
     }
 
     private enum combineLatestBools implements FuncN<Boolean> {

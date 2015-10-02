@@ -14,10 +14,9 @@ public class ShadowActivity extends Activity {
 
         if (savedInstanceState == null) {
             String[] permissions = getIntent().getStringArrayExtra("permissions");
-            requestPermissions(permissions, 0);
+            requestPermissions(permissions, 42);
         }
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
