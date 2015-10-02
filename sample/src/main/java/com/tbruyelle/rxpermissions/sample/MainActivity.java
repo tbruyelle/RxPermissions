@@ -25,15 +25,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mRxPermissions = new RxPermissions(this);
+        mRxPermissions = RxPermissions.getInstance(this);
 
         setContentView(R.layout.act_main);
         mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        mRxPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     public void enableCamera(View v) {

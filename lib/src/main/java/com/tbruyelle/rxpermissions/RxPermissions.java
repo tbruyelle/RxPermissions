@@ -15,30 +15,41 @@
 package com.tbruyelle.rxpermissions;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import rx.Observable;
+import rx.functions.Action0;
 import rx.functions.FuncN;
 import rx.subjects.PublishSubject;
 
 public class RxPermissions {
 
-    private Activity mActivity;
+    private static RxPermissions sSingleton;
+
+    public static RxPermissions getInstance(Context ctx) {
+        if (sSingleton == null) {
+            sSingleton = new RxPermissions();
+            sSingleton.mCtx = ctx.getApplicationContext();
+        }
+        return sSingleton;
+    }
+
+    private Context mCtx;
 
     // Contains all the current permission requests.
     // Once granted or denied, they are removed from it.
     private Map<String, PublishSubject<Boolean>> mSubjects = new HashMap<>();
 
-    public RxPermissions(Activity activity) {
-        mActivity = activity;
+    private RxPermissions() {
+
     }
 
     /**
@@ -71,7 +82,7 @@ public class RxPermissions {
         // This helps to handle concurrent requests, for instance when there is one
         // request for CAMERA and STORAGE, and another request for CAMERA only, only
         // one observable will be create for the CAMERA.
-        // At the end, the observable are combined to have a unique response.
+        // At the end, the observables are combined to have a unique response.
         for (String permission : permissions) {
             PublishSubject<Boolean> subject = mSubjects.get(permission);
             if (subject == null) {
@@ -82,10 +93,22 @@ public class RxPermissions {
             list.add(subject);
         }
         if (!unrequestedPermissions.isEmpty()) {
-            mActivity.requestPermissions(unrequestedPermissions.toArray(new String[0]), permissionID(permissions));
+            startShadowActivity(permissions);
         }
 
-        return Observable.combineLatest(list, combineLatestBools.INSTANCE);
+        return Observable.combineLatest(list, combineLatestBools.INSTANCE).doOnSubscribe(new Action0() {
+            @Override
+            public void call() {
+
+            }
+        });
+    }
+
+    void startShadowActivity(String[] permissions) {
+        Intent intent = new Intent(mCtx, ShadowActivity.class);
+        intent.putExtra("permissions", permissions);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mCtx.startActivity(intent);
     }
 
     /**
@@ -100,7 +123,7 @@ public class RxPermissions {
     @TargetApi(Build.VERSION_CODES.M)
     private boolean hasPermission_(String... permissions) {
         for (String permission : permissions) {
-            if (mActivity.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+            if (mCtx.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
                 return false;
             }
         }
@@ -113,8 +136,8 @@ public class RxPermissions {
      * The method will find the pending requests and emit the response to the
      * matching observables.
      */
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+    void onRequestPermissionsResult(int requestCode,
+                                    String permissions[], int[] grantResults) {
         for (int i = 0; i < permissions.length; i++) {
             // Find the corresponding subject
             PublishSubject<Boolean> subject = mSubjects.get(permissions[i]);
@@ -126,15 +149,6 @@ public class RxPermissions {
             subject.onNext(grantResults[i] == PackageManager.PERMISSION_GRANTED);
             subject.onCompleted();
         }
-    }
-
-    int permissionID(String... permissions) {
-        Arrays.sort(permissions);
-        String s = "";
-        for (String permission : permissions) {
-            s += permission;
-        }
-        return Math.abs(s.hashCode());
     }
 
     private enum combineLatestBools implements FuncN<Boolean> {
