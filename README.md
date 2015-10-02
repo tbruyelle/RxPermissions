@@ -49,7 +49,7 @@ Currently without this library you have to request the permission in one place a
 
 - Handles multiple permission requests out of the box.
 For instance if during the initialization of your app you request the same permission in 2 different places, only one request will
-be made to the framework. As a result, only one popup will appear to the user, but his reponse will be dispatched to all requesters.
+be made to the framework. As a result, only one popup will appear to the user, but his response will be dispatched to all requesters.
 
 - Easy testing.
 
