@@ -93,10 +93,7 @@ public class RxPermissions {
             list.add(subject);
         }
         if (!unrequestedPermissions.isEmpty()) {
-            Intent intent = new Intent(mCtx, ShadowActivity.class);
-            intent.putExtra("permissions", permissions);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            mCtx.startActivity(intent);
+            startShadowActivity(permissions);
         }
 
         return Observable.combineLatest(list, combineLatestBools.INSTANCE).doOnSubscribe(new Action0() {
@@ -105,6 +102,13 @@ public class RxPermissions {
 
             }
         });
+    }
+
+    void startShadowActivity(String[] permissions) {
+        Intent intent = new Intent(mCtx, ShadowActivity.class);
+        intent.putExtra("permissions", permissions);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mCtx.startActivity(intent);
     }
 
     /**
