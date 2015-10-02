@@ -1,2 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.tbruyelle.rxpermissions" />
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.tbruyelle.rxpermissions"
+    >
+
+  <application>
+    <activity
+        android:name=".ProxyRequestPermissionsActivity"
+        android:theme="@style/NoDisplay"
+        />
+  </application>
+
+</manifest>

@@ -11,6 +11,11 @@ android {
         version = '0.2.0'
         group = 'com.tbruyelle.rxpermissions'
     }
+
+    sourceSets {
+        main.res.srcDirs 'res', 'res-public'
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -18,8 +23,11 @@ android {
         }
     }
 
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
     testOptions.unitTests.all {
-        // unitTests.returnDefaultValues = true
         // Always show the result of every unit test, even if it passes.
         testLogging {
             events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
