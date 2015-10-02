@@ -136,8 +136,8 @@ public class RxPermissions {
      * The method will find the pending requests and emit the response to the
      * matching observables.
      */
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+    void onRequestPermissionsResult(int requestCode,
+                                    String permissions[], int[] grantResults) {
         for (int i = 0; i < permissions.length; i++) {
             // Find the corresponding subject
             PublishSubject<Boolean> subject = mSubjects.get(permissions[i]);
