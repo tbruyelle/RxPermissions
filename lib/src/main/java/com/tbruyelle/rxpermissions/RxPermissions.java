@@ -29,6 +29,7 @@ import java.util.Map;
 import rx.Observable;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
+import rx.subjects.Subject;
 
 public class RxPermissions {
 
@@ -127,10 +128,16 @@ public class RxPermissions {
         // At the end, the observables are combined to have a unique response.
         for (String permission : permissions) {
             PublishSubject<Permission> subject = mSubjects.get(permission);
-            if (subject == null) {
+            // Create a new subject if not exists OR if completed.
+            // This last case occurs on configuration change, and in that case
+            // we need to recreate a new subject, but without request the permission
+            // again.
+            if (subject == null || subject.hasCompleted()) {
+                if (subject == null) {
+                    unrequestedPermissions.add(permission);
+                }
                 subject = PublishSubject.create();
                 mSubjects.put(permission, subject);
-                unrequestedPermissions.add(permission);
             }
             list.add(subject);
         }
@@ -186,6 +193,14 @@ public class RxPermissions {
             }
         }
         return true;
+    }
+
+    void onDestroy() {
+        // Invoke onCompleted on all registered subjects.
+        // This should unsubscribe the observers.
+        for (Subject subject : mSubjects.values()) {
+            subject.onCompleted();
+        }
     }
 
     void onRequestPermissionsResult(int requestCode,
