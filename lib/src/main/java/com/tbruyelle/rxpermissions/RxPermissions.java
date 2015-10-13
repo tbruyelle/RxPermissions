@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import rx.Observable;
-import rx.functions.Action0;
 import rx.functions.FuncN;
 import rx.subjects.PublishSubject;
 
@@ -96,12 +95,7 @@ public class RxPermissions {
             startShadowActivity(permissions);
         }
 
-        return Observable.combineLatest(list, combineLatestBools.INSTANCE).doOnSubscribe(new Action0() {
-            @Override
-            public void call() {
-
-            }
-        });
+        return Observable.combineLatest(list, combineLatestBools.INSTANCE);
     }
 
     void startShadowActivity(String[] permissions) {
