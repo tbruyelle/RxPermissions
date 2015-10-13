@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p/>
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +15,7 @@
 package com.tbruyelle.rxpermissions;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -53,10 +54,10 @@ public class RxPermissions {
 
     /**
      * Register one or several permission requests and returns an observable.
-     * <p/>
+     * <p>
      * For SDK &lt; 23, the observable will immediatly emit true, otherwise
      * the user response to that request.
-     * <p/>
+     * <p>
      * It handles multiple requests to the same permission, in that case the
      * same observable will be returned.
      */
@@ -98,6 +99,24 @@ public class RxPermissions {
         return Observable.combineLatest(list, combineLatestBools.INSTANCE);
     }
 
+    /**
+     * Invokes Activity.shouldShowRequestPermissionRationale and wraps
+     * the returned value in an observable.
+     * <p>
+     * For SDK &lt; 23, the observable will always emit false.
+     */
+    public Observable<Boolean> shouldShowRequestPermissionRationale(final Activity activity, final String permission) {
+        if (isMarshmallow()) {
+            return shouldShowRequestPermissionRationale_(activity, permission);
+        }
+        return Observable.just(false);
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private Observable<Boolean> shouldShowRequestPermissionRationale_(final Activity activity, final String permission) {
+        return Observable.just(activity.shouldShowRequestPermissionRationale(permission));
+    }
+
     void startShadowActivity(String[] permissions) {
         Intent intent = new Intent(mCtx, ShadowActivity.class);
         intent.putExtra("permissions", permissions);
@@ -107,11 +126,15 @@ public class RxPermissions {
 
     /**
      * Returns true if the permissions is already granted.
-     * <p/>
+     * <p>
      * Always true if SDK &lt; 23.
      */
     public boolean isGranted(String... permissions) {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M || hasPermission_(permissions);
+        return !isMarshmallow() || hasPermission_(permissions);
+    }
+
+    private boolean isMarshmallow() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -126,7 +149,7 @@ public class RxPermissions {
 
     /**
      * Must be invoked in {@code Activity.onRequestPermissionsResult}
-     * <p/>
+     * <p>
      * The method will find the pending requests and emit the response to the
      * matching observables.
      */

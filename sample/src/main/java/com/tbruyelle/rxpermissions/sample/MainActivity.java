@@ -32,7 +32,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void enableCamera(View v) {
-        mRxPermissions.request(Manifest.permission.CAMERA)
+        mRxPermissions.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)
+                .flatMap(should -> {
+                    if (should) {
+                        // User already denied the permission, but didn't
+                        // checked "never ask again".
+                        Toast.makeText(MainActivity.this,
+                                "Please please grant this permission !",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                    return mRxPermissions.request(Manifest.permission.CAMERA);
+                })
                 .subscribe(granted -> {
                     if (granted) {
                         releaseCamera();
