@@ -63,7 +63,7 @@ public class RxPermissions {
      */
     public Observable<Boolean> request(final String... permissions) {
         if (permissions == null || permissions.length == 0) {
-            throw new IllegalArgumentException("RxPermission.request requires at least one input permission");
+            throw new IllegalArgumentException("RxPermissions.request requires at least one input permission");
         }
         if (isGranted(permissions)) {
             // Already granted, or not Android M
@@ -143,7 +143,7 @@ public class RxPermissions {
             PublishSubject<Boolean> subject = mSubjects.get(permissions[i]);
             if (subject == null) {
                 // No subject found
-                throw new IllegalStateException("RxPermission.onRequestPermissionsResult invoked but didn't find the corresponding permission request.");
+                throw new IllegalStateException("RxPermissions.onRequestPermissionsResult invoked but didn't find the corresponding permission request.");
             }
             mSubjects.remove(permissions[i]);
             subject.onNext(grantResults[i] == PackageManager.PERMISSION_GRANTED);
