@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import rx.Observable;
-import rx.functions.FuncN;
+import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
 public class RxPermissions {
@@ -46,16 +46,46 @@ public class RxPermissions {
 
     // Contains all the current permission requests.
     // Once granted or denied, they are removed from it.
-    private Map<String, PublishSubject<Boolean>> mSubjects = new HashMap<>();
+    private Map<String, PublishSubject<Permission>> mSubjects = new HashMap<>();
 
     private RxPermissions() {
 
     }
 
     /**
-     * Register one or several permission requests and returns an observable.
+     * Register one or several permission requests and returns an observable that
+     * emits a {@link Permission} for each requested permission.
      * <p>
-     * For SDK &lt; 23, the observable will immediatly emit true, otherwise
+     * For SDK &lt; 23, the observable will immediately emit true, otherwise
+     * the user response to that request.
+     * <p>
+     * It handles multiple requests to the same permission, in that case the
+     * same observable will be returned.
+     */
+    public Observable<Permission> requestEach(final String... permissions) {
+        if (permissions == null || permissions.length == 0) {
+            throw new IllegalArgumentException("RxPermissions.request requires at least one input permission");
+        }
+        if (isGranted(permissions)) {
+            // Already granted, or not Android M
+            // Map all requested permissions to granted Permission objects.
+            return Observable.from(permissions)
+                    .map(new Func1<String, Permission>() {
+                        @Override
+                        public Permission call(String s) {
+                            return new Permission(s, true);
+                        }
+                    });
+        }
+        return request_(permissions);
+    }
+
+    /**
+     * Register one or several permission requests and returns an observable that
+     * emits an aggregation of the answers. If all  requested permissions were
+     * granted, it emits true, else false.
+     * <p>
+     * For SDK &lt; 23, the observable will immediately emit true, otherwise
      * the user response to that request.
      * <p>
      * It handles multiple requests to the same permission, in that case the
@@ -69,13 +99,25 @@ public class RxPermissions {
             // Already granted, or not Android M
             return Observable.just(true);
         }
-        return request_(permissions);
+        return request_(permissions)
+                .toList()
+                .map(new Func1<List<Permission>, Boolean>() {
+                    @Override
+                    public Boolean call(List<Permission> permissions) {
+                        for (Permission p : permissions) {
+                            if (!p.granted) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                });
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    private Observable<Boolean> request_(final String... permissions) {
+    private Observable<Permission> request_(final String... permissions) {
 
-        List<Observable<Boolean>> list = new ArrayList<>(permissions.length);
+        List<Observable<Permission>> list = new ArrayList<>(permissions.length);
         List<String> unrequestedPermissions = new ArrayList<>();
 
         // In case of multiple permissions, we create a observable for each of them.
@@ -84,7 +126,7 @@ public class RxPermissions {
         // one observable will be create for the CAMERA.
         // At the end, the observables are combined to have a unique response.
         for (String permission : permissions) {
-            PublishSubject<Boolean> subject = mSubjects.get(permission);
+            PublishSubject<Permission> subject = mSubjects.get(permission);
             if (subject == null) {
                 subject = PublishSubject.create();
                 mSubjects.put(permission, subject);
@@ -95,8 +137,7 @@ public class RxPermissions {
         if (!unrequestedPermissions.isEmpty()) {
             startShadowActivity(permissions);
         }
-
-        return Observable.combineLatest(list, combineLatestBools.INSTANCE);
+        return Observable.concat(Observable.from(list));
     }
 
     /**
@@ -147,37 +188,19 @@ public class RxPermissions {
         return true;
     }
 
-    /**
-     * Must be invoked in {@code Activity.onRequestPermissionsResult}
-     * <p>
-     * The method will find the pending requests and emit the response to the
-     * matching observables.
-     */
     void onRequestPermissionsResult(int requestCode,
                                     String permissions[], int[] grantResults) {
-        for (int i = 0; i < permissions.length; i++) {
+        for (int i = 0, size = permissions.length; i < size; i++) {
             // Find the corresponding subject
-            PublishSubject<Boolean> subject = mSubjects.get(permissions[i]);
+            PublishSubject<Permission> subject = mSubjects.get(permissions[i]);
             if (subject == null) {
                 // No subject found
                 throw new IllegalStateException("RxPermissions.onRequestPermissionsResult invoked but didn't find the corresponding permission request.");
             }
             mSubjects.remove(permissions[i]);
-            subject.onNext(grantResults[i] == PackageManager.PERMISSION_GRANTED);
+            boolean granted = grantResults[i] == PackageManager.PERMISSION_GRANTED;
+            subject.onNext(new Permission(permissions[i], granted));
             subject.onCompleted();
-        }
-    }
-
-    private enum combineLatestBools implements FuncN<Boolean> {
-        INSTANCE;
-
-        public Boolean call(Object... args) {
-            for (Object arg : args) {
-                if (!(Boolean) arg) {
-                    return false;
-                }
-            }
-            return true;
         }
     }
 }
