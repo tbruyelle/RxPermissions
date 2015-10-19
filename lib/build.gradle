@@ -7,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2
-        version = '0.2.0'
+        versionCode 3
+        version = '0.3.0'
         group = 'com.tbruyelle.rxpermissions'
     }
     buildTypes {
