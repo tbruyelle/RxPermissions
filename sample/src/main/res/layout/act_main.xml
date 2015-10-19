@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="16dp"
-        android:onClick="enableCamera"
+        android:id="@+id/enableCamera"
         android:text="Enable camera"
         />
 

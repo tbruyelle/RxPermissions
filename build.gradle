@@ -14,13 +14,15 @@ subprojects {
 }
 
 ext {
-    minSdkVersion = 9
+    minSdkVersion = 14
     compileSdkVersion = 23
     targetSdkVersion = compileSdkVersion
     buildToolsVersion = '23.0.1'
 
     rxJava = 'io.reactivex:rxjava:1.0.14'
     appCompat = 'com.android.support:appcompat-v7:23.0.1'
+    supportAppCompat = 'com.android.support:appcompat-v7:23.0.1'
+    supportAnnotations = "com.android.support:support-annotations:23.0.1"
     junit = 'junit:junit:4.12'
     mockito = 'org.mockito:mockito-core:1.10.19'
 }

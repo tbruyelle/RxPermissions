@@ -2,18 +2,20 @@ package com.tbruyelle.rxpermissions.sample;
 
 import android.Manifest;
 import android.hardware.Camera;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.SurfaceView;
-import android.view.View;
 import android.widget.Toast;
 
+import com.jakewharton.rxbinding.view.RxView;
 import com.tbruyelle.rxpermissions.RxPermissions;
+import com.trello.navi.component.AbstractNaviActivity;
+import com.trello.navi.rx.RxNaviActivity;
 
 import java.io.IOException;
 
-public class MainActivity extends AppCompatActivity {
+import rx.Observable;
+
+public class MainActivity extends AbstractNaviActivity {
 
     private static final String TAG = "RxPermissions";
 
@@ -21,47 +23,42 @@ public class MainActivity extends AppCompatActivity {
     private Camera mCamera;
     private SurfaceView mSurfaceView;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public MainActivity() {
+        RxNaviActivity.creating(this).subscribe(b -> {
+            mRxPermissions = RxPermissions.getInstance(this);
 
-        mRxPermissions = RxPermissions.getInstance(this);
+            setContentView(R.layout.act_main);
+            mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView);
 
-        setContentView(R.layout.act_main);
-        mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView);
+            Observable.merge(
+                    RxView.clicks(findViewById(R.id.enableCamera)),
+                    mRxPermissions.pending(Manifest.permission.CAMERA)
+            )
+                    .flatMap(v -> mRxPermissions.request(Manifest.permission.CAMERA))
+                    .takeUntil(RxNaviActivity.destroying(this))
+                    .subscribe(granted -> {
+                                Log.i(TAG, "Received result " + granted);
+                                if (granted) {
+                                    releaseCamera();
+                                    mCamera = Camera.open(0);
+                                    try {
+                                        mCamera.setPreviewDisplay(mSurfaceView.getHolder());
+                                        mCamera.startPreview();
+                                    } catch (IOException e) {
+                                        Log.e(TAG, "Error while trying to display the camera preview", e);
+                                    }
+                                } else {
+                                    Toast.makeText(MainActivity.this,
+                                            "Permission denied, can't enable the camera",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            },
+                            t -> Log.e(TAG, "onError", t),
+                            () -> Log.i(TAG, "OnComplete")
+                    );
+        });
     }
-
-    public void enableCamera(View v) {
-        mRxPermissions.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)
-                .flatMap(should -> {
-                    if (should) {
-                        // User already denied the permission, but didn't
-                        // checked "never ask again".
-                        Toast.makeText(MainActivity.this,
-                                "Please please grant this permission !",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                    return mRxPermissions.request(Manifest.permission.CAMERA);
-                })
-                .subscribe(granted -> {
-                    if (granted) {
-                        releaseCamera();
-                        mCamera = Camera.open(0);
-                        try {
-                            mCamera.setPreviewDisplay(mSurfaceView.getHolder());
-                            mCamera.startPreview();
-                        } catch (IOException e) {
-                            Log.e(TAG, "Error while trying to display the camera preview", e);
-                        }
-                    } else {
-                        Toast.makeText(MainActivity.this,
-                                "Permission denied, can't enable the camera",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
-
+    
     @Override
     protected void onPause() {
         super.onPause();

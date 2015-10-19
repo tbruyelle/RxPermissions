@@ -41,6 +41,8 @@ repositories {
 
 dependencies {
     compile project(':lib')
+    compile project(':navi')
 
     compile rootProject.ext.appCompat
+    compile 'com.jakewharton.rxbinding:rxbinding:0.2.0'
 }

@@ -31,6 +31,8 @@ import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 import rx.subjects.Subject;
 
+import static rx.Observable.just;
+
 public class RxPermissions {
 
     private static RxPermissions sSingleton;
@@ -98,7 +100,7 @@ public class RxPermissions {
         }
         if (isGranted(permissions)) {
             // Already granted, or not Android M
-            return Observable.just(true);
+            return just(true);
         }
         return request_(permissions)
                 .toList()
@@ -113,6 +115,13 @@ public class RxPermissions {
                         return true;
                     }
                 });
+    }
+
+    public Observable<Void> pending(final String permission) {
+        if (mSubjects.containsKey(permission)) {
+            return Observable.just(null);
+        }
+        return Observable.empty();
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -197,7 +206,7 @@ public class RxPermissions {
 
     void onDestroy() {
         // Invoke onCompleted on all registered subjects.
-        // This should unsubscribe the observers.
+        // This should un-subscribe the observers.
         for (Subject subject : mSubjects.values()) {
             subject.onCompleted();
         }
