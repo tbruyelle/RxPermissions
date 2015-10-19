@@ -22,7 +22,8 @@ If multiple permissions at the same time, the result is combined :
 
 ```java
  RxPermissions.getInstance(this) // this = a Context
-                .request(Manifest.permission.CAMERA, Manifest.permission.READ_PHONE_STATE)
+                .request(Manifest.permission.CAMERA,
+                         Manifest.permission.READ_PHONE_STATE)
                 .subscribe(granted -> {
                     if (granted) {
                        // All requested permissions are granted
@@ -36,7 +37,8 @@ You can also observe a detailed result with `requestEach` :
 
 ```java
  RxPermissions.getInstance(this) // this = a Context
-                .requestEach(Manifest.permission.CAMERA, Manifest.permission.READ_PHONE_STATE)
+                .requestEach(Manifest.permission.CAMERA,
+                             Manifest.permission.READ_PHONE_STATE)
                 .subscribe(permission -> { // will emit 2 Permission objects
                     if (permission.granted) {
                        // `permission.name` is granted !
