@@ -98,17 +98,26 @@ public class RxPermissions {
         if (permissions == null || permissions.length == 0) {
             throw new IllegalArgumentException("RxPermissions.request requires at least one input permission");
         }
-        if (isGranted(permissions)) {
-            // Already granted, or not Android M
-            return just(true);
-        }
 
         return Observable.merge(trigger, pending(permissions[0]))
                 .flatMap(new Func1() {
                     @Override
                     public Observable<Boolean> call(Object o) {
+                        if (isGranted(permissions)) {
+                            // Already granted, or not Android M
+                            return just(true);
+                        }
                         return request_(permissions)
                                 .toList()
+                                .flatMap(new Func1<List<Permission>, Observable<List<Permission>>>() {
+                                    @Override
+                                    public Observable<List<Permission>> call(List<Permission> permissions) {
+                                        if (permissions.isEmpty()) {
+                                            return Observable.empty();
+                                        }
+                                        return Observable.just(permissions);
+                                    }
+                                })
                                 .map(new Func1<List<Permission>, Boolean>() {
                                     @Override
                                     public Boolean call(List<Permission> permissions) {
