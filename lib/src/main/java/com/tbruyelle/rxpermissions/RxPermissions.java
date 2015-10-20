@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
+import java.io.ObjectStreamClass;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,21 +67,43 @@ public class RxPermissions {
      * same observable will be returned.
      */
     public Observable<Permission> requestEach(final String... permissions) {
+        return requestEach(Observable.just(null), permissions);
+    }
+
+    /**
+     * Register one or several permission requests and returns an observable that
+     * emits a {@link Permission} for each requested permission.
+     * <p>
+     * The request is only executed when the `trigger` observable emits something.
+     * <p>
+     * For SDK &lt; 23, the observable will immediately emit true, otherwise
+     * the user response to that request.
+     * <p>
+     * It handles multiple requests to the same permission, in that case the
+     * same observable will be returned.
+     */
+    public Observable<Permission> requestEach(final Observable<Object> trigger, final String... permissions) {
         if (permissions == null || permissions.length == 0) {
             throw new IllegalArgumentException("RxPermissions.request requires at least one input permission");
         }
-        if (isGranted(permissions)) {
-            // Already granted, or not Android M
-            // Map all requested permissions to granted Permission objects.
-            return Observable.from(permissions)
-                    .map(new Func1<String, Permission>() {
-                        @Override
-                        public Permission call(String s) {
-                            return new Permission(s, true);
+        return Observable.merge(trigger, pending(permissions))
+                .flatMap(new Func1<Object, Observable<Permission>>() {
+                    @Override
+                    public Observable<Permission> call(Object o) {
+                        if (isGranted(permissions)) {
+                            // Already granted, or not Android M
+                            // Map all requested permissions to granted Permission objects.
+                            return Observable.from(permissions)
+                                    .map(new Func1<String, Permission>() {
+                                        @Override
+                                        public Permission call(String s) {
+                                            return new Permission(s, true);
+                                        }
+                                    });
                         }
-                    });
-        }
-        return request_(permissions);
+                        return request_(permissions);
+                    }
+                });
     }
 
     /**
@@ -94,13 +117,29 @@ public class RxPermissions {
      * It handles multiple requests to the same permission, in that case the
      * same observable will be returned.
      */
+    public Observable<Boolean> request(final String... permissions) {
+        return request(Observable.just(null), permissions);
+    }
+
+    /**
+     * Register one or several permission requests and returns an observable that
+     * emits an aggregation of the answers. If all  requested permissions were
+     * granted, it emits true, else false.
+     * <p>
+     * The request is only executed when the `trigger` observable emits something.
+     * <p>
+     * For SDK &lt; 23, the observable will immediately emit true, otherwise
+     * the user response to that request.
+     * <p>
+     * It handles multiple requests to the same permission, in that case the
+     * same observable will be returned.
+     */
     public Observable<Boolean> request(final Observable<Object> trigger, final String... permissions) {
         if (permissions == null || permissions.length == 0) {
             throw new IllegalArgumentException("RxPermissions.request requires at least one input permission");
         }
 
         return Observable.merge(trigger, pending(permissions))
-
                 .flatMap(new Func1<Object, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> call(Object o) {

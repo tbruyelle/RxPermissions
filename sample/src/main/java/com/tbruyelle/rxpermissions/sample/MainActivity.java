@@ -13,6 +13,8 @@ import com.tbruyelle.rxpermissions.RxPermissions;
 
 import java.io.IOException;
 
+import rx.Observable;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "RxPermissions";
@@ -30,8 +32,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.act_main);
         mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView);
 
+        // If the permission request is triggered by a particular event
+        // (a click for instance) we need to pass that information threw
+        // an Observable.
+        // com.jakewharton.rxbinding.view.RxView does exactly what we need.
+        Observable<Object> trigger = RxView.clicks(findViewById(R.id.enableCamera));
+
         mRxPermissions
-                .request(RxView.clicks(findViewById(R.id.enableCamera)), Manifest.permission.CAMERA)
+                .request(trigger, Manifest.permission.CAMERA)
                 .subscribe(granted -> {
                             Log.i(TAG, "Received result " + granted);
                             if (granted) {
