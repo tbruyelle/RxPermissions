@@ -94,7 +94,7 @@ public class RxPermissions {
      * It handles multiple requests to the same permission, in that case the
      * same observable will be returned.
      */
-    public Observable<Boolean> request(final String... permissions) {
+    public Observable<Boolean> request(final Observable trigger, final String... permissions) {
         if (permissions == null || permissions.length == 0) {
             throw new IllegalArgumentException("RxPermissions.request requires at least one input permission");
         }
@@ -102,22 +102,29 @@ public class RxPermissions {
             // Already granted, or not Android M
             return just(true);
         }
-        return request_(permissions)
-                .toList()
-                .map(new Func1<List<Permission>, Boolean>() {
+
+        return Observable.merge(trigger, pending(permissions[0]))
+                .flatMap(new Func1() {
                     @Override
-                    public Boolean call(List<Permission> permissions) {
-                        for (Permission p : permissions) {
-                            if (!p.granted) {
-                                return false;
-                            }
-                        }
-                        return true;
+                    public Observable<Boolean> call(Object o) {
+                        return request_(permissions)
+                                .toList()
+                                .map(new Func1<List<Permission>, Boolean>() {
+                                    @Override
+                                    public Boolean call(List<Permission> permissions) {
+                                        for (Permission p : permissions) {
+                                            if (!p.granted) {
+                                                return false;
+                                            }
+                                        }
+                                        return true;
+                                    }
+                                });
                     }
                 });
     }
 
-    public Observable<Void> pending(final String permission) {
+    private Observable<Void> pending(final String permission) {
         if (mSubjects.containsKey(permission)) {
             return Observable.just(null);
         }

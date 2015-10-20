@@ -13,8 +13,6 @@ import com.trello.navi.rx.RxNaviActivity;
 
 import java.io.IOException;
 
-import rx.Observable;
-
 public class MainActivity extends AbstractNaviActivity {
 
     private static final String TAG = "RxPermissions";
@@ -30,11 +28,8 @@ public class MainActivity extends AbstractNaviActivity {
             setContentView(R.layout.act_main);
             mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView);
 
-            Observable.merge(
-                    RxView.clicks(findViewById(R.id.enableCamera)),
-                    mRxPermissions.pending(Manifest.permission.CAMERA)
-            )
-                    .flatMap(v -> mRxPermissions.request(Manifest.permission.CAMERA))
+            mRxPermissions
+                    .request(RxView.clicks(findViewById(R.id.enableCamera)), Manifest.permission.CAMERA)
                     .takeUntil(RxNaviActivity.destroying(this))
                     .subscribe(granted -> {
                                 Log.i(TAG, "Received result " + granted);
@@ -58,7 +53,7 @@ public class MainActivity extends AbstractNaviActivity {
                     );
         });
     }
-    
+
     @Override
     protected void onPause() {
         super.onPause();
