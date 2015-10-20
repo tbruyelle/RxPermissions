@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import rx.Observable;
 import rx.functions.Func1;
@@ -94,13 +95,14 @@ public class RxPermissions {
      * It handles multiple requests to the same permission, in that case the
      * same observable will be returned.
      */
-    public Observable<Boolean> request(final Observable trigger, final String... permissions) {
+    public Observable<Boolean> request(final Observable<Object> trigger, final String... permissions) {
         if (permissions == null || permissions.length == 0) {
             throw new IllegalArgumentException("RxPermissions.request requires at least one input permission");
         }
 
         return Observable.merge(trigger, pending(permissions[0]))
-                .flatMap(new Func1() {
+
+                .flatMap(new Func1<Object, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> call(Object o) {
                         if (isGranted(permissions)) {
@@ -109,31 +111,29 @@ public class RxPermissions {
                         }
                         return request_(permissions)
                                 .toList()
-                                .flatMap(new Func1<List<Permission>, Observable<List<Permission>>>() {
+                                .flatMap(new Func1<List<Permission>, Observable<Boolean>>() {
                                     @Override
-                                    public Observable<List<Permission>> call(List<Permission> permissions) {
+                                    public Observable<Boolean> call(List<Permission> permissions) {
                                         if (permissions.isEmpty()) {
+                                            // Occurs during orientation change, when the subject receives onComplete.
+                                            // In that case we don't want to propagate that empty list to the
+                                            // subscriber, only the onComplete.
                                             return Observable.empty();
                                         }
-                                        return Observable.just(permissions);
-                                    }
-                                })
-                                .map(new Func1<List<Permission>, Boolean>() {
-                                    @Override
-                                    public Boolean call(List<Permission> permissions) {
+                                        // Return true if all permissions are granted.
                                         for (Permission p : permissions) {
                                             if (!p.granted) {
-                                                return false;
+                                                return Observable.just(false);
                                             }
                                         }
-                                        return true;
+                                        return Observable.just(true);
                                     }
                                 });
                     }
                 });
     }
 
-    private Observable<Void> pending(final String permission) {
+    private Observable<Object> pending(final String permission) {
         if (mSubjects.containsKey(permission)) {
             return Observable.just(null);
         }
