@@ -1,3 +1,2 @@
 include 'lib'
-include 'navi'
 include 'sample'
