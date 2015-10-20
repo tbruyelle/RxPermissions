@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import rx.Observable;
 import rx.functions.Func1;
@@ -100,7 +99,7 @@ public class RxPermissions {
             throw new IllegalArgumentException("RxPermissions.request requires at least one input permission");
         }
 
-        return Observable.merge(trigger, pending(permissions[0]))
+        return Observable.merge(trigger, pending(permissions))
 
                 .flatMap(new Func1<Object, Observable<Boolean>>() {
                     @Override
@@ -133,11 +132,13 @@ public class RxPermissions {
                 });
     }
 
-    private Observable<Object> pending(final String permission) {
-        if (mSubjects.containsKey(permission)) {
-            return Observable.just(null);
+    private Observable<Object> pending(final String... permissions) {
+        for (String p : permissions) {
+            if (!mSubjects.containsKey(p)) {
+                return Observable.empty();
+            }
         }
-        return Observable.empty();
+        return Observable.just(null);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
