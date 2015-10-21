@@ -506,4 +506,38 @@ public class RxPermissionsTest {
         ps.add(new Permission(permissions[1], true));
         sub2.assertReceivedOnNext(ps);
     }
+
+    @Test
+    @TargetApi(Build.VERSION_CODES.M)
+    public void severalSubscription_afterDestroy() {
+        TestSubscriber<Boolean> sub1 = new TestSubscriber<>();
+        TestSubscriber<Boolean> sub2 = new TestSubscriber<>();
+        String permission = Manifest.permission.READ_PHONE_STATE;
+        when(mRxPermissions.isGranted(permission)).thenReturn(false);
+        int[] result = new int[]{PackageManager.PERMISSION_GRANTED};
+
+        mRxPermissions.request(permission).subscribe(sub1);
+        mRxPermissions.request(permission).subscribe(sub2);
+        mRxPermissions.onDestroy();
+        for (TestSubscriber sub : new TestSubscriber[]{sub1, sub2}) {
+            sub.assertNoErrors();
+            sub.assertTerminalEvent();
+            sub.assertUnsubscribed();
+            sub.assertNoValues();
+        }
+
+        sub1 = new TestSubscriber<>();
+        sub2 = new TestSubscriber<>();
+        mRxPermissions.request(permission).subscribe(sub1);
+        mRxPermissions.request(permission).subscribe(sub2);
+        mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
+
+        verify(mRxPermissions).startShadowActivity(any(String[].class));
+        for (TestSubscriber sub : new TestSubscriber[]{sub1, sub2}) {
+            sub.assertNoErrors();
+            sub.assertTerminalEvent();
+            sub.assertUnsubscribed();
+            sub.assertReceivedOnNext(singletonList(true));
+        }
+    }
 }

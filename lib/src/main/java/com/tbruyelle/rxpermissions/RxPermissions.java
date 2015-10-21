@@ -85,7 +85,7 @@ public class RxPermissions {
         if (permissions == null || permissions.length == 0) {
             throw new IllegalArgumentException("RxPermissions.request requires at least one input permission");
         }
-        return Observable.merge(trigger, pending(permissions))
+        return oneOf(trigger, pending(permissions))
                 .flatMap(new Func1<Object, Observable<Permission>>() {
                     @Override
                     public Observable<Permission> call(Object o) {
@@ -138,7 +138,7 @@ public class RxPermissions {
             throw new IllegalArgumentException("RxPermissions.request requires at least one input permission");
         }
 
-        return Observable.merge(trigger, pending(permissions))
+        return oneOf(trigger, pending(permissions))
                 .flatMap(new Func1<Object, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> call(Object o) {
@@ -170,13 +170,23 @@ public class RxPermissions {
                 });
     }
 
+    /**
+     * Returns an empty observable is there is no pending permission
+     * request.
+     * Else returns a one-item observable.
+     */
     private Observable<Object> pending(final String... permissions) {
         for (String p : permissions) {
-            if (!mSubjects.containsKey(p)) {
+            Subject s = mSubjects.get(p);
+            if (s == null || !s.hasCompleted()) {
                 return Observable.empty();
             }
         }
         return Observable.just(null);
+    }
+
+    private Observable<Object> oneOf(Observable<Object> o1, Observable<Object> o2) {
+        return Observable.merge(o1, o2).take(1);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
