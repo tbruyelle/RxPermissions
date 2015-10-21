@@ -31,8 +31,6 @@ import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 import rx.subjects.Subject;
 
-import static rx.Observable.just;
-
 public class RxPermissions {
 
     private static RxPermissions sSingleton;
@@ -83,23 +81,12 @@ public class RxPermissions {
      */
     public Observable<Permission> requestEach(final Observable<Object> trigger, final String... permissions) {
         if (permissions == null || permissions.length == 0) {
-            throw new IllegalArgumentException("RxPermissions.request requires at least one input permission");
+            throw new IllegalArgumentException("RxPermissions.request/requestEach requires at least one input permission");
         }
         return oneOf(trigger, pending(permissions))
                 .flatMap(new Func1<Object, Observable<Permission>>() {
                     @Override
                     public Observable<Permission> call(Object o) {
-                        if (isGranted(permissions)) {
-                            // Already granted, or not Android M
-                            // Map all requested permissions to granted Permission objects.
-                            return Observable.from(permissions)
-                                    .map(new Func1<String, Permission>() {
-                                        @Override
-                                        public Permission call(String s) {
-                                            return new Permission(s, true);
-                                        }
-                                    });
-                        }
                         return request_(permissions);
                     }
                 });
@@ -134,38 +121,25 @@ public class RxPermissions {
      * same observable will be returned.
      */
     public Observable<Boolean> request(final Observable<Object> trigger, final String... permissions) {
-        if (permissions == null || permissions.length == 0) {
-            throw new IllegalArgumentException("RxPermissions.request requires at least one input permission");
-        }
-
-        return oneOf(trigger, pending(permissions))
-                .flatMap(new Func1<Object, Observable<Boolean>>() {
+        return requestEach(trigger, permissions)
+                // Transform Observable<Permission> to Observable<Boolean>
+                .toList()
+                .flatMap(new Func1<List<Permission>, Observable<Boolean>>() {
                     @Override
-                    public Observable<Boolean> call(Object o) {
-                        if (isGranted(permissions)) {
-                            // Already granted, or not Android M
-                            return just(true);
+                    public Observable<Boolean> call(List<Permission> permissions) {
+                        if (permissions.isEmpty()) {
+                            // Occurs during orientation change, when the subject receives onComplete.
+                            // In that case we don't want to propagate that empty list to the
+                            // subscriber, only the onComplete.
+                            return Observable.empty();
                         }
-                        return request_(permissions)
-                                .toList()
-                                .flatMap(new Func1<List<Permission>, Observable<Boolean>>() {
-                                    @Override
-                                    public Observable<Boolean> call(List<Permission> permissions) {
-                                        if (permissions.isEmpty()) {
-                                            // Occurs during orientation change, when the subject receives onComplete.
-                                            // In that case we don't want to propagate that empty list to the
-                                            // subscriber, only the onComplete.
-                                            return Observable.empty();
-                                        }
-                                        // Return true if all permissions are granted.
-                                        for (Permission p : permissions) {
-                                            if (!p.granted) {
-                                                return Observable.just(false);
-                                            }
-                                        }
-                                        return Observable.just(true);
-                                    }
-                                });
+                        // Return true if all permissions are granted.
+                        for (Permission p : permissions) {
+                            if (!p.granted) {
+                                return Observable.just(false);
+                            }
+                        }
+                        return Observable.just(true);
                     }
                 });
     }
@@ -191,6 +165,17 @@ public class RxPermissions {
 
     @TargetApi(Build.VERSION_CODES.M)
     private Observable<Permission> request_(final String... permissions) {
+        if (isGranted(permissions)) {
+            // Already granted, or not Android M
+            // Map all requested permissions to granted Permission objects.
+            return Observable.from(permissions)
+                    .map(new Func1<String, Permission>() {
+                        @Override
+                        public Permission call(String s) {
+                            return new Permission(s, true);
+                        }
+                    });
+        }
 
         List<Observable<Permission>> list = new ArrayList<>(permissions.length);
         List<String> unrequestedPermissions = new ArrayList<>();
