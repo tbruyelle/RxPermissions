@@ -5,17 +5,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 
 @TargetApi(Build.VERSION_CODES.M)
 public class ShadowActivity extends Activity {
 
-    private static final String TAG = "ShadowActivity";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(TAG, "onCreate");
         if (savedInstanceState == null) {
             handleIntent(getIntent());
         }
@@ -23,7 +19,6 @@ public class ShadowActivity extends Activity {
 
     @Override
     protected void onNewIntent(Intent intent) {
-        Log.i(TAG, "onNewIntent");
         handleIntent(intent);
     }
 
@@ -35,13 +30,11 @@ public class ShadowActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.i(TAG, "onDestroy");
         RxPermissions.getInstance(this).onDestroy();
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        Log.i(TAG, "onRequestPermissionsResult");
         RxPermissions.getInstance(this).onRequestPermissionsResult(requestCode, permissions, grantResults);
         finish();
     }
