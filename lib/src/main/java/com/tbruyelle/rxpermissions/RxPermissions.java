@@ -21,7 +21,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
-import java.io.ObjectStreamClass;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
