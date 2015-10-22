@@ -79,7 +79,7 @@ public class RxPermissions {
      * It handles multiple requests to the same permission, in that case the
      * same observable will be returned.
      */
-    public Observable<Permission> requestEach(final Observable<Object> trigger, final String... permissions) {
+    public Observable<Permission> requestEach(final Observable<?> trigger, final String... permissions) {
         if (permissions == null || permissions.length == 0) {
             throw new IllegalArgumentException("RxPermissions.request/requestEach requires at least one input permission");
         }
@@ -120,7 +120,7 @@ public class RxPermissions {
      * It handles multiple requests to the same permission, in that case the
      * same observable will be returned.
      */
-    public Observable<Boolean> request(final Observable<Object> trigger, final String... permissions) {
+    public Observable<Boolean> request(final Observable<?> trigger, final String... permissions) {
         return requestEach(trigger, permissions)
                 // Transform Observable<Permission> to Observable<Boolean>
                 .toList()
@@ -149,7 +149,7 @@ public class RxPermissions {
      * request.
      * Else returns a one-item observable.
      */
-    private Observable<Object> pending(final String... permissions) {
+    private Observable<?> pending(final String... permissions) {
         for (String p : permissions) {
             Subject s = mSubjects.get(p);
             if (s == null || !s.hasCompleted()) {
@@ -159,7 +159,7 @@ public class RxPermissions {
         return Observable.just(null);
     }
 
-    private Observable<Object> oneOf(Observable<Object> o1, Observable<Object> o2) {
+    private Observable<Object> oneOf(Observable<?> o1, Observable<?> o2) {
         return Observable.merge(o1, o2).take(1);
     }
 
