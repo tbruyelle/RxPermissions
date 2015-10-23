@@ -160,7 +160,7 @@ public class RxPermissions {
     }
 
     private Observable<Object> oneOf(Observable<?> o1, Observable<?> o2) {
-        return Observable.merge(o1, o2).take(1);
+        return Observable.merge(o1, o2);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
