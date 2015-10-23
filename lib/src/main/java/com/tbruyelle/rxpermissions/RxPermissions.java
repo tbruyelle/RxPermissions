@@ -200,8 +200,9 @@ public class RxPermissions {
             }
             list.add(subject);
         }
+
         if (!unrequestedPermissions.isEmpty()) {
-            startShadowActivity(permissions);
+            startShadowActivity(unrequestedPermissions.toArray(new String[]{}));
         }
         return Observable.concat(Observable.from(list));
     }
