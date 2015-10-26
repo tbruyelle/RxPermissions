@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,11 +29,13 @@ import java.util.Map;
 
 import rx.Observable;
 import rx.functions.Func1;
+import rx.functions.FuncN;
 import rx.subjects.PublishSubject;
 import rx.subjects.Subject;
 
 public class RxPermissions {
 
+    public static final String TAG = "RxPermissions";
     private static RxPermissions sSingleton;
 
     public static RxPermissions getInstance(Context ctx) {
@@ -48,9 +51,20 @@ public class RxPermissions {
     // Contains all the current permission requests.
     // Once granted or denied, they are removed from it.
     private Map<String, PublishSubject<Permission>> mSubjects = new HashMap<>();
+    private boolean mLogging;
 
     private RxPermissions() {
 
+    }
+
+    public void setLogging(boolean logging) {
+        mLogging = logging;
+    }
+
+    private void log(String message) {
+        if (mLogging) {
+            Log.d(TAG, message);
+        }
     }
 
     /**
@@ -226,6 +240,7 @@ public class RxPermissions {
     }
 
     void startShadowActivity(String[] permissions) {
+        log("startShadowActivity " + permissions);
         Intent intent = new Intent(mCtx, ShadowActivity.class);
         intent.putExtra("permissions", permissions);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -266,6 +281,7 @@ public class RxPermissions {
     void onRequestPermissionsResult(int requestCode,
                                     String permissions[], int[] grantResults) {
         for (int i = 0, size = permissions.length; i < size; i++) {
+            log("onRequestPermissionsResult  " + permissions[i]);
             // Find the corresponding subject
             PublishSubject<Permission> subject = mSubjects.get(permissions[i]);
             if (subject == null) {
