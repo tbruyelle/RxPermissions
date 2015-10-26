@@ -77,7 +77,7 @@ public class RxPermissions {
      * same observable will be returned.
      */
     public Observable<Permission> requestEach(final String... permissions) {
-        return requestEach(Observable.just(null), permissions);
+        return requestEach(null, permissions);
     }
 
     /**
@@ -117,7 +117,7 @@ public class RxPermissions {
      * same observable will be returned.
      */
     public Observable<Boolean> request(final String... permissions) {
-        return request(Observable.just(null), permissions);
+        return request(null, permissions);
     }
 
     /**
@@ -172,8 +172,11 @@ public class RxPermissions {
         return Observable.just(null);
     }
 
-    private Observable<Object> oneOf(Observable<?> o1, Observable<?> o2) {
-        return Observable.merge(o1, o2);
+    private Observable<Object> oneOf(Observable<?> trigger, Observable<?> pending) {
+        if (trigger == null) {
+            return Observable.just(null);
+        }
+        return Observable.merge(trigger, pending);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
