@@ -29,7 +29,6 @@ import java.util.Map;
 
 import rx.Observable;
 import rx.functions.Func1;
-import rx.functions.FuncN;
 import rx.subjects.PublishSubject;
 import rx.subjects.Subject;
 
@@ -137,7 +136,7 @@ public class RxPermissions {
     public Observable<Boolean> request(final Observable<?> trigger, final String... permissions) {
         return requestEach(trigger, permissions)
                 // Transform Observable<Permission> to Observable<Boolean>
-                .toList()
+                .buffer(permissions.length)
                 .flatMap(new Func1<List<Permission>, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> call(List<Permission> permissions) {
