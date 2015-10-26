@@ -17,7 +17,7 @@ import rx.Observable;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = "RxPermissions";
+    private static final String TAG = "RxPermissionsSample";
 
     private RxPermissions mRxPermissions;
     private Camera mCamera;
@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         mRxPermissions = RxPermissions.getInstance(this);
+        mRxPermissions.setLogging(true);
 
         setContentView(R.layout.act_main);
         mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView);

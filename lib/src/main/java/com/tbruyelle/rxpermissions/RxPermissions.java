@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -39,8 +40,7 @@ public class RxPermissions {
 
     public static RxPermissions getInstance(Context ctx) {
         if (sSingleton == null) {
-            sSingleton = new RxPermissions();
-            sSingleton.mCtx = ctx.getApplicationContext();
+            sSingleton = new RxPermissions(ctx.getApplicationContext());
         }
         return sSingleton;
     }
@@ -52,8 +52,8 @@ public class RxPermissions {
     private Map<String, PublishSubject<Permission>> mSubjects = new HashMap<>();
     private boolean mLogging;
 
-    private RxPermissions() {
-
+    RxPermissions(Context ctx) {
+        mCtx = ctx;
     }
 
     public void setLogging(boolean logging) {
@@ -181,7 +181,13 @@ public class RxPermissions {
 
     @TargetApi(Build.VERSION_CODES.M)
     private Observable<Permission> request_(final String... permissions) {
+        if (mLogging) {
+            log("Requesting permissions " + TextUtils.join(", ", permissions));
+        }
         if (isGranted(permissions)) {
+            if (mLogging) {
+                log("GRANTED " + TextUtils.join(", ", permissions));
+            }
             // Already granted, or not Android M
             // Map all requested permissions to granted Permission objects.
             return Observable.from(permissions)
@@ -242,7 +248,7 @@ public class RxPermissions {
     }
 
     void startShadowActivity(String[] permissions) {
-        log("startShadowActivity " + permissions);
+        log("startShadowActivity " + TextUtils.join(", ", permissions));
         Intent intent = new Intent(mCtx, ShadowActivity.class);
         intent.putExtra("permissions", permissions);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -273,6 +279,7 @@ public class RxPermissions {
     }
 
     void onDestroy() {
+        log("onDestroy");
         // Invoke onCompleted on all registered subjects.
         // This should un-subscribe the observers.
         for (Subject subject : mSubjects.values()) {
