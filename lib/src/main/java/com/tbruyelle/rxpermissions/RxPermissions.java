@@ -233,18 +233,27 @@ public class RxPermissions {
      * Invokes Activity.shouldShowRequestPermissionRationale and wraps
      * the returned value in an observable.
      * <p>
+     * In case of multiple permissions, only emits true if
+     * Activity.shouldShowRequestPermissionRationale returned true for
+     * all permissions.
+     * <p>
      * For SDK &lt; 23, the observable will always emit false.
      */
-    public Observable<Boolean> shouldShowRequestPermissionRationale(final Activity activity, final String permission) {
+    public Observable<Boolean> shouldShowRequestPermissionRationale(final Activity activity, final String... permissions) {
         if (isMarshmallow()) {
-            return shouldShowRequestPermissionRationale_(activity, permission);
+            return Observable.just(shouldShowRequestPermissionRationale_(activity, permissions));
         }
         return Observable.just(false);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    private Observable<Boolean> shouldShowRequestPermissionRationale_(final Activity activity, final String permission) {
-        return Observable.just(activity.shouldShowRequestPermissionRationale(permission));
+    private boolean shouldShowRequestPermissionRationale_(final Activity activity, final String... permissions) {
+        for (String p : permissions) {
+            if (!activity.shouldShowRequestPermissionRationale(p)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     void startShadowActivity(String[] permissions) {
@@ -264,7 +273,7 @@ public class RxPermissions {
         return !isMarshmallow() || hasPermission_(permissions);
     }
 
-    private boolean isMarshmallow() {
+    boolean isMarshmallow() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
     }
 

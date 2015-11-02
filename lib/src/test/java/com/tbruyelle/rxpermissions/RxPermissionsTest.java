@@ -16,6 +16,7 @@ package com.tbruyelle.rxpermissions;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -27,14 +28,17 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import rx.observers.TestSubscriber;
 import rx.subjects.PublishSubject;
 
 import static java.util.Collections.singletonList;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -691,5 +695,37 @@ public class RxPermissionsTest {
         // to receive the result.
         // A solution would be to remove concurrent access code, inform the user to only use
         // one permission at a time or suggest to use share() on the received observable.
+    }
+
+    @Test
+    @TargetApi(Build.VERSION_CODES.M)
+    public void shouldShowRequestPermissionRationale() {
+        when(mRxPermissions.isMarshmallow()).thenReturn(true);
+        Activity activity = mock(Activity.class);
+        when(activity.shouldShowRequestPermissionRationale(anyString())).thenReturn(true);
+
+        TestSubscriber<Boolean> sub = new TestSubscriber<>();
+        mRxPermissions.shouldShowRequestPermissionRationale(activity, new String[]{"p1", "p2"})
+                .subscribe(sub);
+
+        sub.assertCompleted();
+        sub.assertNoErrors();
+        sub.assertReceivedOnNext(Collections.singletonList(true));
+    }
+
+    @Test
+    @TargetApi(Build.VERSION_CODES.M)
+    public void shouldShowRequestPermissionRationale_oneFalse() {
+        when(mRxPermissions.isMarshmallow()).thenReturn(true);
+        Activity activity = mock(Activity.class);
+        when(activity.shouldShowRequestPermissionRationale("p1")).thenReturn(true);
+
+        TestSubscriber<Boolean> sub = new TestSubscriber<>();
+        mRxPermissions.shouldShowRequestPermissionRationale(activity, new String[]{"p1", "p2"})
+                .subscribe(sub);
+
+        sub.assertCompleted();
+        sub.assertNoErrors();
+        sub.assertReceivedOnNext(Collections.singletonList(false));
     }
 }
