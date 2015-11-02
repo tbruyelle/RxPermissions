@@ -77,6 +77,7 @@ protected void onCreate(Bundle savedInstanceState) {
     Observable<Object> trigger = RxView.clicks(findViewById(R.id.enableCamera));
 
     RxPermissions.getInstance(this)
+        // The trigger is passed as first arg
         .request(trigger, Manifest.permission.CAMERA)
         .subscribe(granted -> {
             // R.id.enableCamera has been clicked
