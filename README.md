@@ -48,12 +48,42 @@ You can also observe a detailed result with `requestEach` :
 
 Look at the `sample` app for more.
 
+## Important read
+
+**Because your app may be restarted during the permission request, the request must be done 
+during an initialization phase**. This may be `Activity.onCreate/onResume`, or `View.onFinishInflate` or others.
+
+If not, and if your app is restarted during the permission request (because of a configuration change for instance),
+the user's answer will never be emitted to the subscriber.
+
+If you need to trigger the permission request from a specific event and not during initialization phase, you have
+to pass an extra parameter to the library methods, the trigger.
+The trigger must be an `Observable`, you can use  [JakeWharton/RxBinding](https://github.com/JakeWharton/RxBinding)
+to turn your view to an observable (not included in the library).
+
+Example :
+
+```java
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+
+    Observable<Object> trigger = RxView.clicks(findViewById(R.id.enableCamera));
+
+    RxPermissions.getInstance(this)
+        .request(trigger, Manifest.permission.CAMERA)
+        .subscribe(granted -> {
+            // R.id.enableCamera has been clicked
+            // or the app has been restarted during the permission request.
+        });
+}
+```
+
+
 ## Status
 
 **This library is at a very early stage of development, so contributions are welcome.
 It should not be used in production, or at your own risk.**
-
-The first improvement needed is lifecycle management (see [#3](https://github.com/tbruyelle/RxPermissions/issues/3)). I need some help to find and design a well shaped solution.
 
 ## Benefits
 
@@ -65,8 +95,6 @@ Currently without this library you have to request the permission in one place a
 - Handles multiple permission requests out of the box.
 For instance if during the initialization of your app you request the same permission in 2 different places, only one request will
 be made to the framework. As a result, only one popup will appear to the user, but his response will be dispatched to all requesters.
-
-- Easy testing.
 
 - All what RX provides about transformation, filter, chaining...
 
@@ -80,6 +108,6 @@ repositories {
 }
 
 dependencies {
-    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.3.0@aar'
+    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.4.1@aar'
 }
 ```
