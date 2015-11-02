@@ -7,43 +7,49 @@ This library allows the usage of RxJava with the new Android M permission model.
 Example (With Retrolambda for brevity, but not required):
 
 ```java
- RxPermissions.getInstance(this) // this = a Context
-                .request(Manifest.permission.CAMERA)
-                .subscribe(granted -> {
-                    if (granted) { // Always true pre-M
-                       // I can control the camera now
-                    } else {
-                       // Oups permission denied
-                    }
-                });
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+
+    // Must be done during an initialization phase like onCreate
+    RxPermissions.getInstance(this)
+        .request(Manifest.permission.CAMERA)
+        .subscribe(granted -> {
+            if (granted) { // Always true pre-M
+               // I can control the camera now
+            } else {
+               // Oups permission denied
+            }
+        });
+}
 ```
 
 If multiple permissions at the same time, the result is combined :
 
 ```java
- RxPermissions.getInstance(this) // this = a Context
-                .request(Manifest.permission.CAMERA,
-                         Manifest.permission.READ_PHONE_STATE)
-                .subscribe(granted -> {
-                    if (granted) {
-                       // All requested permissions are granted
-                    } else {
-                       // At least one permission is denied
-                    }
-                });
+RxPermissions.getInstance(this)
+    .request(Manifest.permission.CAMERA,
+             Manifest.permission.READ_PHONE_STATE)
+    .subscribe(granted -> {
+        if (granted) {
+           // All requested permissions are granted
+        } else {
+           // At least one permission is denied
+        }
+    });
 ```
 
 You can also observe a detailed result with `requestEach` :
 
 ```java
- RxPermissions.getInstance(this) // this = a Context
-                .requestEach(Manifest.permission.CAMERA,
-                             Manifest.permission.READ_PHONE_STATE)
-                .subscribe(permission -> { // will emit 2 Permission objects
-                    if (permission.granted) {
-                       // `permission.name` is granted !
-                    }
-                });
+RxPermissions.getInstance(this)
+.requestEach(Manifest.permission.CAMERA,
+         Manifest.permission.READ_PHONE_STATE)
+    .subscribe(permission -> { // will emit 2 Permission objects
+        if (permission.granted) {
+           // `permission.name` is granted !
+        }
+    });
 ```
 
 Look at the `sample` app for more.
