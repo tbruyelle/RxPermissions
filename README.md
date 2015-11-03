@@ -74,7 +74,7 @@ Example :
 protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    Observable<Object> trigger = RxView.clicks(findViewById(R.id.enableCamera));
+    Observable<Void> trigger = RxView.clicks(findViewById(R.id.enableCamera));
 
     RxPermissions.getInstance(this)
         // The trigger is passed as first arg
