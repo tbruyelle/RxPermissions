@@ -107,6 +107,8 @@ be made to the framework. As a result, only one popup will appear to the user, b
 
 ## Setup
 
+To use this library your ` minSdkVersion` must be >= 9.
+
 In your build.gradle :
 
 ```gradle
