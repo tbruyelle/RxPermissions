@@ -44,7 +44,7 @@ You can also observe a detailed result with `requestEach` :
 ```java
 RxPermissions.getInstance(this)
 .requestEach(Manifest.permission.CAMERA,
-         Manifest.permission.READ_PHONE_STATE)
+             Manifest.permission.READ_PHONE_STATE)
     .subscribe(permission -> { // will emit 2 Permission objects
         if (permission.granted) {
            // `permission.name` is granted !
