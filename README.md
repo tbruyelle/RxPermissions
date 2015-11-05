@@ -81,7 +81,6 @@ protected void onCreate(Bundle savedInstanceState) {
         .request(trigger, Manifest.permission.CAMERA)
         .subscribe(granted -> {
             // R.id.enableCamera has been clicked
-            // or the app has been restarted during the permission request.
         });
 }
 ```
