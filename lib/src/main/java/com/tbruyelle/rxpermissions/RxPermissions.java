@@ -92,7 +92,8 @@ public class RxPermissions {
      * It handles multiple requests to the same permission, in that case the
      * same observable will be returned.
      */
-    public Observable<Permission> requestEach(final Observable<?> trigger, final String... permissions) {
+    public Observable<Permission> requestEach(final Observable<?> trigger,
+                                              final String... permissions) {
         if (permissions == null || permissions.length == 0) {
             throw new IllegalArgumentException("RxPermissions.request/requestEach requires at least one input permission");
         }
@@ -224,7 +225,8 @@ public class RxPermissions {
         }
 
         if (!unrequestedPermissions.isEmpty()) {
-            startShadowActivity(unrequestedPermissions.toArray(new String[]{}));
+            startShadowActivity(unrequestedPermissions
+                    .toArray(new String[unrequestedPermissions.size()]));
         }
         return Observable.concat(Observable.from(list));
     }
@@ -239,7 +241,8 @@ public class RxPermissions {
      * <p>
      * For SDK &lt; 23, the observable will always emit false.
      */
-    public Observable<Boolean> shouldShowRequestPermissionRationale(final Activity activity, final String... permissions) {
+    public Observable<Boolean> shouldShowRequestPermissionRationale(final Activity activity,
+                                                                    final String... permissions) {
         if (isMarshmallow()) {
             return Observable.just(shouldShowRequestPermissionRationale_(activity, permissions));
         }
@@ -247,7 +250,8 @@ public class RxPermissions {
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    private boolean shouldShowRequestPermissionRationale_(final Activity activity, final String... permissions) {
+    private boolean shouldShowRequestPermissionRationale_(final Activity activity,
+                                                          final String... permissions) {
         for (String p : permissions) {
             if (!activity.shouldShowRequestPermissionRationale(p)) {
                 return false;
