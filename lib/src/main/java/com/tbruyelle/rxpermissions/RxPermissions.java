@@ -243,10 +243,10 @@ public class RxPermissions {
      */
     public Observable<Boolean> shouldShowRequestPermissionRationale(final Activity activity,
                                                                     final String... permissions) {
-        if (isMarshmallow()) {
-            return Observable.just(shouldShowRequestPermissionRationale_(activity, permissions));
+        if (!isMarshmallow()) {
+            return Observable.just(false);
         }
-        return Observable.just(false);
+        return Observable.just(shouldShowRequestPermissionRationale_(activity, permissions));
     }
 
     @TargetApi(Build.VERSION_CODES.M)
