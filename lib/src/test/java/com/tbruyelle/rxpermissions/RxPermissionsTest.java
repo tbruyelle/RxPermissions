@@ -38,6 +38,7 @@ import static java.util.Collections.singletonList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -46,7 +47,8 @@ import static org.mockito.Mockito.when;
 
 public class RxPermissionsTest {
 
-    @Mock Context mCtx;
+    @Mock
+    Context mCtx;
 
     RxPermissions mRxPermissions;
 
@@ -56,6 +58,8 @@ public class RxPermissionsTest {
         when(mCtx.getApplicationContext()).thenReturn(mCtx);
         mRxPermissions = spy(new RxPermissions(mCtx));
         doNothing().when(mRxPermissions).startShadowActivity(any(String[].class));
+        // Default deny all permissions
+        doReturn(false).when(mRxPermissions).isGranted(anyString());
     }
 
     @Test
@@ -699,7 +703,7 @@ public class RxPermissionsTest {
 
     @Test
     @TargetApi(Build.VERSION_CODES.M)
-    public void shouldShowRequestPermissionRationale() {
+    public void shouldShowRequestPermissionRationale_allDenied_allRationale() {
         when(mRxPermissions.isMarshmallow()).thenReturn(true);
         Activity activity = mock(Activity.class);
         when(activity.shouldShowRequestPermissionRationale(anyString())).thenReturn(true);
@@ -715,10 +719,58 @@ public class RxPermissionsTest {
 
     @Test
     @TargetApi(Build.VERSION_CODES.M)
-    public void shouldShowRequestPermissionRationale_oneFalse() {
+    public void shouldShowRequestPermissionRationale_allDenied_oneRationale() {
         when(mRxPermissions.isMarshmallow()).thenReturn(true);
         Activity activity = mock(Activity.class);
         when(activity.shouldShowRequestPermissionRationale("p1")).thenReturn(true);
+
+        TestSubscriber<Boolean> sub = new TestSubscriber<>();
+        mRxPermissions.shouldShowRequestPermissionRationale(activity, new String[]{"p1", "p2"})
+                .subscribe(sub);
+
+        sub.assertCompleted();
+        sub.assertNoErrors();
+        sub.assertReceivedOnNext(Collections.singletonList(false));
+    }
+
+    @Test
+    @TargetApi(Build.VERSION_CODES.M)
+    public void shouldShowRequestPermissionRationale_allDenied_noRationale() {
+        when(mRxPermissions.isMarshmallow()).thenReturn(true);
+        Activity activity = mock(Activity.class);
+
+        TestSubscriber<Boolean> sub = new TestSubscriber<>();
+        mRxPermissions.shouldShowRequestPermissionRationale(activity, new String[]{"p1", "p2"})
+                .subscribe(sub);
+
+        sub.assertCompleted();
+        sub.assertNoErrors();
+        sub.assertReceivedOnNext(Collections.singletonList(false));
+    }
+
+    @Test
+    @TargetApi(Build.VERSION_CODES.M)
+    public void shouldShowRequestPermissionRationale_oneDeniedRationale() {
+        when(mRxPermissions.isMarshmallow()).thenReturn(true);
+        Activity activity = mock(Activity.class);
+        when(mRxPermissions.isGranted("p1")).thenReturn(true);
+        when(activity.shouldShowRequestPermissionRationale("p2")).thenReturn(true);
+
+        TestSubscriber<Boolean> sub = new TestSubscriber<>();
+        mRxPermissions.shouldShowRequestPermissionRationale(activity, new String[]{"p1", "p2"})
+                .subscribe(sub);
+
+        sub.assertCompleted();
+        sub.assertNoErrors();
+        sub.assertReceivedOnNext(Collections.singletonList(true));
+    }
+
+    @Test
+    @TargetApi(Build.VERSION_CODES.M)
+    public void shouldShowRequestPermissionRationale_oneDeniedNotRationale() {
+        when(mRxPermissions.isMarshmallow()).thenReturn(true);
+        Activity activity = mock(Activity.class);
+        when(mRxPermissions.isGranted("p2")).thenReturn(true);
 
         TestSubscriber<Boolean> sub = new TestSubscriber<>();
         mRxPermissions.shouldShowRequestPermissionRationale(activity, new String[]{"p1", "p2"})

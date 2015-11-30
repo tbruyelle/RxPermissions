@@ -237,7 +237,9 @@ public class RxPermissions {
      * <p>
      * In case of multiple permissions, only emits true if
      * Activity.shouldShowRequestPermissionRationale returned true for
-     * all permissions.
+     * all revoked permissions.
+     * <p>
+     * You shouldn't call this method is all permissions haven been granted.
      * <p>
      * For SDK &lt; 23, the observable will always emit false.
      */
@@ -253,7 +255,7 @@ public class RxPermissions {
     private boolean shouldShowRequestPermissionRationale_(final Activity activity,
                                                           final String... permissions) {
         for (String p : permissions) {
-            if (!activity.shouldShowRequestPermissionRationale(p)) {
+            if (!isGranted(p) && !activity.shouldShowRequestPermissionRationale(p)) {
                 return false;
             }
         }
