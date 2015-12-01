@@ -185,20 +185,6 @@ public class RxPermissions {
         if (mLogging) {
             log("Requesting permissions " + TextUtils.join(", ", permissions));
         }
-        if (isGranted(permissions)) {
-            if (mLogging) {
-                log("GRANTED " + TextUtils.join(", ", permissions));
-            }
-            // Already granted, or not Android M
-            // Map all requested permissions to granted Permission objects.
-            return Observable.from(permissions)
-                    .map(new Func1<String, Permission>() {
-                        @Override
-                        public Permission call(String s) {
-                            return new Permission(s, true);
-                        }
-                    });
-        }
 
         List<Observable<Permission>> list = new ArrayList<>(permissions.length);
         List<String> unrequestedPermissions = new ArrayList<>();
@@ -209,6 +195,14 @@ public class RxPermissions {
         // one observable will be create for the CAMERA.
         // At the end, the observables are combined to have a unique response.
         for (String permission : permissions) {
+            if (isGranted(permission)) {
+                // Already granted, or not Android M
+                // Return a granted Permission object.
+                list.add(Observable.just(new Permission(permission, true)));
+                continue;
+            }
+
+
             PublishSubject<Permission> subject = mSubjects.get(permission);
             // Create a new subject if not exists OR if completed.
             // This last case occurs on configuration change, and in that case

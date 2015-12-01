@@ -21,8 +21,10 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -294,6 +296,32 @@ public class RxPermissionsTest {
         sub.assertTerminalEvent();
         sub.assertUnsubscribed();
         sub.assertReceivedOnNext(singletonList(false));
+    }
+
+    @Test
+    @TargetApi(Build.VERSION_CODES.M)
+    public void singleEachSubscription_severalPermissions_oneAlreadyGranted() {
+        TestSubscriber<Permission> sub = new TestSubscriber<>();
+        String[] permissions = new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.CAMERA};
+        when(mRxPermissions.isGranted(Matchers.<String>anyVararg())).thenReturn(false);
+        when(mRxPermissions.isGranted(Manifest.permission.CAMERA)).thenReturn(true);
+
+        mRxPermissions.requestEach(permissions).subscribe(sub);
+        mRxPermissions.onRequestPermissionsResult(0,
+                new String[]{Manifest.permission.READ_PHONE_STATE},
+                new int[]{PackageManager.PERMISSION_GRANTED});
+
+        sub.assertNoErrors();
+        sub.assertTerminalEvent();
+        sub.assertUnsubscribed();
+        List<Permission> ps = new ArrayList<>();
+        ps.add(new Permission(permissions[0], true));
+        ps.add(new Permission(permissions[1], true));
+        sub.assertReceivedOnNext(ps);
+        ArgumentCaptor<String[]> requestedPermissions = ArgumentCaptor.forClass(String[].class);
+        verify(mRxPermissions).startShadowActivity(requestedPermissions.capture());
+        Assert.assertEquals(1, requestedPermissions.getValue().length);
+        Assert.assertEquals(Manifest.permission.READ_PHONE_STATE, requestedPermissions.getValue()[0]);
     }
 
     @Test
