@@ -62,6 +62,8 @@ public class RxPermissionsTest {
         doNothing().when(mRxPermissions).startShadowActivity(any(String[].class));
         // Default deny all permissions
         doReturn(false).when(mRxPermissions).isGranted(anyString());
+        // Default no revoked permissions
+        doReturn(false).when(mRxPermissions).isRevoked(anyString());
     }
 
     @Test
@@ -170,6 +172,36 @@ public class RxPermissionsTest {
 
         mRxPermissions.requestEach(permission).subscribe(sub);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
+
+        sub.assertNoErrors();
+        sub.assertTerminalEvent();
+        sub.assertUnsubscribed();
+        sub.assertReceivedOnNext(singletonList(new Permission(permission, false)));
+    }
+
+    @Test
+    @TargetApi(Build.VERSION_CODES.M)
+    public void singleSubscription_revoked() {
+        TestSubscriber<Boolean> sub = new TestSubscriber<>();
+        String permission = Manifest.permission.READ_PHONE_STATE;
+        when(mRxPermissions.isRevoked(permission)).thenReturn(true);
+
+        mRxPermissions.request(permission).subscribe(sub);
+
+        sub.assertNoErrors();
+        sub.assertTerminalEvent();
+        sub.assertUnsubscribed();
+        sub.assertReceivedOnNext(singletonList(false));
+    }
+
+    @Test
+    @TargetApi(Build.VERSION_CODES.M)
+    public void singleEachSubscription_revoked() {
+        TestSubscriber<Permission> sub = new TestSubscriber<>();
+        String permission = Manifest.permission.READ_PHONE_STATE;
+        when(mRxPermissions.isRevoked(permission)).thenReturn(true);
+
+        mRxPermissions.requestEach(permission).subscribe(sub);
 
         sub.assertNoErrors();
         sub.assertTerminalEvent();
@@ -300,6 +332,25 @@ public class RxPermissionsTest {
 
     @Test
     @TargetApi(Build.VERSION_CODES.M)
+    public void singleSubscription_severalPermissions_oneRevoked() {
+        TestSubscriber<Boolean> sub = new TestSubscriber<>();
+        String[] permissions = new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.CAMERA};
+        when(mRxPermissions.isGranted(Matchers.<String>anyVararg())).thenReturn(false);
+        when(mRxPermissions.isRevoked(Manifest.permission.CAMERA)).thenReturn(true);
+
+        mRxPermissions.request(permissions).subscribe(sub);
+        mRxPermissions.onRequestPermissionsResult(0,
+                new String[]{Manifest.permission.READ_PHONE_STATE},
+                new int[]{PackageManager.PERMISSION_GRANTED});
+
+        sub.assertNoErrors();
+        sub.assertTerminalEvent();
+        sub.assertUnsubscribed();
+        sub.assertReceivedOnNext(singletonList(false));
+    }
+
+    @Test
+    @TargetApi(Build.VERSION_CODES.M)
     public void singleEachSubscription_severalPermissions_oneAlreadyGranted() {
         TestSubscriber<Permission> sub = new TestSubscriber<>();
         String[] permissions = new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.CAMERA};
@@ -334,6 +385,28 @@ public class RxPermissionsTest {
 
         mRxPermissions.requestEach(permissions).subscribe(sub);
         mRxPermissions.onRequestPermissionsResult(0, permissions, result);
+
+        sub.assertNoErrors();
+        sub.assertTerminalEvent();
+        sub.assertUnsubscribed();
+        List<Permission> ps = new ArrayList<>();
+        ps.add(new Permission(permissions[0], true));
+        ps.add(new Permission(permissions[1], false));
+        sub.assertReceivedOnNext(ps);
+    }
+
+    @Test
+    @TargetApi(Build.VERSION_CODES.M)
+    public void singleEachSubscription_severalPermissions_oneRevoked() {
+        TestSubscriber<Permission> sub = new TestSubscriber<>();
+        String[] permissions = new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.CAMERA};
+        when(mRxPermissions.isGranted(Matchers.<String>anyVararg())).thenReturn(false);
+        when(mRxPermissions.isRevoked(Manifest.permission.CAMERA)).thenReturn(true);
+
+        mRxPermissions.requestEach(permissions).subscribe(sub);
+        mRxPermissions.onRequestPermissionsResult(0,
+                new String[]{Manifest.permission.READ_PHONE_STATE},
+                new int[]{PackageManager.PERMISSION_GRANTED});
 
         sub.assertNoErrors();
         sub.assertTerminalEvent();
