@@ -202,6 +202,11 @@ public class RxPermissions {
                 continue;
             }
 
+            if (isRevoked(permission)) {
+                // Revoked by a policy, return a denied Permission object.
+                list.add(Observable.just(new Permission(permission, false)));
+                continue;
+            }
 
             PublishSubject<Permission> subject = mSubjects.get(permission);
             // Create a new subject if not exists OR if completed.
@@ -273,6 +278,15 @@ public class RxPermissions {
         return !isMarshmallow() || hasPermission_(permissions);
     }
 
+    /**
+     * Returns true if any of the supplied permissions has been revoked by a policy.
+     * <p>
+     * Always false if SDK &lt; 23.
+     */
+    public boolean isRevoked(String... permissions) {
+        return isMarshmallow() && isRevoked_(permissions);
+    }
+
     boolean isMarshmallow() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
     }
@@ -285,6 +299,18 @@ public class RxPermissions {
             }
         }
         return true;
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private boolean isRevoked_(String... permissions) {
+        PackageManager pm = mCtx.getPackageManager();
+        String pkg = mCtx.getPackageName();
+        for (String permission : permissions) {
+            if (pm.isPermissionRevokedByPolicy(permission, pkg)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     void onDestroy() {
