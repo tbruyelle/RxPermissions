@@ -21,7 +21,6 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -37,8 +36,13 @@ import rx.observers.TestSubscriber;
 import rx.subjects.PublishSubject;
 
 import static java.util.Collections.singletonList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -371,8 +375,8 @@ public class RxPermissionsTest {
         sub.assertReceivedOnNext(ps);
         ArgumentCaptor<String[]> requestedPermissions = ArgumentCaptor.forClass(String[].class);
         verify(mRxPermissions).startShadowActivity(requestedPermissions.capture());
-        Assert.assertEquals(1, requestedPermissions.getValue().length);
-        Assert.assertEquals(Manifest.permission.READ_PHONE_STATE, requestedPermissions.getValue()[0]);
+        assertEquals(1, requestedPermissions.getValue().length);
+        assertEquals(Manifest.permission.READ_PHONE_STATE, requestedPermissions.getValue()[0]);
     }
 
     @Test
@@ -880,5 +884,83 @@ public class RxPermissionsTest {
         sub.assertCompleted();
         sub.assertNoErrors();
         sub.assertReceivedOnNext(Collections.singletonList(false));
+    }
+
+    @Test
+    public void isGranted_preMarshmallow() {
+        // unmock isGranted
+        doCallRealMethod().when(mRxPermissions).isGranted(anyString());
+        doReturn(false).when(mRxPermissions).isMarshmallow();
+
+        boolean granted = mRxPermissions.isGranted("p");
+
+        assertTrue(granted);
+    }
+
+    @Test
+    @TargetApi(Build.VERSION_CODES.M)
+    public void isGranted_granted() {
+        // unmock isGranted
+        doCallRealMethod().when(mRxPermissions).isGranted(anyString());
+        doReturn(true).when(mRxPermissions).isMarshmallow();
+        when(mCtx.checkSelfPermission("p")).thenReturn(PackageManager.PERMISSION_GRANTED);
+
+        boolean granted = mRxPermissions.isGranted("p");
+
+        assertTrue(granted);
+    }
+
+    @Test
+    @TargetApi(Build.VERSION_CODES.M)
+    public void isGranted_denied() {
+        // unmock isGranted
+        doCallRealMethod().when(mRxPermissions).isGranted(anyString());
+        doReturn(true).when(mRxPermissions).isMarshmallow();
+        when(mCtx.checkSelfPermission("p")).thenReturn(PackageManager.PERMISSION_DENIED);
+
+        boolean granted = mRxPermissions.isGranted("p");
+
+        assertFalse(granted);
+    }
+
+    @Test
+    public void isRevoked_preMarshmallow() {
+        // unmock isRevoked
+        doCallRealMethod().when(mRxPermissions).isRevoked(anyString());
+        doReturn(false).when(mRxPermissions).isMarshmallow();
+
+        boolean revoked = mRxPermissions.isRevoked("p");
+
+        assertFalse(revoked);
+    }
+
+    @Test
+    @TargetApi(Build.VERSION_CODES.M)
+    public void isRevoked_true() {
+        // unmock isRevoked
+        doCallRealMethod().when(mRxPermissions).isRevoked(anyString());
+        doReturn(true).when(mRxPermissions).isMarshmallow();
+        PackageManager pm = mock(PackageManager.class);
+        when(mCtx.getPackageManager()).thenReturn(pm);
+        when(pm.isPermissionRevokedByPolicy(eq("p"), anyString())).thenReturn(true);
+
+        boolean revoked = mRxPermissions.isRevoked("p");
+
+        assertTrue(revoked);
+    }
+
+    @Test
+    @TargetApi(Build.VERSION_CODES.M)
+    public void isGranted_false() {
+        // unmock isRevoked
+        doCallRealMethod().when(mRxPermissions).isRevoked(anyString());
+        doReturn(true).when(mRxPermissions).isMarshmallow();
+        PackageManager pm = mock(PackageManager.class);
+        when(mCtx.getPackageManager()).thenReturn(pm);
+        when(pm.isPermissionRevokedByPolicy(eq("p"), anyString())).thenReturn(false);
+
+        boolean revoked = mRxPermissions.isRevoked("p");
+
+        assertFalse(revoked);
     }
 }

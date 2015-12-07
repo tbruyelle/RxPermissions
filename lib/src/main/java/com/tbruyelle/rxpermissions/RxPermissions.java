@@ -270,21 +270,21 @@ public class RxPermissions {
     }
 
     /**
-     * Returns true if the permissions is already granted.
+     * Returns true if the permission is already granted.
      * <p>
      * Always true if SDK &lt; 23.
      */
-    public boolean isGranted(String... permissions) {
-        return !isMarshmallow() || hasPermission_(permissions);
+    public boolean isGranted(String permission) {
+        return !isMarshmallow() || isGranted_(permission);
     }
 
     /**
-     * Returns true if any of the supplied permissions has been revoked by a policy.
+     * Returns true if the permission has been revoked by a policy.
      * <p>
      * Always false if SDK &lt; 23.
      */
-    public boolean isRevoked(String... permissions) {
-        return isMarshmallow() && isRevoked_(permissions);
+    public boolean  isRevoked(String permission) {
+        return isMarshmallow() && isRevoked_(permission);
     }
 
     boolean isMarshmallow() {
@@ -292,25 +292,13 @@ public class RxPermissions {
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    private boolean hasPermission_(String... permissions) {
-        for (String permission : permissions) {
-            if (mCtx.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
-        }
-        return true;
+    private boolean isGranted_(String permission) {
+        return mCtx.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    private boolean isRevoked_(String... permissions) {
-        PackageManager pm = mCtx.getPackageManager();
-        String pkg = mCtx.getPackageName();
-        for (String permission : permissions) {
-            if (pm.isPermissionRevokedByPolicy(permission, pkg)) {
-                return true;
-            }
-        }
-        return false;
+    private boolean isRevoked_(String permission) {
+        return mCtx.getPackageManager().isPermissionRevokedByPolicy(permission, mCtx.getPackageName());
     }
 
     void onDestroy() {
