@@ -165,7 +165,7 @@ public class RxPermissions {
      */
     private Observable<?> pending(final String... permissions) {
         for (String p : permissions) {
-            Subject s = mSubjects.get(p);
+            PublishSubject s = mSubjects.get(p);
             if (s == null || !s.hasCompleted()) {
                 return Observable.empty();
             }
