@@ -88,8 +88,7 @@ protected void onCreate(Bundle savedInstanceState) {
 
 ## Status
 
-**This library is at a very early stage of development, so contributions are welcome.
-It should not be used in production, or at your own risk.**
+**This library is still beta, so contributions are welcome. I'm currently using it in production since months without issue.**
 
 ## Benefits
 
