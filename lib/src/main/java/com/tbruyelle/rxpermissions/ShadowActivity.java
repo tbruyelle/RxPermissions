@@ -28,12 +28,6 @@ public class ShadowActivity extends Activity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        RxPermissions.getInstance(this).onDestroy();
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         RxPermissions.getInstance(this).onRequestPermissionsResult(requestCode, permissions, grantResults);
         finish();
