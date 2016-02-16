@@ -301,6 +301,15 @@ public class RxPermissions {
         return mCtx.getPackageManager().isPermissionRevokedByPolicy(permission, mCtx.getPackageName());
     }
 
+    void onDestroy() {
+        log("onDestroy");
+        // Invoke onCompleted on all registered subjects.
+        // This should un-subscribe the observers.
+        for (Subject subject : mSubjects.values()) {
+            subject.onCompleted();
+        }
+    }
+
     void onRequestPermissionsResult(int requestCode,
                                     String permissions[], int[] grantResults) {
         for (int i = 0, size = permissions.length; i < size; i++) {
