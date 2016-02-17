@@ -301,10 +301,13 @@ public class RxPermissions {
         return mCtx.getPackageManager().isPermissionRevokedByPolicy(permission, mCtx.getPackageName());
     }
 
-    void onDestroy() {
+    /**
+     * Invokes onCompleted on all registered subjects.
+     * <p>
+     * This should un-subscribe the observers.
+     */
+    public void onDestroy() {
         log("onDestroy");
-        // Invoke onCompleted on all registered subjects.
-        // This should un-subscribe the observers.
         for (Subject subject : mSubjects.values()) {
             subject.onCompleted();
         }
