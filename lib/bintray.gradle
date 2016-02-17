@@ -22,7 +22,9 @@ artifacts {
 }
 
 Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
+try {
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+} catch (FileNotFoundException ignore) {}
 
 bintray {
     user = properties.getProperty("bintray.user")
