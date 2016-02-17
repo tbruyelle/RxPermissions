@@ -33,3 +33,6 @@ dependencies {
     testCompile rootProject.ext.junit
     testCompile rootProject.ext.mockito
 }
+
+apply from: 'install.gradle'
+apply from: 'bintray.gradle'

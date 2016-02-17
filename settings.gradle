@@ -1,2 +1,4 @@
-include 'lib'
+include 'rxpermissions'
+project(':rxpermissions').projectDir = new File(settingsDir, '/lib')
+project(':rxpermissions').name = 'rxpermissions'
 include 'sample'
