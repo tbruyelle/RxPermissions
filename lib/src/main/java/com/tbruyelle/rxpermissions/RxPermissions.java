@@ -47,6 +47,9 @@ public class RxPermissions {
 
     private Context mCtx;
 
+    // Contains all the permission requests, which have no result yet
+    private List<PublishSubject<Permission>> mNoResultSubjects = new ArrayList<>();
+
     // Contains all the current permission requests.
     // Once granted or denied, they are removed from it.
     private Map<String, PublishSubject<Permission>> mSubjects = new HashMap<>();
@@ -156,7 +159,7 @@ public class RxPermissions {
     private Observable<?> pending(final String... permissions) {
         for (String p : permissions) {
             PublishSubject s = mSubjects.get(p);
-            if (s == null || !s.hasCompleted()) {
+            if (s == null || !mNoResultSubjects.contains(s)) {
                 return Observable.empty();
             }
         }
@@ -197,11 +200,12 @@ public class RxPermissions {
             }
 
             PublishSubject<Permission> subject = mSubjects.get(permission);
-            // Create a new subject if not exists OR if completed.
+            // Create a new subject if not exists OR if it did not receive a result.
             // This last case occurs on configuration change, and in that case
             // we need to recreate a new subject, but without request the permission
             // again.
-            if (subject == null || subject.hasCompleted()) {
+            if (subject == null || mNoResultSubjects.contains(subject)) {
+                mNoResultSubjects.remove(subject);
                 if (subject == null) {
                     unrequestedPermissions.add(permission);
                 }
@@ -296,8 +300,8 @@ public class RxPermissions {
      */
     public void onDestroy() {
         log("onDestroy");
-        for (Subject subject : mSubjects.values()) {
-            subject.onCompleted();
+        for (PublishSubject<Permission> subject : mSubjects.values()) {
+            mNoResultSubjects.add(subject);
         }
     }
 
