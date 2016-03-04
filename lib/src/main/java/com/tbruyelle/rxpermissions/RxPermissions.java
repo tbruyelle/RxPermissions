@@ -182,9 +182,7 @@ public class RxPermissions {
 
     @TargetApi(Build.VERSION_CODES.M)
     private Observable<Permission> request_(final String... permissions) {
-        if (mLogging) {
-            log("Requesting permissions " + TextUtils.join(", ", permissions));
-        }
+        log("Requesting permissions " + TextUtils.join(", ", permissions));
 
         List<Observable<Permission>> list = new ArrayList<>(permissions.length);
         List<String> unrequestedPermissions = new ArrayList<>();
