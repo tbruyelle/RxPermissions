@@ -635,8 +635,6 @@ public class RxPermissionsTest {
         mRxPermissions.onDestroy();
         for (TestSubscriber sub : new TestSubscriber[]{sub1, sub2}) {
             sub.assertNoErrors();
-            sub.assertTerminalEvent();
-            sub.assertUnsubscribed();
             sub.assertNoValues();
         }
 
@@ -669,8 +667,6 @@ public class RxPermissionsTest {
         mRxPermissions.onDestroy();
         for (TestSubscriber sub : new TestSubscriber[]{sub1, sub2}) {
             sub.assertNoErrors();
-            sub.assertTerminalEvent();
-            sub.assertUnsubscribed();
             sub.assertNoValues();
         }
 
