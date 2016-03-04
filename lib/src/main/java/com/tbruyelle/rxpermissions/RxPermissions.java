@@ -66,6 +66,24 @@ public class RxPermissions {
         }
     }
 
+    public static Observable.Transformer<Object, Boolean> ensure(final Context ctx, final String... permissions) {
+        return new Observable.Transformer<Object, Boolean>() {
+            @Override
+            public Observable<Boolean> call(Observable<Object> o) {
+                return RxPermissions.getInstance(ctx).request(o, permissions);
+            }
+        };
+    }
+
+    public static Observable.Transformer<Object, Permission> ensureEach(final Context ctx, final String... permissions) {
+        return new Observable.Transformer<Object, Permission>() {
+            @Override
+            public Observable<Permission> call(Observable<Object> o) {
+                return RxPermissions.getInstance(ctx).requestEach(o, permissions);
+            }
+        };
+    }
+
     /**
      * Register one or several permission requests and returns an observable that
      * emits a {@link Permission} for each requested permission.
@@ -281,7 +299,7 @@ public class RxPermissions {
      * <p>
      * Always false if SDK &lt; 23.
      */
-    public boolean  isRevoked(String permission) {
+    public boolean isRevoked(String permission) {
         return isMarshmallow() && isRevoked_(permission);
     }
 

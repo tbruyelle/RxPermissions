@@ -33,34 +33,49 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.act_main);
         mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView);
 
+        Observable.just(null)
+                .compose(RxPermissions.ensure(this, Manifest.permission.CAMERA))
+                .subscribe(granted -> {
+                    Log.i(TAG, "Received result " + granted);
+                    if (granted) {
+                        Toast.makeText(MainActivity.this,
+                                "Permission granted, enable the camera",
+                                Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(MainActivity.this,
+                                "Permission denied, can't enable the camera",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+
         // If the permission request is triggered by a particular event
         // (a click for instance) we need to pass that information threw
         // an Observable.
         // com.jakewharton.rxbinding.view.RxView does exactly what we need.
         Observable<Object> trigger = RxView.clicks(findViewById(R.id.enableCamera));
 
-        mRxPermissions
-                .request(trigger, Manifest.permission.CAMERA)
-                .subscribe(granted -> {
-                            Log.i(TAG, "Received result " + granted);
-                            if (granted) {
-                                releaseCamera();
-                                mCamera = Camera.open(0);
-                                try {
-                                    mCamera.setPreviewDisplay(mSurfaceView.getHolder());
-                                    mCamera.startPreview();
-                                } catch (IOException e) {
-                                    Log.e(TAG, "Error while trying to display the camera preview", e);
-                                }
-                            } else {
-                                Toast.makeText(MainActivity.this,
-                                        "Permission denied, can't enable the camera",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        },
-                        t -> Log.e(TAG, "onError", t),
-                        () -> Log.i(TAG, "OnComplete")
-                );
+//        trigger
+//                .compose(RxPermissions.ensure(this, Manifest.permission.CAMERA))
+//                .subscribe(granted -> {
+//                            Log.i(TAG, " TRIGGER Received result " + granted);
+//                            if (granted) {
+//                                releaseCamera();
+//                                mCamera = Camera.open(0);
+//                                try {
+//                                    mCamera.setPreviewDisplay(mSurfaceView.getHolder());
+//                                    mCamera.startPreview();
+//                                } catch (IOException e) {
+//                                    Log.e(TAG, "Error while trying to display the camera preview", e);
+//                                }
+//                            } else {
+//                                Toast.makeText(MainActivity.this,
+//                                        "Permission denied, can't enable the camera",
+//                                        Toast.LENGTH_SHORT).show();
+//                            }
+//                        },
+//                        t -> Log.e(TAG, "onError", t),
+//                        () -> Log.i(TAG, "OnComplete")
+//                );
     }
 
     @Override
