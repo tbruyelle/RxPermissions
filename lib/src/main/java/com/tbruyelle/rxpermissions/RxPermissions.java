@@ -47,7 +47,7 @@ public class RxPermissions {
     private Context mCtx;
 
     // Contains all the permission requests, which have no result yet
-    private List<PublishSubject<Permission>> mNoResultSubjects = new ArrayList<>();
+    private List<String> mNoResultRequests = new ArrayList<>();
 
     // Contains all the current permission requests.
     // Once granted or denied, they are removed from it.
@@ -103,15 +103,16 @@ public class RxPermissions {
         if (permissions == null || permissions.length == 0) {
             throw new IllegalArgumentException("RxPermissions.request/requestEach requires at least one input permission");
         }
-        return oneOf(trigger, pending(permissions))
-                .flatMap(new Func1<Object, Observable<Permission>>() {
-                    @Override
-                    public Observable<Permission> call(Object o) {
-                        return request_(permissions);
-                    }
-                });
+        if (pending(permissions)) {
+            return request_(permissions);
+        }
+        return trigger.flatMap(new Func1<Object, Observable<Permission>>() {
+            @Override
+            public Observable<Permission> call(Object o) {
+                return request_(permissions);
+            }
+        });
     }
-
 
     /**
      * Register one or several permission requests and returns an observable that
@@ -150,26 +151,13 @@ public class RxPermissions {
                 });
     }
 
-    /**
-     * Returns an empty observable is there is no pending permission
-     * request.
-     * Else returns a one-item observable.
-     */
-    private Observable<?> pending(final String... permissions) {
+    private boolean pending(final String... permissions) {
         for (String p : permissions) {
-            PublishSubject s = mSubjects.get(p);
-            if (s == null || !mNoResultSubjects.contains(s)) {
-                return Observable.empty();
+            if (!mNoResultRequests.contains(p)) {
+                return false;
             }
         }
-        return Observable.just(null);
-    }
-
-    private Observable<Object> oneOf(Observable<?> trigger, Observable<?> pending) {
-        if (trigger == null) {
-            return Observable.just(null);
-        }
-        return Observable.merge(trigger, pending);
+        return true;
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -199,18 +187,19 @@ public class RxPermissions {
             }
 
             PublishSubject<Permission> subject = mSubjects.get(permission);
-            // Create a new subject if not exists OR if it did not receive a result.
+            // Check if already requested permission, without receiving the result.
             // This last case occurs on configuration change, and in that case
-            // we need to recreate a new subject, but without request the permission
-            // again.
-            if (subject == null || mNoResultSubjects.contains(subject)) {
-                mNoResultSubjects.remove(subject);
-                if (subject == null) {
-                    unrequestedPermissions.add(permission);
-                }
+            // we don't request the permission again.
+            if (subject == null && !mNoResultRequests.contains(permission)) {
+                unrequestedPermissions.add(permission);
+            }
+
+            // Create a new subject if not exists
+            if (subject == null) {
                 subject = PublishSubject.create();
                 mSubjects.put(permission, subject);
             }
+
             list.add(subject);
         }
 
@@ -299,9 +288,10 @@ public class RxPermissions {
      */
     public void onDestroy() {
         log("onDestroy");
-        for (PublishSubject<Permission> subject : mSubjects.values()) {
-            mNoResultSubjects.add(subject);
+        for (String permission : mSubjects.keySet()) {
+            mNoResultRequests.add(permission);
         }
+        mSubjects.clear();
     }
 
     void onRequestPermissionsResult(int requestCode,
@@ -315,6 +305,7 @@ public class RxPermissions {
                 throw new IllegalStateException("RxPermissions.onRequestPermissionsResult invoked but didn't find the corresponding permission request.");
             }
             mSubjects.remove(permissions[i]);
+            mNoResultRequests.remove(permissions[i]);
             boolean granted = grantResults[i] == PackageManager.PERMISSION_GRANTED;
             subject.onNext(new Permission(permissions[i], granted));
             subject.onCompleted();

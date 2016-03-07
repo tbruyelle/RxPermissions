@@ -730,10 +730,8 @@ public class RxPermissionsTest {
         mRxPermissions.onDestroy();
         for (TestSubscriber sub : new TestSubscriber[]{sub1, sub2}) {
             sub.assertNoErrors();
-            // TODO should be uncommented
-//            sub.assertTerminalEvent();
-//            sub.assertUnsubscribed();
             sub.assertNoValues();
+            sub.assertNoTerminalEvent();
         }
 
         sub1 = new TestSubscriber<>();
@@ -743,16 +741,11 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
 
         verify(mRxPermissions).startShadowActivity(any(String[].class));
-        for (TestSubscriber sub : new TestSubscriber[]{sub1}) {
+        for (TestSubscriber sub : new TestSubscriber[]{sub1, sub2}) {
             sub.assertNoErrors();
-            sub.assertNoTerminalEvent();
+            sub.assertCompleted();
             sub.assertReceivedOnNext(singletonList(true));
         }
-        // TODO Previous loop should also check sub2 but a bug prevents the second subscriber
-        // to receive the result.
-        // A solution would be to remove concurrent access code, inform the user to only use
-        // one permission at a time or suggest to use share() on the received observable.
-
     }
 
     @Test
@@ -771,10 +764,8 @@ public class RxPermissionsTest {
         mRxPermissions.onDestroy();
         for (TestSubscriber sub : new TestSubscriber[]{sub1, sub2}) {
             sub.assertNoErrors();
-            // TODO should be uncommented
-//            sub.assertTerminalEvent();
-//            sub.assertUnsubscribed();
             sub.assertNoValues();
+            sub.assertNoTerminalEvent();
         }
 
         sub1 = new TestSubscriber<>();
@@ -784,15 +775,11 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
 
         verify(mRxPermissions).startShadowActivity(any(String[].class));
-        for (TestSubscriber sub : new TestSubscriber[]{sub1}) {
+        for (TestSubscriber sub : new TestSubscriber[]{sub1, sub2}) {
             sub.assertNoErrors();
-            sub.assertNoTerminalEvent();
+            sub.assertCompleted();
             sub.assertReceivedOnNext(singletonList(new Permission(permission, true)));
         }
-        // TODO Previous loop should also check sub2 but a bug prevents the second subscriber
-        // to receive the result.
-        // A solution would be to remove concurrent access code, inform the user to only use
-        // one permission at a time or suggest to use share() on the received observable.
     }
 
     @Test
