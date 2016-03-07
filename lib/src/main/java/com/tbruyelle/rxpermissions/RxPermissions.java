@@ -68,6 +68,13 @@ public class RxPermissions {
         }
     }
 
+    /**
+     * Map emitted items from the source observable into {@code true} if permissions in parameters
+     * are granted, or {@code false} if not.
+     * <p>
+     * If one or several permissions have never been requested, invoke the related framework method
+     * to ask the user if he allows the permissions.
+     */
     public static Observable.Transformer<Object, Boolean> ensure(final Context ctx, final String... permissions) {
         return new Observable.Transformer<Object, Boolean>() {
             @Override
@@ -77,6 +84,13 @@ public class RxPermissions {
         };
     }
 
+    /**
+     * Map emitted items from the source observable into {@link Permission} objects for each
+     * permissions in parameters.
+     * <p>
+     * If one or several permissions have never been requested, invoke the related framework method
+     * to ask the user if he allows the permissions.
+     */
     public static Observable.Transformer<Object, Permission> ensureEach(final Context ctx, final String... permissions) {
         return new Observable.Transformer<Object, Permission>() {
             @Override
@@ -86,18 +100,6 @@ public class RxPermissions {
         };
     }
 
-    /**
-     * Register one or several permission requests and returns an observable that
-     * emits a {@link Permission} for each requested permission.
-     * <p>
-     * The request is only executed when the `trigger` observable emits something.
-     * <p>
-     * For SDK &lt; 23, the observable will immediately emit true, otherwise
-     * the user response to that request.
-     * <p>
-     * It handles multiple requests to the same permission, in that case the
-     * same observable will be returned.
-     */
     private Observable<Permission> requestEach(final Observable<?> trigger,
                                                final String... permissions) {
         if (permissions == null || permissions.length == 0) {
@@ -114,19 +116,7 @@ public class RxPermissions {
         });
     }
 
-    /**
-     * Register one or several permission requests and returns an observable that
-     * emits an aggregation of the answers. If all  requested permissions were
-     * granted, it emits true, else false.
-     * <p>
-     * The request is only executed when the `trigger` observable emits something.
-     * <p>
-     * For SDK &lt; 23, the observable will immediately emit true, otherwise
-     * the user response to that request.
-     * <p>
-     * It handles multiple requests to the same permission, in that case the
-     * same observable will be returned.
-     */
+
     private Observable<Boolean> request(final Observable<?> trigger, final String... permissions) {
         return requestEach(trigger, permissions)
                 // Transform Observable<Permission> to Observable<Boolean>
