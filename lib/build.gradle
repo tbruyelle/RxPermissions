@@ -18,15 +18,12 @@ android {
         }
     }
 
-    testOptions.unitTests.returnDefaultValues = true
-
     testOptions.unitTests.all {
         // unitTests.returnDefaultValues = true
         // Always show the result of every unit test, even if it passes.
         testLogging {
             events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
         }
-
     }
 }
 

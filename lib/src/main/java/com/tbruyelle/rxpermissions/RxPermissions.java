@@ -31,7 +31,6 @@ import java.util.Map;
 import rx.Observable;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
-import rx.subjects.Subject;
 
 public class RxPermissions {
 
