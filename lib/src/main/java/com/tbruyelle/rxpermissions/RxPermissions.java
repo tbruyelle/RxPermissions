@@ -36,7 +36,7 @@ import rx.subjects.Subject;
 public class RxPermissions {
 
     public static final String TAG = "RxPermissions";
-    private static RxPermissions sSingleton;
+    static RxPermissions sSingleton;
 
     public static RxPermissions getInstance(Context ctx) {
         if (sSingleton == null) {
@@ -88,20 +88,6 @@ public class RxPermissions {
      * Register one or several permission requests and returns an observable that
      * emits a {@link Permission} for each requested permission.
      * <p>
-     * For SDK &lt; 23, the observable will immediately emit true, otherwise
-     * the user response to that request.
-     * <p>
-     * It handles multiple requests to the same permission, in that case the
-     * same observable will be returned.
-     */
-    public Observable<Permission> requestEach(final String... permissions) {
-        return requestEach(null, permissions);
-    }
-
-    /**
-     * Register one or several permission requests and returns an observable that
-     * emits a {@link Permission} for each requested permission.
-     * <p>
      * The request is only executed when the `trigger` observable emits something.
      * <p>
      * For SDK &lt; 23, the observable will immediately emit true, otherwise
@@ -110,8 +96,8 @@ public class RxPermissions {
      * It handles multiple requests to the same permission, in that case the
      * same observable will be returned.
      */
-    public Observable<Permission> requestEach(final Observable<?> trigger,
-                                              final String... permissions) {
+    private Observable<Permission> requestEach(final Observable<?> trigger,
+                                               final String... permissions) {
         if (permissions == null || permissions.length == 0) {
             throw new IllegalArgumentException("RxPermissions.request/requestEach requires at least one input permission");
         }
@@ -124,20 +110,6 @@ public class RxPermissions {
                 });
     }
 
-    /**
-     * Register one or several permission requests and returns an observable that
-     * emits an aggregation of the answers. If all  requested permissions were
-     * granted, it emits true, else false.
-     * <p>
-     * For SDK &lt; 23, the observable will immediately emit true, otherwise
-     * the user response to that request.
-     * <p>
-     * It handles multiple requests to the same permission, in that case the
-     * same observable will be returned.
-     */
-    public Observable<Boolean> request(final String... permissions) {
-        return request(null, permissions);
-    }
 
     /**
      * Register one or several permission requests and returns an observable that
@@ -152,7 +124,7 @@ public class RxPermissions {
      * It handles multiple requests to the same permission, in that case the
      * same observable will be returned.
      */
-    public Observable<Boolean> request(final Observable<?> trigger, final String... permissions) {
+    private Observable<Boolean> request(final Observable<?> trigger, final String... permissions) {
         return requestEach(trigger, permissions)
                 // Transform Observable<Permission> to Observable<Boolean>
                 .buffer(permissions.length)
@@ -200,7 +172,6 @@ public class RxPermissions {
 
     @TargetApi(Build.VERSION_CODES.M)
     private Observable<Permission> request_(final String... permissions) {
-        log("Requesting permissions " + TextUtils.join(", ", permissions));
 
         List<Observable<Permission>> list = new ArrayList<>(permissions.length);
         List<String> unrequestedPermissions = new ArrayList<>();
@@ -211,6 +182,7 @@ public class RxPermissions {
         // one observable will be create for the CAMERA.
         // At the end, the observables are combined to have a unique response.
         for (String permission : permissions) {
+            log("Requesting permission " + permission);
             if (isGranted(permission)) {
                 // Already granted, or not Android M
                 // Return a granted Permission object.
