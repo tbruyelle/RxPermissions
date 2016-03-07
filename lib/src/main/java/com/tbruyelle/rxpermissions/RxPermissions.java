@@ -46,7 +46,7 @@ public class RxPermissions {
 
     private Context mCtx;
 
-    // Contains all the permission requests, which have no result yet
+    // Contains all pending permission requests after a config change.
     private List<String> mNoResultRequests = new ArrayList<>();
 
     // Contains all the current permission requests.
@@ -79,7 +79,27 @@ public class RxPermissions {
         return new Observable.Transformer<Object, Boolean>() {
             @Override
             public Observable<Boolean> call(Observable<Object> o) {
-                return RxPermissions.getInstance(ctx).request(o, permissions);
+                return RxPermissions.getInstance(ctx).request(o, permissions)
+                        // Transform Observable<Permission> to Observable<Boolean>
+                        .buffer(permissions.length)
+                        .flatMap(new Func1<List<Permission>, Observable<Boolean>>() {
+                            @Override
+                            public Observable<Boolean> call(List<Permission> permissions) {
+                                if (permissions.isEmpty()) {
+                                    // Occurs during orientation change, when the subject receives onComplete.
+                                    // In that case we don't want to propagate that empty list to the
+                                    // subscriber, only the onComplete.
+                                    return Observable.empty();
+                                }
+                                // Return true if all permissions are granted.
+                                for (Permission p : permissions) {
+                                    if (!p.granted) {
+                                        return Observable.just(false);
+                                    }
+                                }
+                                return Observable.just(true);
+                            }
+                        });
             }
         };
     }
@@ -95,50 +115,26 @@ public class RxPermissions {
         return new Observable.Transformer<Object, Permission>() {
             @Override
             public Observable<Permission> call(Observable<Object> o) {
-                return RxPermissions.getInstance(ctx).requestEach(o, permissions);
+                return RxPermissions.getInstance(ctx).request(o, permissions);
             }
         };
     }
 
-    private Observable<Permission> requestEach(final Observable<?> trigger,
-                                               final String... permissions) {
+    private Observable<Permission> request(final Observable<?> trigger,
+                                           final String... permissions) {
         if (permissions == null || permissions.length == 0) {
             throw new IllegalArgumentException("RxPermissions.request/requestEach requires at least one input permission");
         }
+        // If there's pending request
         if (pending(permissions)) {
-            return request_(permissions);
+            return request(permissions);
         }
         return trigger.flatMap(new Func1<Object, Observable<Permission>>() {
             @Override
             public Observable<Permission> call(Object o) {
-                return request_(permissions);
+                return request(permissions);
             }
         });
-    }
-
-
-    private Observable<Boolean> request(final Observable<?> trigger, final String... permissions) {
-        return requestEach(trigger, permissions)
-                // Transform Observable<Permission> to Observable<Boolean>
-                .buffer(permissions.length)
-                .flatMap(new Func1<List<Permission>, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> call(List<Permission> permissions) {
-                        if (permissions.isEmpty()) {
-                            // Occurs during orientation change, when the subject receives onComplete.
-                            // In that case we don't want to propagate that empty list to the
-                            // subscriber, only the onComplete.
-                            return Observable.empty();
-                        }
-                        // Return true if all permissions are granted.
-                        for (Permission p : permissions) {
-                            if (!p.granted) {
-                                return Observable.just(false);
-                            }
-                        }
-                        return Observable.just(true);
-                    }
-                });
     }
 
     private boolean pending(final String... permissions) {
@@ -151,7 +147,7 @@ public class RxPermissions {
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    private Observable<Permission> request_(final String... permissions) {
+    private Observable<Permission> request(final String... permissions) {
 
         List<Observable<Permission>> list = new ArrayList<>(permissions.length);
         List<String> unrequestedPermissions = new ArrayList<>();
@@ -177,9 +173,9 @@ public class RxPermissions {
             }
 
             PublishSubject<Permission> subject = mSubjects.get(permission);
-            // Check if already requested permission, without receiving the result.
-            // This last case occurs on configuration change, and in that case
-            // we don't request the permission again.
+            // Request the permission to the framework only if not already done
+            // and if there's no request without result (occurs on configuration
+            // change, see onDestroy method).
             if (subject == null && !mNoResultRequests.contains(permission)) {
                 unrequestedPermissions.add(permission);
             }
@@ -271,12 +267,7 @@ public class RxPermissions {
         return mCtx.getPackageManager().isPermissionRevokedByPolicy(permission, mCtx.getPackageName());
     }
 
-    /**
-     * Invokes onCompleted on all registered subjects.
-     * <p>
-     * This should un-subscribe the observers.
-     */
-    public void onDestroy() {
+    void onDestroy() {
         log("onDestroy");
         for (String permission : mSubjects.keySet()) {
             mNoResultRequests.add(permission);
