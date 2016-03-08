@@ -17,29 +17,29 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "RxPermissionsSample";
 
-    private Camera mCamera;
-    private SurfaceView mSurfaceView;
-    private RxPermissions mRxPermissions;
+    private Camera camera;
+    private SurfaceView surfaceView;
+    private RxPermissions rxPermissions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRxPermissions = RxPermissions.getInstance(this);
-        mRxPermissions.setLogging(true);
+        rxPermissions = RxPermissions.getInstance(this);
+        rxPermissions.setLogging(true);
 
         setContentView(R.layout.act_main);
-        mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView);
+        surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
 
         RxView.clicks(findViewById(R.id.enableCamera))
-                .compose(mRxPermissions.ensure(Manifest.permission.CAMERA))
+                .compose(rxPermissions.ensure(Manifest.permission.CAMERA))
                 .subscribe(granted -> {
                             Log.i(TAG, " TRIGGER Received result " + granted);
                             if (granted) {
                                 releaseCamera();
-                                mCamera = Camera.open(0);
+                                camera = Camera.open(0);
                                 try {
-                                    mCamera.setPreviewDisplay(mSurfaceView.getHolder());
-                                    mCamera.startPreview();
+                                    camera.setPreviewDisplay(surfaceView.getHolder());
+                                    camera.startPreview();
                                 } catch (IOException e) {
                                     Log.e(TAG, "Error while trying to display the camera preview", e);
                                 }
@@ -61,9 +61,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void releaseCamera() {
-        if (mCamera != null) {
-            mCamera.release();
-            mCamera = null;
+        if (camera != null) {
+            camera.release();
+            camera = null;
         }
     }
 }
