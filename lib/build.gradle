@@ -8,8 +8,8 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 11
-        version = '0.5.2'
-        group = 'com.tbruyelle.rxpermissions'
+        version = rootProject.ext.libraryVersion
+        group = rootProject.ext.publishedGroupId + rootProject.ext.artifact
     }
     buildTypes {
         release {
@@ -33,3 +33,6 @@ dependencies {
     testCompile rootProject.ext.junit
     testCompile rootProject.ext.mockito
 }
+
+apply from: 'install.gradle'
+apply from: 'bintray.gradle'
