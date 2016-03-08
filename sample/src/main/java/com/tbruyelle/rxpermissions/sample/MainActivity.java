@@ -19,17 +19,19 @@ public class MainActivity extends AppCompatActivity {
 
     private Camera mCamera;
     private SurfaceView mSurfaceView;
+    private RxPermissions mRxPermissions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        RxPermissions.getInstance(this).setLogging(true);
+        mRxPermissions = RxPermissions.getInstance(this);
+        mRxPermissions.setLogging(true);
 
         setContentView(R.layout.act_main);
         mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView);
 
         RxView.clicks(findViewById(R.id.enableCamera))
-                .compose(RxPermissions.ensure(this, Manifest.permission.CAMERA))
+                .compose(mRxPermissions.ensure(Manifest.permission.CAMERA))
                 .subscribe(granted -> {
                             Log.i(TAG, " TRIGGER Received result " + granted);
                             if (granted) {

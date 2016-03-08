@@ -75,11 +75,11 @@ public class RxPermissions {
      * If one or several permissions have never been requested, invoke the related framework method
      * to ask the user if he allows the permissions.
      */
-    public static Observable.Transformer<Object, Boolean> ensure(final Context ctx, final String... permissions) {
+    public Observable.Transformer<Object, Boolean> ensure(final String... permissions) {
         return new Observable.Transformer<Object, Boolean>() {
             @Override
             public Observable<Boolean> call(Observable<Object> o) {
-                return RxPermissions.getInstance(ctx).request(o, permissions)
+                return request(o, permissions)
                         // Transform Observable<Permission> to Observable<Boolean>
                         .buffer(permissions.length)
                         .flatMap(new Func1<List<Permission>, Observable<Boolean>>() {
@@ -111,11 +111,11 @@ public class RxPermissions {
      * If one or several permissions have never been requested, invoke the related framework method
      * to ask the user if he allows the permissions.
      */
-    public static Observable.Transformer<Object, Permission> ensureEach(final Context ctx, final String... permissions) {
+    public Observable.Transformer<Object, Permission> ensureEach(final String... permissions) {
         return new Observable.Transformer<Object, Permission>() {
             @Override
             public Observable<Permission> call(Observable<Object> o) {
-                return RxPermissions.getInstance(ctx).request(o, permissions);
+                return request(o, permissions);
             }
         };
     }

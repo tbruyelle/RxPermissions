@@ -70,7 +70,7 @@ public class RxPermissionsTest {
         String permission = Manifest.permission.READ_PHONE_STATE;
         when(mRxPermissions.isGranted(permission)).thenReturn(true);
 
-        trigger().compose(RxPermissions.ensure(mCtx, permission)).subscribe(sub);
+        trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub);
 
         sub.assertNoErrors();
         sub.assertTerminalEvent();
@@ -86,7 +86,7 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted(permission)).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED};
 
-        trigger().compose(RxPermissions.ensure(mCtx, permission)).subscribe(sub);
+        trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
 
         sub.assertNoErrors();
@@ -103,7 +103,7 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted(permission)).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED};
 
-        trigger().compose(RxPermissions.ensureEach(mCtx, permission)).subscribe(sub);
+        trigger().compose(mRxPermissions.ensureEach(permission)).subscribe(sub);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
 
         sub.assertNoErrors();
@@ -119,7 +119,7 @@ public class RxPermissionsTest {
         String permission = Manifest.permission.READ_PHONE_STATE;
         when(mRxPermissions.isGranted(permission)).thenReturn(true);
 
-        trigger().compose(RxPermissions.ensureEach(mCtx, permission)).subscribe(sub);
+        trigger().compose(mRxPermissions.ensureEach(permission)).subscribe(sub);
 
         sub.assertNoErrors();
         sub.assertTerminalEvent();
@@ -134,7 +134,7 @@ public class RxPermissionsTest {
         String permission = Manifest.permission.READ_PHONE_STATE;
         when(mRxPermissions.isGranted(permission)).thenReturn(true);
 
-        trigger().compose(RxPermissions.ensure(mCtx, permission)).subscribe(sub);
+        trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub);
 
         sub.assertNoErrors();
         sub.assertTerminalEvent();
@@ -150,7 +150,7 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted(permission)).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_DENIED};
 
-        trigger().compose(RxPermissions.ensure(mCtx, permission)).subscribe(sub);
+        trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
 
         sub.assertNoErrors();
@@ -167,7 +167,7 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted(permission)).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_DENIED};
 
-        trigger().compose(RxPermissions.ensureEach(mCtx, permission)).subscribe(sub);
+        trigger().compose(mRxPermissions.ensureEach(permission)).subscribe(sub);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
 
         sub.assertNoErrors();
@@ -183,7 +183,7 @@ public class RxPermissionsTest {
         String permission = Manifest.permission.READ_PHONE_STATE;
         when(mRxPermissions.isRevoked(permission)).thenReturn(true);
 
-        trigger().compose(RxPermissions.ensure(mCtx, permission)).subscribe(sub);
+        trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub);
 
         sub.assertNoErrors();
         sub.assertTerminalEvent();
@@ -198,7 +198,7 @@ public class RxPermissionsTest {
         String permission = Manifest.permission.READ_PHONE_STATE;
         when(mRxPermissions.isRevoked(permission)).thenReturn(true);
 
-        trigger().compose(RxPermissions.ensureEach(mCtx, permission)).subscribe(sub);
+        trigger().compose(mRxPermissions.ensureEach(permission)).subscribe(sub);
 
         sub.assertNoErrors();
         sub.assertTerminalEvent();
@@ -215,8 +215,8 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted(permission)).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED};
 
-        trigger().compose(RxPermissions.ensure(mCtx, permission)).subscribe(sub1);
-        trigger().compose(RxPermissions.ensure(mCtx, permission)).subscribe(sub2);
+        trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub1);
+        trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub2);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
 
         verify(mRxPermissions).startShadowActivity(any(String[].class));
@@ -237,8 +237,8 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted(permission)).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED};
 
-        trigger().compose(RxPermissions.ensureEach(mCtx, permission)).subscribe(sub1);
-        trigger().compose(RxPermissions.ensureEach(mCtx, permission)).subscribe(sub2);
+        trigger().compose(mRxPermissions.ensureEach(permission)).subscribe(sub1);
+        trigger().compose(mRxPermissions.ensureEach(permission)).subscribe(sub2);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
 
         verify(mRxPermissions).startShadowActivity(any(String[].class));
@@ -259,8 +259,8 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted(permission)).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED};
 
-        trigger().compose(RxPermissions.ensure(mCtx, permission)).subscribe(sub1);
-        trigger().compose(RxPermissions.ensureEach(mCtx, permission)).subscribe(sub2);
+        trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub1);
+        trigger().compose(mRxPermissions.ensureEach(permission)).subscribe(sub2);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
 
         verify(mRxPermissions).startShadowActivity(any(String[].class));
@@ -281,7 +281,7 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted(Matchers.<String>anyVararg())).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED, PackageManager.PERMISSION_GRANTED};
 
-        trigger().compose(RxPermissions.ensure(mCtx, permissions)).subscribe(sub);
+        trigger().compose(mRxPermissions.ensure(permissions)).subscribe(sub);
         mRxPermissions.onRequestPermissionsResult(0, permissions, result);
 
         sub.assertNoErrors();
@@ -298,7 +298,7 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted(Matchers.<String>anyVararg())).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED, PackageManager.PERMISSION_GRANTED};
 
-        trigger().compose(RxPermissions.ensureEach(mCtx, permissions)).subscribe(sub);
+        trigger().compose(mRxPermissions.ensureEach(permissions)).subscribe(sub);
         mRxPermissions.onRequestPermissionsResult(0, permissions, result);
 
         sub.assertNoErrors();
@@ -318,7 +318,7 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted(Matchers.<String>anyVararg())).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED, PackageManager.PERMISSION_DENIED};
 
-        trigger().compose(RxPermissions.ensure(mCtx, permissions)).subscribe(sub);
+        trigger().compose(mRxPermissions.ensure(permissions)).subscribe(sub);
         mRxPermissions.onRequestPermissionsResult(0, permissions, result);
 
         sub.assertNoErrors();
@@ -335,7 +335,7 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted(Matchers.<String>anyVararg())).thenReturn(false);
         when(mRxPermissions.isRevoked(Manifest.permission.CAMERA)).thenReturn(true);
 
-        trigger().compose(RxPermissions.ensure(mCtx, permissions)).subscribe(sub);
+        trigger().compose(mRxPermissions.ensure(permissions)).subscribe(sub);
         mRxPermissions.onRequestPermissionsResult(0,
                 new String[]{Manifest.permission.READ_PHONE_STATE},
                 new int[]{PackageManager.PERMISSION_GRANTED});
@@ -354,7 +354,7 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted(Matchers.<String>anyVararg())).thenReturn(false);
         when(mRxPermissions.isGranted(Manifest.permission.CAMERA)).thenReturn(true);
 
-        trigger().compose(RxPermissions.ensureEach(mCtx, permissions)).subscribe(sub);
+        trigger().compose(mRxPermissions.ensureEach(permissions)).subscribe(sub);
         mRxPermissions.onRequestPermissionsResult(0,
                 new String[]{Manifest.permission.READ_PHONE_STATE},
                 new int[]{PackageManager.PERMISSION_GRANTED});
@@ -380,7 +380,7 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted(Matchers.<String>anyVararg())).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED, PackageManager.PERMISSION_DENIED};
 
-        trigger().compose(RxPermissions.ensureEach(mCtx, permissions)).subscribe(sub);
+        trigger().compose(mRxPermissions.ensureEach(permissions)).subscribe(sub);
         mRxPermissions.onRequestPermissionsResult(0, permissions, result);
 
         sub.assertNoErrors();
@@ -400,7 +400,7 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted(Matchers.<String>anyVararg())).thenReturn(false);
         when(mRxPermissions.isRevoked(Manifest.permission.CAMERA)).thenReturn(true);
 
-        trigger().compose(RxPermissions.ensureEach(mCtx, permissions)).subscribe(sub);
+        trigger().compose(mRxPermissions.ensureEach(permissions)).subscribe(sub);
         mRxPermissions.onRequestPermissionsResult(0,
                 new String[]{Manifest.permission.READ_PHONE_STATE},
                 new int[]{PackageManager.PERMISSION_GRANTED});
@@ -423,8 +423,8 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted(Matchers.<String>anyVararg())).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED, PackageManager.PERMISSION_GRANTED};
 
-        trigger().compose(RxPermissions.ensure(mCtx, permissions)).subscribe(sub1);
-        trigger().compose(RxPermissions.ensure(mCtx, permissions)).subscribe(sub2);
+        trigger().compose(mRxPermissions.ensure(permissions)).subscribe(sub1);
+        trigger().compose(mRxPermissions.ensure(permissions)).subscribe(sub2);
         mRxPermissions.onRequestPermissionsResult(0, permissions, result);
 
         verify(mRxPermissions).startShadowActivity(any(String[].class));
@@ -445,8 +445,8 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted(Matchers.<String>anyVararg())).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED, PackageManager.PERMISSION_GRANTED};
 
-        trigger().compose(RxPermissions.ensureEach(mCtx, permissions)).subscribe(sub1);
-        trigger().compose(RxPermissions.ensureEach(mCtx, permissions)).subscribe(sub2);
+        trigger().compose(mRxPermissions.ensureEach(permissions)).subscribe(sub1);
+        trigger().compose(mRxPermissions.ensureEach(permissions)).subscribe(sub2);
         mRxPermissions.onRequestPermissionsResult(0, permissions, result);
 
         verify(mRxPermissions).startShadowActivity(any(String[].class));
@@ -470,8 +470,8 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted(Matchers.<String>anyVararg())).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED, PackageManager.PERMISSION_GRANTED};
 
-        trigger().compose(RxPermissions.ensure(mCtx, permissions)).subscribe(sub1);
-        trigger().compose(RxPermissions.ensure(mCtx, Manifest.permission.CAMERA)).subscribe(sub2);
+        trigger().compose(mRxPermissions.ensure(permissions)).subscribe(sub1);
+        trigger().compose(mRxPermissions.ensure(Manifest.permission.CAMERA)).subscribe(sub2);
         mRxPermissions.onRequestPermissionsResult(0, permissions, result);
 
         verify(mRxPermissions).startShadowActivity(any(String[].class));
@@ -492,8 +492,8 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted(Matchers.<String>anyVararg())).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED, PackageManager.PERMISSION_GRANTED};
 
-        trigger().compose(RxPermissions.ensureEach(mCtx, permissions)).subscribe(sub1);
-        trigger().compose(RxPermissions.ensureEach(mCtx, Manifest.permission.CAMERA)).subscribe(sub2);
+        trigger().compose(mRxPermissions.ensureEach(permissions)).subscribe(sub1);
+        trigger().compose(mRxPermissions.ensureEach(Manifest.permission.CAMERA)).subscribe(sub2);
         mRxPermissions.onRequestPermissionsResult(0, permissions, result);
 
         verify(mRxPermissions).startShadowActivity(any(String[].class));
@@ -518,8 +518,8 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted(Matchers.<String>anyVararg())).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED};
 
-        trigger().compose(RxPermissions.ensure(mCtx, Manifest.permission.CAMERA)).subscribe(sub1);
-        trigger().compose(RxPermissions.ensure(mCtx, permissions)).subscribe(sub2);
+        trigger().compose(mRxPermissions.ensure(Manifest.permission.CAMERA)).subscribe(sub1);
+        trigger().compose(mRxPermissions.ensure(permissions)).subscribe(sub2);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{Manifest.permission.READ_PHONE_STATE}, result);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{Manifest.permission.CAMERA}, result);
 
@@ -541,8 +541,8 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted(Matchers.<String>anyVararg())).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED};
 
-        trigger().compose(RxPermissions.ensureEach(mCtx, Manifest.permission.CAMERA)).subscribe(sub1);
-        trigger().compose(RxPermissions.ensureEach(mCtx, permissions)).subscribe(sub2);
+        trigger().compose(mRxPermissions.ensureEach(Manifest.permission.CAMERA)).subscribe(sub1);
+        trigger().compose(mRxPermissions.ensureEach(permissions)).subscribe(sub2);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{Manifest.permission.READ_PHONE_STATE}, result);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{Manifest.permission.CAMERA}, result);
 
@@ -569,8 +569,8 @@ public class RxPermissionsTest {
         int[] resultGranted = new int[]{PackageManager.PERMISSION_GRANTED};
         int[] resultDenied = new int[]{PackageManager.PERMISSION_DENIED};
 
-        trigger().compose(RxPermissions.ensure(mCtx, Manifest.permission.CAMERA)).subscribe(sub1);
-        trigger().compose(RxPermissions.ensure(mCtx, permissions)).subscribe(sub2);
+        trigger().compose(mRxPermissions.ensure(Manifest.permission.CAMERA)).subscribe(sub1);
+        trigger().compose(mRxPermissions.ensure(permissions)).subscribe(sub2);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{Manifest.permission.READ_PHONE_STATE}, resultDenied);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{Manifest.permission.CAMERA}, resultGranted);
 
@@ -595,8 +595,8 @@ public class RxPermissionsTest {
         int[] resultGranted = new int[]{PackageManager.PERMISSION_GRANTED};
         int[] resultDenied = new int[]{PackageManager.PERMISSION_DENIED};
 
-        trigger().compose(RxPermissions.ensureEach(mCtx, Manifest.permission.CAMERA)).subscribe(sub1);
-        trigger().compose(RxPermissions.ensureEach(mCtx, permissions)).subscribe(sub2);
+        trigger().compose(mRxPermissions.ensureEach(Manifest.permission.CAMERA)).subscribe(sub1);
+        trigger().compose(mRxPermissions.ensureEach(permissions)).subscribe(sub2);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{Manifest.permission.READ_PHONE_STATE}, resultDenied);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{Manifest.permission.CAMERA}, resultGranted);
 
@@ -623,8 +623,8 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted(permission)).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED};
 
-        trigger().compose(RxPermissions.ensure(mCtx, permission)).subscribe(sub1);
-        trigger().compose(RxPermissions.ensure(mCtx, permission)).subscribe(sub2);
+        trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub1);
+        trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub2);
         mRxPermissions.onDestroy();
         for (TestSubscriber sub : new TestSubscriber[]{sub1, sub2}) {
             sub.assertNoErrors();
@@ -633,8 +633,8 @@ public class RxPermissionsTest {
 
         sub1 = new TestSubscriber<>();
         sub2 = new TestSubscriber<>();
-        trigger().compose(RxPermissions.ensure(mCtx, permission)).subscribe(sub1);
-        trigger().compose(RxPermissions.ensure(mCtx, permission)).subscribe(sub2);
+        trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub1);
+        trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub2);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
 
         verify(mRxPermissions).startShadowActivity(any(String[].class));
@@ -655,8 +655,8 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted(permission)).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED};
 
-        trigger().compose(RxPermissions.ensureEach(mCtx, permission)).subscribe(sub1);
-        trigger().compose(RxPermissions.ensureEach(mCtx, permission)).subscribe(sub2);
+        trigger().compose(mRxPermissions.ensureEach(permission)).subscribe(sub1);
+        trigger().compose(mRxPermissions.ensureEach(permission)).subscribe(sub2);
         mRxPermissions.onDestroy();
         for (TestSubscriber sub : new TestSubscriber[]{sub1, sub2}) {
             sub.assertNoErrors();
@@ -665,8 +665,8 @@ public class RxPermissionsTest {
 
         sub1 = new TestSubscriber<>();
         sub2 = new TestSubscriber<>();
-        trigger().compose(RxPermissions.ensureEach(mCtx, permission)).subscribe(sub1);
-        trigger().compose(RxPermissions.ensureEach(mCtx, permission)).subscribe(sub2);
+        trigger().compose(mRxPermissions.ensureEach(permission)).subscribe(sub1);
+        trigger().compose(mRxPermissions.ensureEach(permission)).subscribe(sub2);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
 
         verify(mRxPermissions).startShadowActivity(any(String[].class));
@@ -687,7 +687,7 @@ public class RxPermissionsTest {
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED};
         PublishSubject<Object> trigger = PublishSubject.create();
 
-        trigger.compose(RxPermissions.ensure(mCtx, permission)).subscribe(sub);
+        trigger.compose(mRxPermissions.ensure(permission)).subscribe(sub);
         trigger.onNext(null);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
 
@@ -705,7 +705,7 @@ public class RxPermissionsTest {
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED};
         PublishSubject<Object> trigger = PublishSubject.create();
 
-        trigger.compose(RxPermissions.ensureEach(mCtx, permission)).subscribe(sub);
+        trigger.compose(mRxPermissions.ensureEach(permission)).subscribe(sub);
         trigger.onNext(null);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
 
@@ -724,8 +724,8 @@ public class RxPermissionsTest {
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED};
         PublishSubject<Object> trigger = PublishSubject.create();
 
-        trigger.compose(RxPermissions.ensure(mCtx, permission)).subscribe(sub1);
-        trigger.compose(RxPermissions.ensure(mCtx, permission)).subscribe(sub2);
+        trigger.compose(mRxPermissions.ensure(permission)).subscribe(sub1);
+        trigger.compose(mRxPermissions.ensure(permission)).subscribe(sub2);
         trigger.onNext(null);
         mRxPermissions.onDestroy();
         for (TestSubscriber sub : new TestSubscriber[]{sub1, sub2}) {
@@ -736,8 +736,8 @@ public class RxPermissionsTest {
 
         sub1 = new TestSubscriber<>();
         sub2 = new TestSubscriber<>();
-        trigger.compose(RxPermissions.ensure(mCtx, permission)).subscribe(sub1);
-        trigger.compose(RxPermissions.ensure(mCtx, permission)).subscribe(sub2);
+        trigger.compose(mRxPermissions.ensure(permission)).subscribe(sub1);
+        trigger.compose(mRxPermissions.ensure(permission)).subscribe(sub2);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
 
         verify(mRxPermissions).startShadowActivity(any(String[].class));
@@ -758,8 +758,8 @@ public class RxPermissionsTest {
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED};
         PublishSubject<Object> trigger = PublishSubject.create();
 
-        trigger.compose(RxPermissions.ensureEach(mCtx, permission)).subscribe(sub1);
-        trigger.compose(RxPermissions.ensureEach(mCtx, permission)).subscribe(sub2);
+        trigger.compose(mRxPermissions.ensureEach(permission)).subscribe(sub1);
+        trigger.compose(mRxPermissions.ensureEach(permission)).subscribe(sub2);
         trigger.onNext(null);
         mRxPermissions.onDestroy();
         for (TestSubscriber sub : new TestSubscriber[]{sub1, sub2}) {
@@ -770,8 +770,8 @@ public class RxPermissionsTest {
 
         sub1 = new TestSubscriber<>();
         sub2 = new TestSubscriber<>();
-        trigger.compose(RxPermissions.ensureEach(mCtx, permission)).subscribe(sub1);
-        trigger.compose(RxPermissions.ensureEach(mCtx, permission)).subscribe(sub2);
+        trigger.compose(mRxPermissions.ensureEach(permission)).subscribe(sub1);
+        trigger.compose(mRxPermissions.ensureEach(permission)).subscribe(sub2);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
 
         verify(mRxPermissions).startShadowActivity(any(String[].class));
