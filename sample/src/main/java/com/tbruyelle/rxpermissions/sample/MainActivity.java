@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
         surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
 
         RxView.clicks(findViewById(R.id.enableCamera))
+                // Ask for permissions when button is clicked
                 .compose(rxPermissions.ensure(Manifest.permission.CAMERA))
                 .subscribe(granted -> {
                             Log.i(TAG, " TRIGGER Received result " + granted);

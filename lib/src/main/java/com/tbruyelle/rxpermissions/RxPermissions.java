@@ -120,6 +120,22 @@ public class RxPermissions {
         };
     }
 
+    /**
+     * Request permissions immediately, <b>must be invoked during initialization phase
+     * of your application</b>.
+     */
+    public Observable<Boolean> request(final String... permissions) {
+        return Observable.just(null).compose(ensure(permissions));
+    }
+
+    /**
+     * Request permissions immediately, <b>must be invoked during initialization phase
+     * of your application</b>.
+     */
+    public Observable<Permission> requestEach(final String... permissions) {
+        return Observable.just(null).compose(ensureEach(permissions));
+    }
+
     private Observable<Permission> request(final Observable<?> trigger,
                                            final String... permissions) {
         if (permissions == null || permissions.length == 0) {
@@ -127,12 +143,12 @@ public class RxPermissions {
         }
         // If there's pending request
         if (pending(permissions)) {
-            return request(permissions);
+            return request_(permissions);
         }
         return trigger.flatMap(new Func1<Object, Observable<Permission>>() {
             @Override
             public Observable<Permission> call(Object o) {
-                return request(permissions);
+                return request_(permissions);
             }
         });
     }
@@ -147,7 +163,7 @@ public class RxPermissions {
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    private Observable<Permission> request(final String... permissions) {
+    private Observable<Permission> request_(final String... permissions) {
 
         List<Observable<Permission>> list = new ArrayList<>(permissions.length);
         List<String> unrequestedPermissions = new ArrayList<>();
