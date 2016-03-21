@@ -1,6 +1,6 @@
 # RxPermissions
 
-[![Build Status](https://api.travis-ci.org/tbruyelle/RxPermissions.svg?branch=v0.5.1)](https://travis-ci.org/tbruyelle/RxPermissions)
+[![Build Status](https://api.travis-ci.org/tbruyelle/RxPermissions.svg?branch=v0.6.0)](https://travis-ci.org/tbruyelle/RxPermissions)
 
 This library allows the usage of RxJava with the new Android M permission model.
 
@@ -114,6 +114,6 @@ repositories {
 }
 
 dependencies {
-    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.5.2@aar'
+    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.6.0@aar'
 }
 ```
