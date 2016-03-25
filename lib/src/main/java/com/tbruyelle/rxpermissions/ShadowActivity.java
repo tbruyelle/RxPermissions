@@ -34,8 +34,8 @@ public class ShadowActivity extends Activity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        RxPermissions.getInstance(this).onDestroy();
+    protected void onStop() {
+        super.onStop();
+        RxPermissions.getInstance(this).onShadowActivityStop();
     }
 }

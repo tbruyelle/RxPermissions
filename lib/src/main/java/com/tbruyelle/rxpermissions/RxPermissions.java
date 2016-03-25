@@ -283,8 +283,8 @@ public class RxPermissions {
         return mCtx.getPackageManager().isPermissionRevokedByPolicy(permission, mCtx.getPackageName());
     }
 
-    void onDestroy() {
-        log("onDestroy");
+    void onShadowActivityStop() {
+        log("onShadowActivityStop");
         for (String permission : mSubjects.keySet()) {
             mNoResultRequests.add(permission);
         }

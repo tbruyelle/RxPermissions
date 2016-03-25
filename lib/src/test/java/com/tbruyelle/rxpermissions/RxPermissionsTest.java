@@ -625,7 +625,7 @@ public class RxPermissionsTest {
 
         trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub1);
         trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub2);
-        mRxPermissions.onDestroy();
+        mRxPermissions.onShadowActivityStop();
         for (TestSubscriber sub : new TestSubscriber[]{sub1, sub2}) {
             sub.assertNoErrors();
             sub.assertNoValues();
@@ -657,7 +657,7 @@ public class RxPermissionsTest {
 
         trigger().compose(mRxPermissions.ensureEach(permission)).subscribe(sub1);
         trigger().compose(mRxPermissions.ensureEach(permission)).subscribe(sub2);
-        mRxPermissions.onDestroy();
+        mRxPermissions.onShadowActivityStop();
         for (TestSubscriber sub : new TestSubscriber[]{sub1, sub2}) {
             sub.assertNoErrors();
             sub.assertNoValues();
@@ -727,7 +727,7 @@ public class RxPermissionsTest {
         trigger.compose(mRxPermissions.ensure(permission)).subscribe(sub1);
         trigger.compose(mRxPermissions.ensure(permission)).subscribe(sub2);
         trigger.onNext(null);
-        mRxPermissions.onDestroy();
+        mRxPermissions.onShadowActivityStop();
         for (TestSubscriber sub : new TestSubscriber[]{sub1, sub2}) {
             sub.assertNoErrors();
             sub.assertNoValues();
@@ -761,7 +761,7 @@ public class RxPermissionsTest {
         trigger.compose(mRxPermissions.ensureEach(permission)).subscribe(sub1);
         trigger.compose(mRxPermissions.ensureEach(permission)).subscribe(sub2);
         trigger.onNext(null);
-        mRxPermissions.onDestroy();
+        mRxPermissions.onShadowActivityStop();
         for (TestSubscriber sub : new TestSubscriber[]{sub1, sub2}) {
             sub.assertNoErrors();
             sub.assertNoValues();
