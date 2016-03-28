@@ -20,4 +20,24 @@
         android:text="Enable camera"
         />
 
+     <Button
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_gravity="center_horizontal"
+         android:layout_marginTop="80dp"
+         android:id="@+id/enableLocation"
+         android:text="Enable location"
+         />
+
+     <TextView
+         android:id="@+id/locTextView"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:gravity="center_horizontal"
+         android:layout_marginTop="140dp"
+         android:textSize="16dp"
+         android:textColor="@android:color/white"
+         />
+
+
 </FrameLayout>
