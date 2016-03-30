@@ -286,6 +286,7 @@ public class RxPermissions {
     void onShadowActivityStop() {
         log("onShadowActivityStop");
         for (String permission : mSubjects.keySet()) {
+            log("NoResultRequest : " + permission);
             mNoResultRequests.add(permission);
         }
         mSubjects.clear();
