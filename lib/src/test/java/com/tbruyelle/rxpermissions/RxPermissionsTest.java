@@ -633,8 +633,8 @@ public class RxPermissionsTest {
 
         sub1 = new TestSubscriber<>();
         sub2 = new TestSubscriber<>();
-        trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub1);
-        trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub2);
+        Observable.empty().compose(mRxPermissions.ensure(permission)).subscribe(sub1);
+        Observable.empty().compose(mRxPermissions.ensure(permission)).subscribe(sub2);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
 
         verify(mRxPermissions).startShadowActivity(any(String[].class));
@@ -665,8 +665,8 @@ public class RxPermissionsTest {
 
         sub1 = new TestSubscriber<>();
         sub2 = new TestSubscriber<>();
-        trigger().compose(mRxPermissions.ensureEach(permission)).subscribe(sub1);
-        trigger().compose(mRxPermissions.ensureEach(permission)).subscribe(sub2);
+        Observable.empty().compose(mRxPermissions.ensureEach(permission)).subscribe(sub1);
+        Observable.empty().compose(mRxPermissions.ensureEach(permission)).subscribe(sub2);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
 
         verify(mRxPermissions).startShadowActivity(any(String[].class));
@@ -743,7 +743,6 @@ public class RxPermissionsTest {
         verify(mRxPermissions).startShadowActivity(any(String[].class));
         for (TestSubscriber sub : new TestSubscriber[]{sub1, sub2}) {
             sub.assertNoErrors();
-            sub.assertCompleted();
             sub.assertReceivedOnNext(singletonList(true));
         }
     }
@@ -777,7 +776,6 @@ public class RxPermissionsTest {
         verify(mRxPermissions).startShadowActivity(any(String[].class));
         for (TestSubscriber sub : new TestSubscriber[]{sub1, sub2}) {
             sub.assertNoErrors();
-            sub.assertCompleted();
             sub.assertReceivedOnNext(singletonList(new Permission(permission, true)));
         }
     }
