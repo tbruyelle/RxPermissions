@@ -170,9 +170,6 @@ public class RxPermissions {
         List<String> unrequestedPermissions = new ArrayList<>();
 
         // In case of multiple permissions, we create a observable for each of them.
-        // This helps to handle concurrent requests, for instance when there is one
-        // request for CAMERA and STORAGE, and another request for CAMERA only, only
-        // one observable will be create for the CAMERA.
         // At the end, the observables are combined to have a unique response.
         for (String permission : permissions) {
             log("Requesting permission " + permission);
@@ -190,7 +187,6 @@ public class RxPermissions {
             }
 
             PublishSubject<Permission> subject = mSubjects.get(permission);
-
             // Create a new subject if not exists
             if (subject == null) {
                 unrequestedPermissions.add(permission);
