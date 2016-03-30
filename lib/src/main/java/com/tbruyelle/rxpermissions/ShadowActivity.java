@@ -32,10 +32,4 @@ public class ShadowActivity extends Activity {
         RxPermissions.getInstance(this).onRequestPermissionsResult(requestCode, permissions, grantResults);
         finish();
     }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        RxPermissions.getInstance(this).onShadowActivityStop();
-    }
 }

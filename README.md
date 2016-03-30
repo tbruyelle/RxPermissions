@@ -95,11 +95,6 @@ receive a granted result.
 Currently without this library you have to request the permission in one place and handle the result
 in `Activity.onRequestPermissionsResult()`.
 
-- Handles multiple permission requests out of the box.
-For instance if during the initialization of your app you request the same permission in 2 different
-places, only one request will be made to the framework. As a result, only one popup will appear to
-the user, but his response will be dispatched to all requesters.
-
 - All what RX provides about transformation, filter, chaining...
 
 ## Setup

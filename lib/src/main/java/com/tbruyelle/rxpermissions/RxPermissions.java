@@ -46,9 +46,6 @@ public class RxPermissions {
 
     private Context mCtx;
 
-    // Contains all pending permission requests after a config change.
-    private List<String> mNoResultRequests = new ArrayList<>();
-
     // Contains all the current permission requests.
     // Once granted or denied, they are removed from it.
     private Map<String, PublishSubject<Permission>> mSubjects = new HashMap<>();
@@ -152,7 +149,7 @@ public class RxPermissions {
 
     private Observable<?> pending(final String... permissions) {
         for (String p : permissions) {
-            if (!mNoResultRequests.contains(p)) {
+            if (!mSubjects.containsKey(p)) {
                 return Observable.empty();
             }
         }
@@ -193,15 +190,10 @@ public class RxPermissions {
             }
 
             PublishSubject<Permission> subject = mSubjects.get(permission);
-            // Request the permission to the framework only if not already done
-            // and if there's no request without result (occurs on configuration
-            // change, see onDestroy method).
-            if (subject == null && !mNoResultRequests.contains(permission)) {
-                unrequestedPermissions.add(permission);
-            }
 
             // Create a new subject if not exists
             if (subject == null) {
+                unrequestedPermissions.add(permission);
                 subject = PublishSubject.create();
                 mSubjects.put(permission, subject);
             }
@@ -287,15 +279,6 @@ public class RxPermissions {
         return mCtx.getPackageManager().isPermissionRevokedByPolicy(permission, mCtx.getPackageName());
     }
 
-    void onShadowActivityStop() {
-        log("onShadowActivityStop");
-        for (String permission : mSubjects.keySet()) {
-            log("NoResultRequest : " + permission);
-            mNoResultRequests.add(permission);
-        }
-        mSubjects.clear();
-    }
-
     void onRequestPermissionsResult(int requestCode,
                                     String permissions[], int[] grantResults) {
         for (int i = 0, size = permissions.length; i < size; i++) {
@@ -307,7 +290,6 @@ public class RxPermissions {
                 throw new IllegalStateException("RxPermissions.onRequestPermissionsResult invoked but didn't find the corresponding permission request.");
             }
             mSubjects.remove(permissions[i]);
-            mNoResultRequests.remove(permissions[i]);
             boolean granted = grantResults[i] == PackageManager.PERMISSION_GRANTED;
             subject.onNext(new Permission(permissions[i], granted));
             subject.onCompleted();
