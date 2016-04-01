@@ -4,7 +4,7 @@
 
 This library allows the usage of RxJava with the new Android M permission model.
 
-Example (With Retrolambda for brevity, but not required):
+Example (with Retrolambda for brevity, but not required):
 
 ```java
 // Must be done during an initialization phase like onCreate
