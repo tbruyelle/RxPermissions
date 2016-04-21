@@ -2,6 +2,22 @@
 
 [![Build Status](https://api.travis-ci.org/tbruyelle/RxPermissions.svg?branch=v0.7.0)](https://travis-ci.org/tbruyelle/RxPermissions)
 
+## Setup
+
+To use this library your `minSdkVersion` must be >= 9.
+
+In your build.gradle :
+
+```gradle
+repositories {
+    jcenter() // If not already there
+}
+
+dependencies {
+    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.7.0@aar'
+}
+```
+
 This library allows the usage of RxJava with the new Android M permission model.
 
 Example (with Retrolambda for brevity, but not required):
@@ -96,19 +112,3 @@ Currently without this library you have to request the permission in one place a
 in `Activity.onRequestPermissionsResult()`.
 
 - All what RX provides about transformation, filter, chaining...
-
-## Setup
-
-To use this library your `minSdkVersion` must be >= 9.
-
-In your build.gradle :
-
-```gradle
-repositories {
-    jcenter() // If not already there
-}
-
-dependencies {
-    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.7.0@aar'
-}
-```
