@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Process;
+import android.util.Log;
 
 @TargetApi(Build.VERSION_CODES.M)
 public class ShadowActivity extends Activity {
@@ -25,7 +26,8 @@ public class ShadowActivity extends Activity {
 
             boolean restoredInAnotherProcess = mOriginalProcessId != Process.myPid();
 
-            if(restoredInAnotherProcess) {
+            Log.e("RxPermissionsSample", "restored :" + restoredInAnotherProcess);
+            if (restoredInAnotherProcess) {
                 finish();
             }
         }

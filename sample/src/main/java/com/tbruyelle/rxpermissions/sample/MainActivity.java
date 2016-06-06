@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
         RxView.clicks(findViewById(R.id.enableCamera))
                 // Ask for permissions when button is clicked
-                .compose(rxPermissions.ensure(Manifest.permission.CAMERA))
+                .compose(rxPermissions.ensure(Manifest.permission.CAMERA, Manifest.permission.ACCESS_FINE_LOCATION))
                 .subscribe(granted -> {
                             Log.i(TAG, " TRIGGER Received result " + granted);
                             if (granted) {
