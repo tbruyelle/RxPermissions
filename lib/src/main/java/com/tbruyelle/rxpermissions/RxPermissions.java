@@ -212,7 +212,7 @@ public class RxPermissions {
      * Activity.shouldShowRequestPermissionRationale returned true for
      * all revoked permissions.
      * <p>
-     * You shouldn't call this method if all permissions haven been granted.
+     * You shouldn't call this method if all permissions have been granted.
      * <p>
      * For SDK &lt; 23, the observable will always emit false.
      */
