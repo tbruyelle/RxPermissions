@@ -103,7 +103,7 @@ public class RxPermissions {
 
     /**
      * Map emitted items from the source observable into {@link Permission} objects for each
-     * permissions in parameters.
+     * permission in parameters.
      * <p>
      * If one or several permissions have never been requested, invoke the related framework method
      * to ask the user if he allows the permissions.
@@ -212,7 +212,7 @@ public class RxPermissions {
      * Activity.shouldShowRequestPermissionRationale returned true for
      * all revoked permissions.
      * <p>
-     * You shouldn't call this method is all permissions haven been granted.
+     * You shouldn't call this method if all permissions haven been granted.
      * <p>
      * For SDK &lt; 23, the observable will always emit false.
      */
