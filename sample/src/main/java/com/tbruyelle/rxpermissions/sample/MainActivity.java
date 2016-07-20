@@ -13,6 +13,9 @@ import com.tbruyelle.rxpermissions.RxPermissions;
 
 import java.io.IOException;
 
+import rx.functions.Action0;
+import rx.functions.Action1;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "RxPermissionsSample";
@@ -33,26 +36,38 @@ public class MainActivity extends AppCompatActivity {
         RxView.clicks(findViewById(R.id.enableCamera))
                 // Ask for permissions when button is clicked
                 .compose(rxPermissions.ensure(Manifest.permission.CAMERA))
-                .subscribe(granted -> {
-                            Log.i(TAG, " TRIGGER Received result " + granted);
-                            if (granted) {
-                                releaseCamera();
-                                camera = Camera.open(0);
-                                try {
-                                    camera.setPreviewDisplay(surfaceView.getHolder());
-                                    camera.startPreview();
-                                } catch (IOException e) {
-                                    Log.e(TAG, "Error while trying to display the camera preview", e);
-                                }
-                            } else {
-                                Toast.makeText(MainActivity.this,
-                                        "Permission denied, can't enable the camera",
-                                        Toast.LENGTH_SHORT).show();
+                .subscribe(new Action1<Boolean>() {
+                               @Override
+                               public void call(Boolean granted) {
+                                   Log.i(TAG, "Permission result " + granted);
+                                   if (granted) {
+                                       releaseCamera();
+                                       camera = Camera.open(0);
+                                       try {
+                                           camera.setPreviewDisplay(surfaceView.getHolder());
+                                           camera.startPreview();
+                                       } catch (IOException e) {
+                                           Log.e(TAG, "Error while trying to display the camera preview", e);
+                                       }
+                                   } else {
+                                       Toast.makeText(MainActivity.this,
+                                               "Permission denied, can't enable the camera",
+                                               Toast.LENGTH_SHORT).show();
+                                   }
+                               }
+                           },
+                        new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable t) {
+                                Log.e(TAG, "onError", t);
                             }
                         },
-                        t -> Log.e(TAG, "onError", t),
-                        () -> Log.i(TAG, "OnComplete")
-                );
+                        new Action0() {
+                            @Override
+                            public void call() {
+                                Log.i(TAG, "OnComplete");
+                            }
+                        });
     }
 
     @Override
