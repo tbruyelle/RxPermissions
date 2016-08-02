@@ -101,7 +101,7 @@ example to see how to use them.
 
 ## Status
 
-This library is still beta, so contributions are welcome. 
+This library is still beta, so contributions are welcome.
 I'm currently using it in production since months without issue.
 
 ## Benefits
