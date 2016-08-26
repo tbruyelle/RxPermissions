@@ -16,8 +16,7 @@ public class Permission {
 
         Permission that = (Permission) o;
 
-        if (granted != that.granted) return false;
-        return name.equals(that.name);
+        return granted == that.granted && name.equals(that.name);
     }
 
     @Override
