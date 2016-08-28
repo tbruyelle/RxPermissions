@@ -93,6 +93,8 @@ must be done during an initialization phase**. This may be `Activity.onCreate/on
 If not, and if your app is restarted during the permission request (because of a configuration
 change for instance), the user's answer will never be emitted to the subscriber.
 
+You can find more details about that [here](https://github.com/tbruyelle/RxPermissions/issues/69).
+
 ## Migration to 0.6.x
 
 Version 0.6.0 replaced the methods `request(trigger, permission...)` and `requestEach(trigger, permission...)`
