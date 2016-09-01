@@ -7,7 +7,11 @@ import android.os.Build;
 import android.os.Bundle;
 
 @TargetApi(Build.VERSION_CODES.M)
-public class ShadowActivity extends Activity {
+class ShadowActivity extends Activity {
+
+    private static final int PERMISSIONS_REQUEST_CODE = 42;
+
+    public static final String PERMISSIONS_KEY = "permissions";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,8 +27,8 @@ public class ShadowActivity extends Activity {
     }
 
     private void handleIntent(Intent intent) {
-        String[] permissions = intent.getStringArrayExtra("permissions");
-        requestPermissions(permissions, 42);
+        String[] permissions = intent.getStringArrayExtra(PERMISSIONS_KEY);
+        requestPermissions(permissions, PERMISSIONS_REQUEST_CODE);
     }
 
     @Override

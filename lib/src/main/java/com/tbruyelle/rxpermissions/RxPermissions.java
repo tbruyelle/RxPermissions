@@ -238,7 +238,7 @@ public class RxPermissions {
     void startShadowActivity(String[] permissions) {
         log("startShadowActivity " + TextUtils.join(", ", permissions));
         Intent intent = new Intent(mCtx, ShadowActivity.class);
-        intent.putExtra("permissions", permissions);
+        intent.putExtra(ShadowActivity.PERMISSIONS_KEY, permissions);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mCtx.startActivity(intent);
     }
