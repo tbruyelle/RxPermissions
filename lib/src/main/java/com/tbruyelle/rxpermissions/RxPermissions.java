@@ -169,20 +169,20 @@ public class RxPermissions {
         List<Observable<Permission>> list = new ArrayList<>(permissions.length);
         List<String> unrequestedPermissions = new ArrayList<>();
 
-        // In case of multiple permissions, we create a observable for each of them.
+        // In case of multiple permissions, we create an Observable for each of them.
         // At the end, the observables are combined to have a unique response.
         for (String permission : permissions) {
             log("Requesting permission " + permission);
             if (isGranted(permission)) {
                 // Already granted, or not Android M
                 // Return a granted Permission object.
-                list.add(Observable.just(new Permission(permission, true)));
+                list.add(Observable.just(new Permission(permission, true, true)));
                 continue;
             }
 
             if (isRevoked(permission)) {
                 // Revoked by a policy, return a denied Permission object.
-                list.add(Observable.just(new Permission(permission, false)));
+                list.add(Observable.just(new Permission(permission, false, false)));
                 continue;
             }
 
@@ -276,7 +276,7 @@ public class RxPermissions {
     }
 
     void onRequestPermissionsResult(int requestCode,
-                                    String permissions[], int[] grantResults) {
+                                    String permissions[], int[] grantResults, boolean[] shouldShowRequestPermissionRationale) {
         for (int i = 0, size = permissions.length; i < size; i++) {
             log("onRequestPermissionsResult  " + permissions[i]);
             // Find the corresponding subject
@@ -287,7 +287,7 @@ public class RxPermissions {
             }
             mSubjects.remove(permissions[i]);
             boolean granted = grantResults[i] == PackageManager.PERMISSION_GRANTED;
-            subject.onNext(new Permission(permissions[i], granted));
+            subject.onNext(new Permission(permissions[i], granted, shouldShowRequestPermissionRationale[i]));
             subject.onCompleted();
         }
     }

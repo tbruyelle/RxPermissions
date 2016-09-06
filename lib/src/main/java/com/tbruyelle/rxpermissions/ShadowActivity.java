@@ -9,6 +9,8 @@ import android.os.Process;
 
 @TargetApi(Build.VERSION_CODES.M)
 public class ShadowActivity extends EnsureSameProcessActivity {
+    private boolean[] shouldShowRequestPermissionRationale;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,12 +26,18 @@ public class ShadowActivity extends EnsureSameProcessActivity {
 
     private void handleIntent(Intent intent) {
         String[] permissions = intent.getStringArrayExtra("permissions");
+        shouldShowRequestPermissionRationale = new boolean[permissions.length];
+
+        for (int i = 0; i < permissions.length; i++) {
+            shouldShowRequestPermissionRationale[i] = shouldShowRequestPermissionRationale(permissions[i]);
+        }
+
         requestPermissions(permissions, 42);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        RxPermissions.getInstance(this).onRequestPermissionsResult(requestCode, permissions, grantResults);
+        RxPermissions.getInstance(this).onRequestPermissionsResult(requestCode, permissions, grantResults, shouldShowRequestPermissionRationale);
         finish();
     }
 }
