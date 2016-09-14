@@ -133,8 +133,8 @@ public class RxPermissions {
         return Observable.just(null).compose(ensureEach(permissions));
     }
 
-    private Observable<Permission> request(final Observable<?> trigger,
-                                           final String... permissions) {
+    Observable<Permission> request(final Observable<?> trigger,
+                                   final String... permissions) {
         if (permissions == null || permissions.length == 0) {
             throw new IllegalArgumentException("RxPermissions.request/requestEach requires at least one input permission");
         }
@@ -164,7 +164,7 @@ public class RxPermissions {
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    private Observable<Permission> request_(final String... permissions) {
+    Observable<Permission> request_(final String... permissions) {
 
         List<Observable<Permission>> list = new ArrayList<>(permissions.length);
         List<String> unrequestedPermissions = new ArrayList<>();
