@@ -18,5 +18,4 @@ dependencies {
     compile project(':rxpermissions')
 
     compile rootProject.ext.appCompat
-    compile 'com.jakewharton.rxbinding:rxbinding:0.4.0'
 }

@@ -21,18 +21,14 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
+import io.reactivex.Observable;
+import io.reactivex.observers.TestObserver;
+import io.reactivex.subjects.PublishSubject;
 import org.junit.*;
+import org.junit.runner.RunWith;
 import org.mockito.*;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import rx.Observable;
-import rx.observers.TestSubscriber;
-import rx.subjects.PublishSubject;
-
-import static java.util.Collections.singletonList;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -59,29 +55,28 @@ public class RxPermissionsTest {
         doReturn(false).when(mRxPermissions).isRevoked(anyString());
     }
 
-    private Observable<Object> trigger() {
-        return Observable.just(null);
+    private Observable<?> trigger() {
+        return Observable.just(RxPermissions.TRIGGER);
     }
 
     @Test
     @TargetApi(Build.VERSION_CODES.M)
     public void subscription_preM() {
-        TestSubscriber<Boolean> sub = new TestSubscriber<>();
+        TestObserver<Boolean> sub = new TestObserver<>();
         String permission = Manifest.permission.READ_PHONE_STATE;
         when(mRxPermissions.isGranted(permission)).thenReturn(true);
 
         trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub);
 
         sub.assertNoErrors();
-        sub.assertTerminalEvent();
-        sub.assertUnsubscribed();
-        sub.assertReceivedOnNext(singletonList(true));
+        sub.assertTerminated();
+        sub.assertValue(true);
     }
 
     @Test
     @TargetApi(Build.VERSION_CODES.M)
     public void subscription_granted() {
-        TestSubscriber<Boolean> sub = new TestSubscriber<>();
+        TestObserver<Boolean> sub = new TestObserver<>();
         String permission = Manifest.permission.READ_PHONE_STATE;
         when(mRxPermissions.isGranted(permission)).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED};
@@ -90,15 +85,14 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
 
         sub.assertNoErrors();
-        sub.assertTerminalEvent();
-        sub.assertUnsubscribed();
-        sub.assertReceivedOnNext(singletonList(true));
+        sub.assertTerminated();
+        sub.assertValue(true);
     }
 
     @Test
     @TargetApi(Build.VERSION_CODES.M)
     public void eachSubscription_granted() {
-        TestSubscriber<Permission> sub = new TestSubscriber<>();
+        TestObserver<Permission> sub = new TestObserver<>();
         String permission = Manifest.permission.READ_PHONE_STATE;
         when(mRxPermissions.isGranted(permission)).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED};
@@ -107,45 +101,42 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
 
         sub.assertNoErrors();
-        sub.assertTerminalEvent();
-        sub.assertUnsubscribed();
-        sub.assertReceivedOnNext(singletonList(new Permission(permission, true)));
+        sub.assertTerminated();
+        sub.assertValue(new Permission(permission, true));
     }
 
     @Test
     @TargetApi(Build.VERSION_CODES.M)
     public void eachSubscription_preM() {
-        TestSubscriber<Permission> sub = new TestSubscriber<>();
+        TestObserver<Permission> sub = new TestObserver<>();
         String permission = Manifest.permission.READ_PHONE_STATE;
         when(mRxPermissions.isGranted(permission)).thenReturn(true);
 
         trigger().compose(mRxPermissions.ensureEach(permission)).subscribe(sub);
 
         sub.assertNoErrors();
-        sub.assertTerminalEvent();
-        sub.assertUnsubscribed();
-        sub.assertReceivedOnNext(singletonList(new Permission(permission, true)));
+        sub.assertTerminated();
+        sub.assertValue(new Permission(permission, true));
     }
 
     @Test
     @TargetApi(Build.VERSION_CODES.M)
     public void subscription_alreadyGranted() {
-        TestSubscriber<Boolean> sub = new TestSubscriber<>();
+        TestObserver<Boolean> sub = new TestObserver<>();
         String permission = Manifest.permission.READ_PHONE_STATE;
         when(mRxPermissions.isGranted(permission)).thenReturn(true);
 
         trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub);
 
         sub.assertNoErrors();
-        sub.assertTerminalEvent();
-        sub.assertUnsubscribed();
-        sub.assertReceivedOnNext(singletonList(true));
+        sub.assertTerminated();
+        sub.assertValue(true);
     }
 
     @Test
     @TargetApi(Build.VERSION_CODES.M)
     public void subscription_denied() {
-        TestSubscriber<Boolean> sub = new TestSubscriber<>();
+        TestObserver<Boolean> sub = new TestObserver<>();
         String permission = Manifest.permission.READ_PHONE_STATE;
         when(mRxPermissions.isGranted(permission)).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_DENIED};
@@ -154,15 +145,14 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
 
         sub.assertNoErrors();
-        sub.assertTerminalEvent();
-        sub.assertUnsubscribed();
-        sub.assertReceivedOnNext(singletonList(false));
+        sub.assertTerminated();
+        sub.assertValue(false);
     }
 
     @Test
     @TargetApi(Build.VERSION_CODES.M)
     public void eachSubscription_denied() {
-        TestSubscriber<Permission> sub = new TestSubscriber<>();
+        TestObserver<Permission> sub = new TestObserver<>();
         String permission = Manifest.permission.READ_PHONE_STATE;
         when(mRxPermissions.isGranted(permission)).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_DENIED};
@@ -171,45 +161,42 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
 
         sub.assertNoErrors();
-        sub.assertTerminalEvent();
-        sub.assertUnsubscribed();
-        sub.assertReceivedOnNext(singletonList(new Permission(permission, false)));
+        sub.assertTerminated();
+        sub.assertValue(new Permission(permission, false));
     }
 
     @Test
     @TargetApi(Build.VERSION_CODES.M)
     public void subscription_revoked() {
-        TestSubscriber<Boolean> sub = new TestSubscriber<>();
+        TestObserver<Boolean> sub = new TestObserver<>();
         String permission = Manifest.permission.READ_PHONE_STATE;
         when(mRxPermissions.isRevoked(permission)).thenReturn(true);
 
         trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub);
 
         sub.assertNoErrors();
-        sub.assertTerminalEvent();
-        sub.assertUnsubscribed();
-        sub.assertReceivedOnNext(singletonList(false));
+        sub.assertTerminated();
+        sub.assertValue(false);
     }
 
     @Test
     @TargetApi(Build.VERSION_CODES.M)
     public void eachSubscription_revoked() {
-        TestSubscriber<Permission> sub = new TestSubscriber<>();
+        TestObserver<Permission> sub = new TestObserver<>();
         String permission = Manifest.permission.READ_PHONE_STATE;
         when(mRxPermissions.isRevoked(permission)).thenReturn(true);
 
         trigger().compose(mRxPermissions.ensureEach(permission)).subscribe(sub);
 
         sub.assertNoErrors();
-        sub.assertTerminalEvent();
-        sub.assertUnsubscribed();
-        sub.assertReceivedOnNext(singletonList(new Permission(permission, false)));
+        sub.assertTerminated();
+        sub.assertValue(new Permission(permission, false));
     }
 
     @Test
     @TargetApi(Build.VERSION_CODES.M)
     public void subscription_severalPermissions_granted() {
-        TestSubscriber<Boolean> sub = new TestSubscriber<>();
+        TestObserver<Boolean> sub = new TestObserver<>();
         String[] permissions = new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.CAMERA};
         when(mRxPermissions.isGranted(Matchers.<String>anyVararg())).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED, PackageManager.PERMISSION_GRANTED};
@@ -218,15 +205,14 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(0, permissions, result);
 
         sub.assertNoErrors();
-        sub.assertTerminalEvent();
-        sub.assertUnsubscribed();
-        sub.assertReceivedOnNext(singletonList(true));
+        sub.assertTerminated();
+        sub.assertValue(true);
     }
 
     @Test
     @TargetApi(Build.VERSION_CODES.M)
     public void eachSubscription_severalPermissions_granted() {
-        TestSubscriber<Permission> sub = new TestSubscriber<>();
+        TestObserver<Permission> sub = new TestObserver<>();
         String[] permissions = new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.CAMERA};
         when(mRxPermissions.isGranted(Matchers.<String>anyVararg())).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED, PackageManager.PERMISSION_GRANTED};
@@ -235,18 +221,14 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(0, permissions, result);
 
         sub.assertNoErrors();
-        sub.assertTerminalEvent();
-        sub.assertUnsubscribed();
-        List<Permission> ps = new ArrayList<>();
-        ps.add(new Permission(permissions[0], true));
-        ps.add(new Permission(permissions[1], true));
-        sub.assertReceivedOnNext(ps);
+        sub.assertTerminated();
+        sub.assertValues(new Permission(permissions[0], true), new Permission(permissions[1], true));
     }
 
     @Test
     @TargetApi(Build.VERSION_CODES.M)
     public void subscription_severalPermissions_oneDenied() {
-        TestSubscriber<Boolean> sub = new TestSubscriber<>();
+        TestObserver<Boolean> sub = new TestObserver<>();
         String[] permissions = new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.CAMERA};
         when(mRxPermissions.isGranted(Matchers.<String>anyVararg())).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED, PackageManager.PERMISSION_DENIED};
@@ -255,15 +237,14 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(0, permissions, result);
 
         sub.assertNoErrors();
-        sub.assertTerminalEvent();
-        sub.assertUnsubscribed();
-        sub.assertReceivedOnNext(singletonList(false));
+        sub.assertTerminated();
+        sub.assertValue(false);
     }
 
     @Test
     @TargetApi(Build.VERSION_CODES.M)
     public void subscription_severalPermissions_oneRevoked() {
-        TestSubscriber<Boolean> sub = new TestSubscriber<>();
+        TestObserver<Boolean> sub = new TestObserver<>();
         String[] permissions = new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.CAMERA};
         when(mRxPermissions.isGranted(Matchers.<String>anyVararg())).thenReturn(false);
         when(mRxPermissions.isRevoked(Manifest.permission.CAMERA)).thenReturn(true);
@@ -274,15 +255,14 @@ public class RxPermissionsTest {
                 new int[]{PackageManager.PERMISSION_GRANTED});
 
         sub.assertNoErrors();
-        sub.assertTerminalEvent();
-        sub.assertUnsubscribed();
-        sub.assertReceivedOnNext(singletonList(false));
+        sub.assertTerminated();
+        sub.assertValue(false);
     }
 
     @Test
     @TargetApi(Build.VERSION_CODES.M)
     public void eachSubscription_severalPermissions_oneAlreadyGranted() {
-        TestSubscriber<Permission> sub = new TestSubscriber<>();
+        TestObserver<Permission> sub = new TestObserver<>();
         String[] permissions = new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.CAMERA};
         when(mRxPermissions.isGranted(Matchers.<String>anyVararg())).thenReturn(false);
         when(mRxPermissions.isGranted(Manifest.permission.CAMERA)).thenReturn(true);
@@ -293,12 +273,8 @@ public class RxPermissionsTest {
                 new int[]{PackageManager.PERMISSION_GRANTED});
 
         sub.assertNoErrors();
-        sub.assertTerminalEvent();
-        sub.assertUnsubscribed();
-        List<Permission> ps = new ArrayList<>();
-        ps.add(new Permission(permissions[0], true));
-        ps.add(new Permission(permissions[1], true));
-        sub.assertReceivedOnNext(ps);
+        sub.assertTerminated();
+        sub.assertValues(new Permission(permissions[0], true), new Permission(permissions[1], true));
         ArgumentCaptor<String[]> requestedPermissions = ArgumentCaptor.forClass(String[].class);
         verify(mRxPermissions).startShadowActivity(requestedPermissions.capture());
         assertEquals(1, requestedPermissions.getValue().length);
@@ -308,7 +284,7 @@ public class RxPermissionsTest {
     @Test
     @TargetApi(Build.VERSION_CODES.M)
     public void eachSubscription_severalPermissions_oneDenied() {
-        TestSubscriber<Permission> sub = new TestSubscriber<>();
+        TestObserver<Permission> sub = new TestObserver<>();
         String[] permissions = new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.CAMERA};
         when(mRxPermissions.isGranted(Matchers.<String>anyVararg())).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED, PackageManager.PERMISSION_DENIED};
@@ -317,18 +293,14 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(0, permissions, result);
 
         sub.assertNoErrors();
-        sub.assertTerminalEvent();
-        sub.assertUnsubscribed();
-        List<Permission> ps = new ArrayList<>();
-        ps.add(new Permission(permissions[0], true));
-        ps.add(new Permission(permissions[1], false));
-        sub.assertReceivedOnNext(ps);
+        sub.assertTerminated();
+        sub.assertValues(new Permission(permissions[0], true), new Permission(permissions[1], false));
     }
 
     @Test
     @TargetApi(Build.VERSION_CODES.M)
     public void eachSubscription_severalPermissions_oneRevoked() {
-        TestSubscriber<Permission> sub = new TestSubscriber<>();
+        TestObserver<Permission> sub = new TestObserver<>();
         String[] permissions = new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.CAMERA};
         when(mRxPermissions.isGranted(Matchers.<String>anyVararg())).thenReturn(false);
         when(mRxPermissions.isRevoked(Manifest.permission.CAMERA)).thenReturn(true);
@@ -339,48 +311,44 @@ public class RxPermissionsTest {
                 new int[]{PackageManager.PERMISSION_GRANTED});
 
         sub.assertNoErrors();
-        sub.assertTerminalEvent();
-        sub.assertUnsubscribed();
-        List<Permission> ps = new ArrayList<>();
-        ps.add(new Permission(permissions[0], true));
-        ps.add(new Permission(permissions[1], false));
-        sub.assertReceivedOnNext(ps);
+        sub.assertTerminated();
+        sub.assertValues(new Permission(permissions[0], true), new Permission(permissions[1], false));
     }
 
     @Test
     @TargetApi(Build.VERSION_CODES.M)
     public void subscription_trigger_granted() {
-        TestSubscriber<Boolean> sub = new TestSubscriber<>();
+        TestObserver<Boolean> sub = new TestObserver<>();
         String permission = Manifest.permission.READ_PHONE_STATE;
         when(mRxPermissions.isGranted(permission)).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED};
         PublishSubject<Object> trigger = PublishSubject.create();
 
         trigger.compose(mRxPermissions.ensure(permission)).subscribe(sub);
-        trigger.onNext(null);
+        trigger.onNext(1);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
 
         sub.assertNoErrors();
-        sub.assertNoTerminalEvent();
-        sub.assertReceivedOnNext(singletonList(true));
+        sub.assertNotTerminated();
+        sub.assertValue(true);
     }
 
     @Test
     @TargetApi(Build.VERSION_CODES.M)
     public void eachSubscription_trigger_granted() {
-        TestSubscriber<Permission> sub = new TestSubscriber<>();
+        TestObserver<Permission> sub = new TestObserver<>();
         String permission = Manifest.permission.READ_PHONE_STATE;
         when(mRxPermissions.isGranted(permission)).thenReturn(false);
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED};
         PublishSubject<Object> trigger = PublishSubject.create();
 
         trigger.compose(mRxPermissions.ensureEach(permission)).subscribe(sub);
-        trigger.onNext(null);
+        trigger.onNext(1);
         mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
 
         sub.assertNoErrors();
-        sub.assertNoTerminalEvent();
-        sub.assertReceivedOnNext(singletonList(new Permission(permission, true)));
+        sub.assertNotTerminated();
+        sub.assertValue(new Permission(permission, true));
     }
 
     @Test
@@ -390,13 +358,13 @@ public class RxPermissionsTest {
         Activity activity = mock(Activity.class);
         when(activity.shouldShowRequestPermissionRationale(anyString())).thenReturn(true);
 
-        TestSubscriber<Boolean> sub = new TestSubscriber<>();
+        TestObserver<Boolean> sub = new TestObserver<>();
         mRxPermissions.shouldShowRequestPermissionRationale(activity, new String[]{"p1", "p2"})
                 .subscribe(sub);
 
-        sub.assertCompleted();
+        sub.assertComplete();
         sub.assertNoErrors();
-        sub.assertReceivedOnNext(Collections.singletonList(true));
+        sub.assertValue(true);
     }
 
     @Test
@@ -406,13 +374,13 @@ public class RxPermissionsTest {
         Activity activity = mock(Activity.class);
         when(activity.shouldShowRequestPermissionRationale("p1")).thenReturn(true);
 
-        TestSubscriber<Boolean> sub = new TestSubscriber<>();
+        TestObserver<Boolean> sub = new TestObserver<>();
         mRxPermissions.shouldShowRequestPermissionRationale(activity, new String[]{"p1", "p2"})
                 .subscribe(sub);
 
-        sub.assertCompleted();
+        sub.assertComplete();
         sub.assertNoErrors();
-        sub.assertReceivedOnNext(Collections.singletonList(false));
+        sub.assertValue(false);
     }
 
     @Test
@@ -421,13 +389,13 @@ public class RxPermissionsTest {
         when(mRxPermissions.isMarshmallow()).thenReturn(true);
         Activity activity = mock(Activity.class);
 
-        TestSubscriber<Boolean> sub = new TestSubscriber<>();
+        TestObserver<Boolean> sub = new TestObserver<>();
         mRxPermissions.shouldShowRequestPermissionRationale(activity, new String[]{"p1", "p2"})
                 .subscribe(sub);
 
-        sub.assertCompleted();
+        sub.assertComplete();
         sub.assertNoErrors();
-        sub.assertReceivedOnNext(Collections.singletonList(false));
+        sub.assertValue(false);
     }
 
     @Test
@@ -438,13 +406,13 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted("p1")).thenReturn(true);
         when(activity.shouldShowRequestPermissionRationale("p2")).thenReturn(true);
 
-        TestSubscriber<Boolean> sub = new TestSubscriber<>();
+        TestObserver<Boolean> sub = new TestObserver<>();
         mRxPermissions.shouldShowRequestPermissionRationale(activity, new String[]{"p1", "p2"})
                 .subscribe(sub);
 
-        sub.assertCompleted();
+        sub.assertComplete();
         sub.assertNoErrors();
-        sub.assertReceivedOnNext(Collections.singletonList(true));
+        sub.assertValue(true);
     }
 
     @Test
@@ -454,13 +422,13 @@ public class RxPermissionsTest {
         Activity activity = mock(Activity.class);
         when(mRxPermissions.isGranted("p2")).thenReturn(true);
 
-        TestSubscriber<Boolean> sub = new TestSubscriber<>();
+        TestObserver<Boolean> sub = new TestObserver<>();
         mRxPermissions.shouldShowRequestPermissionRationale(activity, new String[]{"p1", "p2"})
                 .subscribe(sub);
 
-        sub.assertCompleted();
+        sub.assertComplete();
         sub.assertNoErrors();
-        sub.assertReceivedOnNext(Collections.singletonList(false));
+        sub.assertValue(false);
     }
 
     @Test
