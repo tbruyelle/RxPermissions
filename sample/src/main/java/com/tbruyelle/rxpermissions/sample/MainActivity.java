@@ -6,15 +6,14 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.SurfaceView;
+import android.view.View;
 import android.widget.Toast;
 
-import com.jakewharton.rxbinding.view.RxView;
 import com.tbruyelle.rxpermissions.RxPermissions;
 
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
 import java.io.IOException;
-
-import rx.functions.Action0;
-import rx.functions.Action1;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,41 +32,43 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.act_main);
         surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
 
-        RxView.clicks(findViewById(R.id.enableCamera))
-                // Ask for permissions when button is clicked
-                .compose(rxPermissions.ensure(Manifest.permission.CAMERA))
-                .subscribe(new Action1<Boolean>() {
-                               @Override
-                               public void call(Boolean granted) {
-                                   Log.i(TAG, "Permission result " + granted);
-                                   if (granted) {
-                                       releaseCamera();
-                                       camera = Camera.open(0);
-                                       try {
-                                           camera.setPreviewDisplay(surfaceView.getHolder());
-                                           camera.startPreview();
-                                       } catch (IOException e) {
-                                           Log.e(TAG, "Error while trying to display the camera preview", e);
-                                       }
-                                   } else {
-                                       Toast.makeText(MainActivity.this,
+        findViewById(R.id.enableCamera).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                rxPermissions.request(Manifest.permission.CAMERA)
+                    .subscribe(new Consumer<Boolean>() {
+                                   @Override
+                                   public void accept(Boolean granted) throws Exception {
+                                       Log.i(TAG, "Permission result " + granted);
+                                       if (granted) {
+                                           releaseCamera();
+                                           camera = Camera.open(0);
+                                           try {
+                                               camera.setPreviewDisplay(surfaceView.getHolder());
+                                               camera.startPreview();
+                                           } catch (IOException e) {
+                                               Log.e(TAG, "Error while trying to display the camera preview", e);
+                                           }
+                                       } else {
+                                           Toast.makeText(MainActivity.this,
                                                "Permission denied, can't enable the camera",
                                                Toast.LENGTH_SHORT).show();
+                                       }
                                    }
-                               }
-                           },
-                        new Action1<Throwable>() {
+                               },
+                        new Consumer<Throwable>() {
                             @Override
-                            public void call(Throwable t) {
+                            public void accept(Throwable t) throws Exception {
                                 Log.e(TAG, "onError", t);
                             }
                         },
-                        new Action0() {
+                        new Action() {
                             @Override
-                            public void call() {
+                            public void run() {
                                 Log.i(TAG, "OnComplete");
                             }
                         });
+            }
+        });
     }
 
     @Override
