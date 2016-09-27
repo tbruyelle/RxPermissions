@@ -1,4 +1,4 @@
-package com.tbruyelle.rxpermissions;
+package com.tbruyelle.rxpermissions2;
 
 public class Permission {
     public final String name;

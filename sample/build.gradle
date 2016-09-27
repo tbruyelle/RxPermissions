@@ -15,7 +15,7 @@ android {
 }
 
 dependencies {
-    compile project(':rxpermissions')
+    compile project(':rxpermissions2')
 
     compile rootProject.ext.appCompat
 }

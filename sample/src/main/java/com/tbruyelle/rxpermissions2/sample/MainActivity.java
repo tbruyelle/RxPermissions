@@ -1,4 +1,4 @@
-package com.tbruyelle.rxpermissions.sample;
+package com.tbruyelle.rxpermissions2.sample;
 
 import android.Manifest;
 import android.hardware.Camera;
@@ -9,7 +9,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Toast;
 
-import com.tbruyelle.rxpermissions.RxPermissions;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
