@@ -20,6 +20,16 @@ dependencies {
 }
 ```
 
+## Setup for RxJava2
+
+Thanks to @vanniktech, RxPermissions now supports RxJava2, just change the package name to `com.tbruyelle.rxpermissions2`.
+
+```
+dependencies {
+    compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.7.1@aar'
+}
+```
+
 ## Usage
 
 Example (with Retrolambda for brevity, but not required):
