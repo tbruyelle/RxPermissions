@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.7.0@aar'
+    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.7.1@aar'
 }
 ```
 
