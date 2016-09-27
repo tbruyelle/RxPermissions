@@ -1,3 +1,3 @@
 include 'lib'
-project(':lib').name = 'rxpermissions2'
+project(':lib').name = 'rxpermissions'
 include 'sample'
