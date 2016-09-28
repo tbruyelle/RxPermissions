@@ -24,7 +24,7 @@ dependencies {
 
 Thanks to @vanniktech, RxPermissions now supports RxJava2, just change the package name to `com.tbruyelle.rxpermissions2`.
 
-```
+```gradle
 dependencies {
     compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.7.1@aar'
 }
