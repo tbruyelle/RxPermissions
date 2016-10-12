@@ -282,8 +282,11 @@ public class RxPermissions {
             // Find the corresponding subject
             PublishSubject<Permission> subject = mSubjects.get(permissions[i]);
             if (subject == null) {
-                // No subject found
-                throw new IllegalStateException("RxPermissions.onRequestPermissionsResult invoked but didn't find the corresponding permission request.");
+                // No subject found - the app has been closed by the system
+                // There is no good Rx way to handle this
+                // Also, there is a high probability that the user doesn't care for the result anymore anyways
+                // [citation needed]
+                return;
             }
             mSubjects.remove(permissions[i]);
             boolean granted = grantResults[i] == PackageManager.PERMISSION_GRANTED;
