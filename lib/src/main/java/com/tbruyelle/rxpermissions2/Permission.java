@@ -3,20 +3,28 @@ package com.tbruyelle.rxpermissions2;
 public class Permission {
     public final String name;
     public final boolean granted;
+    public final boolean shouldShowRequestPermissionRationale;
 
-    public Permission(String name, boolean granted) {
+    Permission(String name, boolean granted) {
+        this(name, granted, false);
+    }
+
+    Permission(String name, boolean granted, boolean shouldShowRequestPermissionRationale) {
         this.name = name;
         this.granted = granted;
+        this.shouldShowRequestPermissionRationale = shouldShowRequestPermissionRationale;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Permission that = (Permission) o;
+        final Permission that = (Permission) o;
 
         if (granted != that.granted) return false;
+        if (shouldShowRequestPermissionRationale != that.shouldShowRequestPermissionRationale)
+            return false;
         return name.equals(that.name);
     }
 
@@ -24,6 +32,7 @@ public class Permission {
     public int hashCode() {
         int result = name.hashCode();
         result = 31 * result + (granted ? 1 : 0);
+        result = 31 * result + (shouldShowRequestPermissionRationale ? 1 : 0);
         return result;
     }
 
@@ -32,6 +41,7 @@ public class Permission {
         return "Permission{" +
                 "name='" + name + '\'' +
                 ", granted=" + granted +
+                ", shouldShowRequestPermissionRationale=" + shouldShowRequestPermissionRationale +
                 '}';
     }
 }

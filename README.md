@@ -24,7 +24,7 @@ dependencies {
 
 Thanks to @vanniktech, RxPermissions now supports RxJava2, just change the package name to `com.tbruyelle.rxpermissions2`.
 
-```
+```gradle
 dependencies {
     compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.7.1@aar'
 }
@@ -88,6 +88,11 @@ RxPermissions.getInstance(this)
     .subscribe(permission -> { // will emit 2 Permission objects
         if (permission.granted) {
            // `permission.name` is granted !
+        } else if (permission.shouldShowRequestPermissionRationale)
+           // Denied permission without ask never again
+        } else {
+           // Denied permission with ask never again
+           // Need to go to the settings
         }
     });
 ```
