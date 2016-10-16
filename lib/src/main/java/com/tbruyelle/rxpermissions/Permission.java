@@ -5,7 +5,11 @@ public class Permission {
     public final boolean granted;
     public final boolean shouldShowRequestPermissionRationale;
 
-    public Permission(String name, boolean granted, boolean shouldShowRequestPermissionRationale) {
+    Permission(String name, boolean granted) {
+        this(name, granted, false);
+    }
+
+    Permission(String name, boolean granted, boolean shouldShowRequestPermissionRationale) {
         this.name = name;
         this.granted = granted;
         this.shouldShowRequestPermissionRationale = shouldShowRequestPermissionRationale;

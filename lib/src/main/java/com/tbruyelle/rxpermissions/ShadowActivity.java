@@ -1,11 +1,9 @@
 package com.tbruyelle.rxpermissions;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Process;
 
 @TargetApi(Build.VERSION_CODES.M)
 public class ShadowActivity extends EnsureSameProcessActivity {

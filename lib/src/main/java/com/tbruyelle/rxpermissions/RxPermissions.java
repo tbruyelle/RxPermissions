@@ -176,7 +176,7 @@ public class RxPermissions {
             if (isGranted(permission)) {
                 // Already granted, or not Android M
                 // Return a granted Permission object.
-                list.add(Observable.just(new Permission(permission, true, true)));
+                list.add(Observable.just(new Permission(permission, true, false)));
                 continue;
             }
 
@@ -273,6 +273,11 @@ public class RxPermissions {
     @TargetApi(Build.VERSION_CODES.M)
     private boolean isRevoked_(String permission) {
         return mCtx.getPackageManager().isPermissionRevokedByPolicy(permission, mCtx.getPackageName());
+    }
+
+    void onRequestPermissionsResult(int requestCode,
+                                    String permissions[], int[] grantResults) {
+        onRequestPermissionsResult(requestCode, permissions, grantResults, new boolean[permissions.length]);
     }
 
     void onRequestPermissionsResult(int requestCode,
