@@ -26,17 +26,17 @@ public class ShadowActivity extends EnsureSameProcessActivity {
 
     private void handleIntent(Intent intent) {
         String[] permissions = intent.getStringArrayExtra("permissions");
+        requestPermissions(permissions, 42);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         shouldShowRequestPermissionRationale = new boolean[permissions.length];
 
         for (int i = 0; i < permissions.length; i++) {
             shouldShowRequestPermissionRationale[i] = shouldShowRequestPermissionRationale(permissions[i]);
         }
 
-        requestPermissions(permissions, 42);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         RxPermissions.getInstance(this).onRequestPermissionsResult(requestCode, permissions, grantResults, shouldShowRequestPermissionRationale);
         finish();
     }
