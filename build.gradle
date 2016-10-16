@@ -19,7 +19,7 @@ ext {
     minSdkVersion = 9
     compileSdkVersion = 24
     targetSdkVersion = compileSdkVersion
-    buildToolsVersion = '24.0.1'
+    buildToolsVersion = '24.0.3'
 
     rxJava = 'io.reactivex:rxjava:1.1.8'
     appCompat = 'com.android.support:appcompat-v7:24.1.1'
