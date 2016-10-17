@@ -6,11 +6,11 @@ import android.os.Process;
 
 /**
  * In case of restore, ensures it's done by the same process, if not, kill self.
- * </p>
+ * <p>
  * The goal is to prevent a crash when the activity is restored during a permission request
  * but by another process. In that specific case the library is not able to restore the observable
  * chain. This is a hack to prevent the crash, not a fix.
- * </p>
+ * <p>
  * See https://github.com/tbruyelle/RxPermissions/issues/46.
  */
 public abstract class EnsureSameProcessActivity extends Activity {
