@@ -30,6 +30,7 @@ import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
+import io.reactivex.ObservableTransformer;
 import io.reactivex.functions.Function;
 import io.reactivex.subjects.PublishSubject;
 
@@ -74,10 +75,10 @@ public class RxPermissions {
      * If one or several permissions have never been requested, invoke the related framework method
      * to ask the user if he allows the permissions.
      */
-    public <T> Function<Observable<? extends T>, Observable<Boolean>> ensure(final String... permissions) {
-        return new Function<Observable<? extends T>, Observable<Boolean>>() {
+    public <T> ObservableTransformer<T, Boolean> ensure(final String... permissions) {
+        return new ObservableTransformer<T, Boolean>() {
             @Override
-            public Observable<Boolean> apply(Observable<? extends T> o) throws Exception {
+            public ObservableSource<Boolean> apply(Observable<T> o) throws Exception {
                 return request(o, permissions)
                         // Transform Observable<Permission> to Observable<Boolean>
                         .buffer(permissions.length)
@@ -110,10 +111,10 @@ public class RxPermissions {
      * If one or several permissions have never been requested, invoke the related framework method
      * to ask the user if he allows the permissions.
      */
-    public <T> Function<Observable<? extends T>, Observable<Permission>> ensureEach(final String... permissions) {
-        return new Function<Observable<? extends T>, Observable<Permission>>() {
+    public <T> ObservableTransformer<T, Permission> ensureEach(final String... permissions) {
+        return new ObservableTransformer<T, Permission>() {
             @Override
-            public Observable<Permission> apply(Observable<? extends T> o) throws Exception {
+            public ObservableSource<Permission> apply(Observable<T> o) throws Exception {
                 return request(o, permissions);
             }
         };

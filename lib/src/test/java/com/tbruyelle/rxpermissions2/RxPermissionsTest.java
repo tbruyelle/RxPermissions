@@ -53,7 +53,7 @@ public class RxPermissionsTest {
         doReturn(false).when(mRxPermissions).isRevoked(anyString());
     }
 
-    private Observable<?> trigger() {
+    private Observable<Object> trigger() {
         return Observable.just(RxPermissions.TRIGGER);
     }
 
