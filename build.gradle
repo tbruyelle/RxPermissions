@@ -32,7 +32,7 @@ ext {
     publishedGroupId = 'com.tbruyelle.rxpermissions2'
     artifact = 'rxpermissions'
     libraryName = 'RxPermissions'
-    libraryVersion = '0.8.0'
+    libraryVersion = '0.8.1'
 
     libraryDescription = 'A wrapper for Android 6.0 permissions'
 
