@@ -3,6 +3,7 @@ package com.tbruyelle.rxpermissions.sample;
 import android.Manifest;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.SurfaceView;
@@ -62,6 +63,11 @@ public class MainActivity extends AppCompatActivity {
                                                "Permission denied, can't enable the camera",
                                                Toast.LENGTH_SHORT).show();
                                    }
+
+                                   new AlertDialog.Builder(MainActivity.this)
+                                           .setMessage("Hello")
+                                           .setPositiveButton("OK", null)
+                                           .show();
                                }
                            },
                         new Action1<Throwable>() {
