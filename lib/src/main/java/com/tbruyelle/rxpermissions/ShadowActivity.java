@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
 @TargetApi(Build.VERSION_CODES.M)
 public class ShadowActivity extends EnsureSameProcessActivity {
@@ -28,7 +29,7 @@ public class ShadowActivity extends EnsureSameProcessActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         shouldShowRequestPermissionRationale = new boolean[permissions.length];
 
         for (int i = 0; i < permissions.length; i++) {

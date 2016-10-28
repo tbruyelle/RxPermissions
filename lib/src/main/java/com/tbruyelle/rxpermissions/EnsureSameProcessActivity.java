@@ -1,8 +1,8 @@
 package com.tbruyelle.rxpermissions;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.os.Process;
+import android.support.v7.app.AppCompatActivity;
 
 /**
  * In case of restore, ensures it's done by the same process, if not, kill self.
@@ -13,7 +13,7 @@ import android.os.Process;
  * <p>
  * See https://github.com/tbruyelle/RxPermissions/issues/46.
  */
-public abstract class EnsureSameProcessActivity extends Activity {
+public abstract class EnsureSameProcessActivity extends AppCompatActivity {
     private static final String KEY_ORIGINAL_PID = "key_original_pid";
 
     private int mOriginalProcessId;
