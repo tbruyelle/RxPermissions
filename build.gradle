@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.1'
+        classpath 'com.android.tools.build:gradle:2.2.2'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.1'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
     }
@@ -17,14 +17,14 @@ subprojects {
 
 ext {
     minSdkVersion = 9
-    compileSdkVersion = 24
+    compileSdkVersion = 25
     targetSdkVersion = compileSdkVersion
-    buildToolsVersion = '24.0.3'
+    buildToolsVersion = '25.0.0'
 
-    rxJava = 'io.reactivex:rxjava:1.1.8'
-    appCompat = 'com.android.support:appcompat-v7:24.1.1'
+    rxJava = 'io.reactivex:rxjava:1.2.1'
+    appCompat = 'com.android.support:appcompat-v7:25.0.0'
     junit = 'junit:junit:4.12'
-    mockito = 'org.mockito:mockito-core:1.10.19'
+    mockito = 'org.mockito:mockito-core:2.2.9'
 
     bintrayRepo = 'tbruyelle'
     bintrayName = 'RxPermissions'

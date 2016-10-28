@@ -29,7 +29,7 @@ android {
 
 dependencies {
     compile rootProject.ext.rxJava
-
+    compile rootProject.ext.appCompat
     testCompile rootProject.ext.junit
     testCompile rootProject.ext.mockito
 }
