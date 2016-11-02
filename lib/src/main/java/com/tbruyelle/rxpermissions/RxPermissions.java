@@ -55,8 +55,6 @@ public class RxPermissions {
                     .beginTransaction()
                     .add(rxPermissionsFragment, TAG)
                     .commit();
-        }
-        if (sSingleton == null) {
             sSingleton = new RxPermissions(rxPermissionsFragment);
         }
         return sSingleton;
