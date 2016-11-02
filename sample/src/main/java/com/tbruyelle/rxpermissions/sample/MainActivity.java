@@ -23,12 +23,11 @@ public class MainActivity extends AppCompatActivity {
 
     private Camera camera;
     private SurfaceView surfaceView;
-    private RxPermissions rxPermissions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        rxPermissions = RxPermissions.getInstance(this);
+        RxPermissions rxPermissions = RxPermissions.getInstance(this);
         rxPermissions.setLogging(true);
 
         setContentView(R.layout.act_main);
