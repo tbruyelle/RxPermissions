@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -64,18 +63,13 @@ public class RxPermissionsTest {
     public void setup() {
         ActivityController<Activity> activityController = Robolectric.buildActivity(Activity.class);
         mActivity = spy(activityController.setup().get());
-        mRxPermissions = spy(RxPermissions.getInstance(mActivity));
+        mRxPermissions = spy(RxPermissions.newInstance(mActivity));
         mRxPermissions.mRxPermissionsFragment = spy(mRxPermissions.mRxPermissionsFragment);
         when(mRxPermissions.mRxPermissionsFragment.getActivity()).thenReturn(mActivity);
         // Default deny all permissions
         doReturn(false).when(mRxPermissions).isGranted(anyString());
         // Default no revoked permissions
         doReturn(false).when(mRxPermissions).isRevoked(anyString());
-    }
-
-    @After
-    public void tearDown() {
-        RxPermissions.sSingleton = null;
     }
 
     private Observable<Object> trigger() {

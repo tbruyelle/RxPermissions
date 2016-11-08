@@ -23,9 +23,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import rx.Observable;
 import rx.functions.Func1;
@@ -35,18 +33,13 @@ public class RxPermissions {
 
     private static final String TAG = "RxPermissions";
 
-    static RxPermissions sSingleton;
     RxPermissionsFragment mRxPermissionsFragment;
-    // Contains all the current permission requests.
-    // Once granted or denied, they are removed from it.
-    private Map<String, PublishSubject<Permission>> mSubjects = new HashMap<>();
-    private boolean mLogging;
 
     private RxPermissions(@NonNull RxPermissionsFragment requestPermissions) {
         mRxPermissionsFragment = requestPermissions;
     }
 
-    public static RxPermissions getInstance(Activity activity) {
+    public static RxPermissions newInstance(Activity activity) {
         RxPermissionsFragment rxPermissionsFragment = find(activity);
         boolean isNewInstance = rxPermissionsFragment == null;
         if (isNewInstance) {
@@ -55,9 +48,8 @@ public class RxPermissions {
                     .beginTransaction()
                     .add(rxPermissionsFragment, TAG)
                     .commit();
-            sSingleton = new RxPermissions(rxPermissionsFragment);
         }
-        return sSingleton;
+        return new RxPermissions(rxPermissionsFragment);
     }
 
     private static RxPermissionsFragment find(Activity activity) {
@@ -65,11 +57,11 @@ public class RxPermissions {
     }
 
     public void setLogging(boolean logging) {
-        mLogging = logging;
+        mRxPermissionsFragment.setLogging(logging);
     }
 
     private void log(String message) {
-        if (mLogging) {
+        if (mRxPermissionsFragment.isLogging()) {
             Log.d(TAG, message);
         }
     }
@@ -161,7 +153,7 @@ public class RxPermissions {
 
     private Observable<?> pending(final String... permissions) {
         for (String p : permissions) {
-            if (!mSubjects.containsKey(p)) {
+            if (!mRxPermissionsFragment.containsByPermission(p)) {
                 return Observable.empty();
             }
         }
@@ -197,12 +189,12 @@ public class RxPermissions {
                 continue;
             }
 
-            PublishSubject<Permission> subject = mSubjects.get(permission);
+            PublishSubject<Permission> subject = mRxPermissionsFragment.getSubjectByPermission(permission);
             // Create a new subject if not exists
             if (subject == null) {
                 unrequestedPermissions.add(permission);
                 subject = PublishSubject.create();
-                mSubjects.put(permission, subject);
+                mRxPermissionsFragment.setSubjectForPermission(permission, subject);
             }
 
             list.add(subject);
@@ -283,12 +275,12 @@ public class RxPermissions {
         for (int i = 0, size = permissions.length; i < size; i++) {
             log("onRequestPermissionsResult  " + permissions[i]);
             // Find the corresponding subject
-            PublishSubject<Permission> subject = mSubjects.get(permissions[i]);
+            PublishSubject<Permission> subject = mRxPermissionsFragment.getSubjectByPermission(permissions[i]);
             if (subject == null) {
                 // No subject found
                 throw new IllegalStateException("RxPermissions.onRequestPermissionsResult invoked but didn't find the corresponding permission request.");
             }
-            mSubjects.remove(permissions[i]);
+            mRxPermissionsFragment.removeSubjectByPermission(permissions[i]);
             boolean granted = grantResults[i] == PackageManager.PERMISSION_GRANTED;
             subject.onNext(new Permission(permissions[i], granted, shouldShowRequestPermissionRationale[i]));
             subject.onCompleted();

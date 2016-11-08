@@ -7,9 +7,19 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import rx.subjects.PublishSubject;
+
 public class RxPermissionsFragment extends Fragment {
 
     private static final int PERMISSIONS_REQUEST_CODE = 42;
+
+    // Contains all the current permission requests.
+    // Once granted or denied, they are removed from it.
+    private Map<String, PublishSubject<Permission>> mSubjects = new HashMap<>();
+    private boolean mLogging;
 
     public RxPermissionsFragment() {
     }
@@ -37,7 +47,7 @@ public class RxPermissionsFragment extends Fragment {
             shouldShowRequestPermissionRationale[i] = shouldShowRequestPermissionRationale(permissions[i]);
         }
 
-        RxPermissions.getInstance(getActivity()).onRequestPermissionsResult(permissions, grantResults, shouldShowRequestPermissionRationale);
+        RxPermissions.newInstance(getActivity()).onRequestPermissionsResult(permissions, grantResults, shouldShowRequestPermissionRationale);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -48,6 +58,30 @@ public class RxPermissionsFragment extends Fragment {
     @TargetApi(Build.VERSION_CODES.M)
     boolean isRevoked(String permission) {
         return getActivity().getPackageManager().isPermissionRevokedByPolicy(permission, getActivity().getPackageName());
+    }
+
+    public boolean isLogging() {
+        return mLogging;
+    }
+
+    public void setLogging(boolean logging) {
+        mLogging = logging;
+    }
+
+    public PublishSubject<Permission> getSubjectByPermission(@NonNull String permission) {
+        return mSubjects.get(permission);
+    }
+
+    public PublishSubject<Permission> removeSubjectByPermission(@NonNull String permission) {
+        return mSubjects.remove(permission);
+    }
+
+    public boolean containsByPermission(@NonNull String permission) {
+        return mSubjects.containsKey(permission);
+    }
+
+    public PublishSubject<Permission> setSubjectForPermission(@NonNull String permission, @NonNull PublishSubject<Permission> subject) {
+        return mSubjects.put(permission, subject);
     }
 
 }
