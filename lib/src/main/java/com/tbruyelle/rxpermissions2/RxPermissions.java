@@ -78,7 +78,7 @@ public class RxPermissions {
     public <T> ObservableTransformer<T, Boolean> ensure(final String... permissions) {
         return new ObservableTransformer<T, Boolean>() {
             @Override
-            public ObservableSource<Boolean> apply(Observable<T> o) throws Exception {
+            public ObservableSource<Boolean> apply(Observable<T> o) {
                 return request(o, permissions)
                         // Transform Observable<Permission> to Observable<Boolean>
                         .buffer(permissions.length)
@@ -114,7 +114,7 @@ public class RxPermissions {
     public <T> ObservableTransformer<T, Permission> ensureEach(final String... permissions) {
         return new ObservableTransformer<T, Permission>() {
             @Override
-            public ObservableSource<Permission> apply(Observable<T> o) throws Exception {
+            public ObservableSource<Permission> apply(Observable<T> o) {
                 return request(o, permissions);
             }
         };
