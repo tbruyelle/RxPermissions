@@ -21,7 +21,7 @@ ext {
     targetSdkVersion = compileSdkVersion
     buildToolsVersion = '25.0.0'
 
-    rxJava = 'io.reactivex:rxjava:1.2.1'
+    rxJava = 'io.reactivex:rxjava:1.2.2'
     supportLibraryVersion = '25.0.0'
     appCompat = "com.android.support:appcompat-v7:$supportLibraryVersion"
     supportAnnotations = "com.android.support:support-annotations:$supportLibraryVersion"
@@ -40,7 +40,7 @@ ext {
     publishedGroupId = 'com.tbruyelle.rxpermissions'
     artifact = 'rxpermissions'
     libraryName = 'RxPermissions'
-    libraryVersion = '0.8.0'
+    libraryVersion = '0.8.2'
 
     libraryDescription = 'A wrapper for Android 6.0 permissions'
 
