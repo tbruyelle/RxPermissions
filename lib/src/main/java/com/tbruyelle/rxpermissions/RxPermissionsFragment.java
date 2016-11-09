@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +48,23 @@ public class RxPermissionsFragment extends Fragment {
             shouldShowRequestPermissionRationale[i] = shouldShowRequestPermissionRationale(permissions[i]);
         }
 
-        RxPermissions.newInstance(getActivity()).onRequestPermissionsResult(permissions, grantResults, shouldShowRequestPermissionRationale);
+        onRequestPermissionsResult(permissions, grantResults, shouldShowRequestPermissionRationale);
+    }
+
+    void onRequestPermissionsResult(String permissions[], int[] grantResults, boolean[] shouldShowRequestPermissionRationale) {
+        for (int i = 0, size = permissions.length; i < size; i++) {
+            log("onRequestPermissionsResult  " + permissions[i]);
+            // Find the corresponding subject
+            PublishSubject<Permission> subject = mSubjects.get(permissions[i]);
+            if (subject == null) {
+                // No subject found
+                throw new IllegalStateException("RxPermissions.onRequestPermissionsResult invoked but didn't find the corresponding permission request.");
+            }
+            mSubjects.remove(permissions[i]);
+            boolean granted = grantResults[i] == PackageManager.PERMISSION_GRANTED;
+            subject.onNext(new Permission(permissions[i], granted, shouldShowRequestPermissionRationale[i]));
+            subject.onCompleted();
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -60,10 +77,6 @@ public class RxPermissionsFragment extends Fragment {
         return getActivity().getPackageManager().isPermissionRevokedByPolicy(permission, getActivity().getPackageName());
     }
 
-    public boolean isLogging() {
-        return mLogging;
-    }
-
     public void setLogging(boolean logging) {
         mLogging = logging;
     }
@@ -72,16 +85,18 @@ public class RxPermissionsFragment extends Fragment {
         return mSubjects.get(permission);
     }
 
-    public PublishSubject<Permission> removeSubjectByPermission(@NonNull String permission) {
-        return mSubjects.remove(permission);
-    }
-
     public boolean containsByPermission(@NonNull String permission) {
         return mSubjects.containsKey(permission);
     }
 
     public PublishSubject<Permission> setSubjectForPermission(@NonNull String permission, @NonNull PublishSubject<Permission> subject) {
         return mSubjects.put(permission, subject);
+    }
+
+    void log(String message) {
+        if (mLogging) {
+            Log.d(RxPermissions.TAG, message);
+        }
     }
 
 }

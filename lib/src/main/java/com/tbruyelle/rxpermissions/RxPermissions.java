@@ -16,11 +16,10 @@ package com.tbruyelle.rxpermissions;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.pm.PackageManager;
+import android.app.FragmentManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +30,7 @@ import rx.subjects.PublishSubject;
 
 public class RxPermissions {
 
-    private static final String TAG = "RxPermissions";
+    static final String TAG = "RxPermissions";
 
     RxPermissionsFragment mRxPermissionsFragment;
 
@@ -44,10 +43,12 @@ public class RxPermissions {
         boolean isNewInstance = rxPermissionsFragment == null;
         if (isNewInstance) {
             rxPermissionsFragment = new RxPermissionsFragment();
-            activity.getFragmentManager()
+            FragmentManager fragmentManager = activity.getFragmentManager();
+            fragmentManager
                     .beginTransaction()
                     .add(rxPermissionsFragment, TAG)
                     .commit();
+            fragmentManager.executePendingTransactions();
         }
         return new RxPermissions(rxPermissionsFragment);
     }
@@ -58,12 +59,6 @@ public class RxPermissions {
 
     public void setLogging(boolean logging) {
         mRxPermissionsFragment.setLogging(logging);
-    }
-
-    private void log(String message) {
-        if (mRxPermissionsFragment.isLogging()) {
-            Log.d(TAG, message);
-        }
     }
 
     /**
@@ -175,7 +170,7 @@ public class RxPermissions {
         // In case of multiple permissions, we create an Observable for each of them.
         // At the end, the observables are combined to have a unique response.
         for (String permission : permissions) {
-            log("Requesting permission " + permission);
+            mRxPermissionsFragment.log("Requesting permission " + permission);
             if (isGranted(permission)) {
                 // Already granted, or not Android M
                 // Return a granted Permission object.
@@ -239,7 +234,7 @@ public class RxPermissions {
 
     @TargetApi(Build.VERSION_CODES.M)
     void requestPermissionsFromFragment(String[] permissions) {
-        log("requestPermissionsFromFragment " + TextUtils.join(", ", permissions));
+        mRxPermissionsFragment.log("requestPermissionsFromFragment " + TextUtils.join(", ", permissions));
         mRxPermissionsFragment.requestPermissions(permissions);
     }
 
@@ -268,23 +263,7 @@ public class RxPermissions {
     }
 
     void onRequestPermissionsResult(String permissions[], int[] grantResults) {
-        onRequestPermissionsResult(permissions, grantResults, new boolean[permissions.length]);
-    }
-
-    void onRequestPermissionsResult(String permissions[], int[] grantResults, boolean[] shouldShowRequestPermissionRationale) {
-        for (int i = 0, size = permissions.length; i < size; i++) {
-            log("onRequestPermissionsResult  " + permissions[i]);
-            // Find the corresponding subject
-            PublishSubject<Permission> subject = mRxPermissionsFragment.getSubjectByPermission(permissions[i]);
-            if (subject == null) {
-                // No subject found
-                throw new IllegalStateException("RxPermissions.onRequestPermissionsResult invoked but didn't find the corresponding permission request.");
-            }
-            mRxPermissionsFragment.removeSubjectByPermission(permissions[i]);
-            boolean granted = grantResults[i] == PackageManager.PERMISSION_GRANTED;
-            subject.onNext(new Permission(permissions[i], granted, shouldShowRequestPermissionRationale[i]));
-            subject.onCompleted();
-        }
+        mRxPermissionsFragment.onRequestPermissionsResult(permissions, grantResults, new boolean[permissions.length]);
     }
 
 }
