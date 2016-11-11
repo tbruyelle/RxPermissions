@@ -8,7 +8,7 @@
         <activity
             android:name="ShadowActivity"
             android:launchMode="singleTop"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:theme="@style/Theme.Transparent"
             />
     </application>
 </manifest>
