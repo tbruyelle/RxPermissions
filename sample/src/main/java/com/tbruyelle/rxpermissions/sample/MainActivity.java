@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        RxPermissions rxPermissions = RxPermissions.newInstance(this);
+        RxPermissions rxPermissions = new RxPermissions(this);
         rxPermissions.setLogging(true);
 
         setContentView(R.layout.act_main);
@@ -89,4 +89,5 @@ public class MainActivity extends AppCompatActivity {
             camera = null;
         }
     }
+
 }

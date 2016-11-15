@@ -34,12 +34,12 @@ public class RxPermissions {
 
     RxPermissionsFragment mRxPermissionsFragment;
 
-    private RxPermissions(@NonNull RxPermissionsFragment requestPermissions) {
-        mRxPermissionsFragment = requestPermissions;
+    public RxPermissions(@NonNull Activity activity) {
+        mRxPermissionsFragment = getRxPermissionsFragment(activity);
     }
 
-    public static RxPermissions newInstance(Activity activity) {
-        RxPermissionsFragment rxPermissionsFragment = find(activity);
+    private RxPermissionsFragment getRxPermissionsFragment(Activity activity) {
+        RxPermissionsFragment rxPermissionsFragment = findRxPermissionsFragment(activity);
         boolean isNewInstance = rxPermissionsFragment == null;
         if (isNewInstance) {
             rxPermissionsFragment = new RxPermissionsFragment();
@@ -50,10 +50,10 @@ public class RxPermissions {
                     .commit();
             fragmentManager.executePendingTransactions();
         }
-        return new RxPermissions(rxPermissionsFragment);
+        return rxPermissionsFragment;
     }
 
-    private static RxPermissionsFragment find(Activity activity) {
+    private RxPermissionsFragment findRxPermissionsFragment(Activity activity) {
         return (RxPermissionsFragment) activity.getFragmentManager().findFragmentByTag(TAG);
     }
 

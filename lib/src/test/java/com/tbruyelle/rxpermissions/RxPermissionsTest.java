@@ -63,7 +63,7 @@ public class RxPermissionsTest {
     public void setup() {
         ActivityController<Activity> activityController = Robolectric.buildActivity(Activity.class);
         mActivity = spy(activityController.setup().get());
-        mRxPermissions = spy(RxPermissions.newInstance(mActivity));
+        mRxPermissions = spy(new RxPermissions(mActivity));
         mRxPermissions.mRxPermissionsFragment = spy(mRxPermissions.mRxPermissionsFragment);
         when(mRxPermissions.mRxPermissionsFragment.getActivity()).thenReturn(mActivity);
         // Default deny all permissions

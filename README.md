@@ -36,7 +36,8 @@ Example (with Retrolambda for brevity, but not required):
 
 ```java
 // Must be done during an initialization phase like onCreate
-RxPermissions.newInstance(this)
+RxPermissions rxPermissions = new RxPermissions(this);
+rxPermissions
     .request(Manifest.permission.CAMERA)
     .subscribe(granted -> {
         if (granted) { // Always true pre-M
@@ -57,8 +58,9 @@ Example :
 
 ```java
 // Must be done during an initialization phase like onCreate
+RxPermissions rxPermissions = new RxPermissions(this);
 RxView.clicks(findViewById(R.id.enableCamera))
-    .compose(RxPermissions.newInstance(this).ensure(Manifest.permission.CAMERA))
+    .compose(rxPermissions.ensure(Manifest.permission.CAMERA))
     .subscribe(granted -> {
         // R.id.enableCamera has been clicked
     });
@@ -67,7 +69,8 @@ RxView.clicks(findViewById(R.id.enableCamera))
 If multiple permissions at the same time, the result is combined :
 
 ```java
-RxPermissions.newInstance(this)
+RxPermissions rxPermissions = new RxPermissions(this);
+rxPermissions
     .request(Manifest.permission.CAMERA,
              Manifest.permission.READ_PHONE_STATE)
     .subscribe(granted -> {
@@ -82,7 +85,8 @@ RxPermissions.newInstance(this)
 You can also observe a detailed result with `requestEach` or `ensureEach` :
 
 ```java
-RxPermissions.newInstance(this)
+RxPermissions rxPermissions = new RxPermissions(this);
+rxPermissions
     .requestEach(Manifest.permission.CAMERA,
              Manifest.permission.READ_PHONE_STATE)
     .subscribe(permission -> { // will emit 2 Permission objects
