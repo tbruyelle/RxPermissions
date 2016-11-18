@@ -39,7 +39,7 @@ To migrate from 0.8 or earlier, just replace the following :
 RxPermissions.getInstance(this) -> new RxPermissions(this) // where this is an Activity instance
 ```
 
-For the moment, branch 2.x doesn't reflect that change and is still in version 0.8.2. It will moved later.
+For the moment, branch 2.x doesn't reflect that change and is still in version 0.8.2. It will be updated later.
 
 ## Usage
 
