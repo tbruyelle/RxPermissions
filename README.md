@@ -43,11 +43,16 @@ For the moment, branch 2.x doesn't reflect that change and is still in version 0
 
 ## Usage
 
-Example (with Retrolambda for brevity, but not required):
+Create a `RxPermissions` instance :
+
+```java
+RxPermissions rxPermissions = new RxPermissions(this); // where this is an Activity instance
+```
+
+Example : request the CAMERA permission (with Retrolambda for brevity, but not required)
 
 ```java
 // Must be done during an initialization phase like onCreate
-RxPermissions rxPermissions = new RxPermissions(this);
 rxPermissions
     .request(Manifest.permission.CAMERA)
     .subscribe(granted -> {
@@ -69,7 +74,6 @@ Example :
 
 ```java
 // Must be done during an initialization phase like onCreate
-RxPermissions rxPermissions = new RxPermissions(this);
 RxView.clicks(findViewById(R.id.enableCamera))
     .compose(rxPermissions.ensure(Manifest.permission.CAMERA))
     .subscribe(granted -> {
@@ -80,7 +84,6 @@ RxView.clicks(findViewById(R.id.enableCamera))
 If multiple permissions at the same time, the result is combined :
 
 ```java
-RxPermissions rxPermissions = new RxPermissions(this);
 rxPermissions
     .request(Manifest.permission.CAMERA,
              Manifest.permission.READ_PHONE_STATE)
@@ -96,7 +99,6 @@ rxPermissions
 You can also observe a detailed result with `requestEach` or `ensureEach` :
 
 ```java
-RxPermissions rxPermissions = new RxPermissions(this);
 rxPermissions
     .requestEach(Manifest.permission.CAMERA,
              Manifest.permission.READ_PHONE_STATE)
