@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.8.2@aar'
+    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.9.0@aar'
 }
 ```
 
@@ -29,6 +29,17 @@ dependencies {
     compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.8.2@aar'
 }
 ```
+
+## Migration to 0.9
+
+Version 0.9 now uses a retained fragment to trigger the permission request from the framework. As a result, the `RxPermissions` class is no more a singleton.
+To migrate from 0.8 or earlier, just replace the following :
+
+```java
+RxPermissions.getInstance(this) -> new RxPermissions(this) // where this is an Activity instance
+```
+
+For the moment, branch 2.x doesn't reflect that change and is still in version 0.8.2. It will moved later.
 
 ## Usage
 
@@ -113,12 +124,6 @@ If not, and if your app is restarted during the permission request (because of a
 change for instance), the user's answer will never be emitted to the subscriber.
 
 You can find more details about that [here](https://github.com/tbruyelle/RxPermissions/issues/69).
-
-## Migration to 0.6.x
-
-Version 0.6.0 replaced the methods `request(trigger, permission...)` and `requestEach(trigger, permission...)`
-by *composables* methods `ensure(permission...)` and `ensureEach(permission...)`. Read the second
-example to see how to use them.
 
 ## Status
 
