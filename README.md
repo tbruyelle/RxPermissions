@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.8.0@aar'
+    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.9.1@aar'
 }
 ```
 
@@ -26,17 +26,32 @@ Thanks to @vanniktech, RxPermissions now supports RxJava2, just change the packa
 
 ```gradle
 dependencies {
-    compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.8.1@aar'
+    compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.1@aar'
 }
+```
+
+## Migration to 0.9
+
+Version 0.9 now uses a retained fragment to trigger the permission request from the framework. As a result, the `RxPermissions` class is no more a singleton.
+To migrate from 0.8 or earlier, just replace the following :
+
+```java
+RxPermissions.getInstance(this) -> new RxPermissions(this) // where this is an Activity instance
 ```
 
 ## Usage
 
-Example (with Retrolambda for brevity, but not required):
+Create a `RxPermissions` instance :
+
+```java
+RxPermissions rxPermissions = new RxPermissions(this); // where this is an Activity instance
+```
+
+Example : request the CAMERA permission (with Retrolambda for brevity, but not required)
 
 ```java
 // Must be done during an initialization phase like onCreate
-RxPermissions.getInstance(this)
+rxPermissions
     .request(Manifest.permission.CAMERA)
     .subscribe(granted -> {
         if (granted) { // Always true pre-M
@@ -58,7 +73,7 @@ Example :
 ```java
 // Must be done during an initialization phase like onCreate
 RxView.clicks(findViewById(R.id.enableCamera))
-    .compose(RxPermissions.getInstance(this).ensure(Manifest.permission.CAMERA))
+    .compose(rxPermissions.ensure(Manifest.permission.CAMERA))
     .subscribe(granted -> {
         // R.id.enableCamera has been clicked
     });
@@ -67,7 +82,7 @@ RxView.clicks(findViewById(R.id.enableCamera))
 If multiple permissions at the same time, the result is combined :
 
 ```java
-RxPermissions.getInstance(this)
+rxPermissions
     .request(Manifest.permission.CAMERA,
              Manifest.permission.READ_PHONE_STATE)
     .subscribe(granted -> {
@@ -82,7 +97,7 @@ RxPermissions.getInstance(this)
 You can also observe a detailed result with `requestEach` or `ensureEach` :
 
 ```java
-RxPermissions.getInstance(this)
+rxPermissions
     .requestEach(Manifest.permission.CAMERA,
              Manifest.permission.READ_PHONE_STATE)
     .subscribe(permission -> { // will emit 2 Permission objects
@@ -102,19 +117,13 @@ Look at the `sample` app for more.
 ## Important read
 
 **As mentioned above, because your app may be restarted during the permission request, the request
-must be done during an initialization phase**. This may be `Activity.onCreate/onResume`, or
-`View.onFinishInflate` or others.
+must be done during an initialization phase**. This may be `Activity.onCreate`, or
+`View.onFinishInflate`, but not *pausing* methods like `onResume`, because you'll potentially create an infinite request loop, as your requesting activity is paused by the framework during the permission request.
 
 If not, and if your app is restarted during the permission request (because of a configuration
 change for instance), the user's answer will never be emitted to the subscriber.
 
 You can find more details about that [here](https://github.com/tbruyelle/RxPermissions/issues/69).
-
-## Migration to 0.6.x
-
-Version 0.6.0 replaced the methods `request(trigger, permission...)` and `requestEach(trigger, permission...)`
-by *composables* methods `ensure(permission...)` and `ensureEach(permission...)`. Read the second
-example to see how to use them.
 
 ## Status
 
