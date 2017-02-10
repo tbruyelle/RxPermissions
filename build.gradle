@@ -3,9 +3,9 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.2'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.1'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
+        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
     }
 }
 
@@ -22,7 +22,7 @@ ext {
     buildToolsVersion = '25.0.0'
 
     rxJava = 'io.reactivex:rxjava:1.2.2'
-    supportLibraryVersion = '25.0.0'
+    supportLibraryVersion = '25.1.0'
     appCompat = "com.android.support:appcompat-v7:$supportLibraryVersion"
     supportAnnotations = "com.android.support:support-annotations:$supportLibraryVersion"
     junit = 'junit:junit:4.12'
@@ -37,21 +37,23 @@ ext {
     bintrayRepo = 'tbruyelle'
     bintrayName = 'RxPermissions'
 
-    publishedGroupId = 'com.tbruyelle.rxpermissions'
+    publishedGroupId = 'com.sanqis.rxpermissions'
     artifact = 'rxpermissions'
     libraryName = 'RxPermissions'
     libraryVersion = '0.9.1'
 
     libraryDescription = 'A wrapper for Android 6.0 permissions'
 
-    siteUrl = 'https://github.com/tbruyelle/RxPermissions'
-    gitUrl = 'https://github.com/tbruyelle/RxPermissions.git'
+    siteUrl = 'https://github.com/Sanqis/RxPermissions'
+    gitUrl = 'https://github.com/Sanqis/RxPermissions.git'
 
-    developerId = 'tbruyelle'
-    developerName = 'Thomas Bruyelle'
-    developerEmail = 'thomas.bruyelle@gmail.com'
+    developerId = 'Sanqis'
+    developerName = 'Jady Li'
+    developerEmail = '1257984872@qq.com'
 
     licenseName = 'The Apache Software License, Version 2.0'
     licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
     allLicenses = ["Apache-2.0"]
 }
+
+
