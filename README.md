@@ -6,7 +6,7 @@ This library allows the usage of RxJava with the new Android M permission model.
 
 ## Setup
 
-To use this library your `minSdkVersion` must be >= 9.
+To use this library your `minSdkVersion` must be >= 11.
 
 In your build.gradle :
 
@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.9.1@aar'
+    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.9.2@aar'
 }
 ```
 
@@ -26,7 +26,7 @@ Thanks to @vanniktech, RxPermissions now supports RxJava2, just change the packa
 
 ```gradle
 dependencies {
-    compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.1@aar'
+    compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.2@aar'
 }
 ```
 

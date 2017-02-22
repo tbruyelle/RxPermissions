@@ -19,31 +19,25 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Build;
+
 import com.tbruyelle.rxpermissions.BuildConfig;
-import io.reactivex.Observable;
-import io.reactivex.observers.TestObserver;
-import io.reactivex.subjects.PublishSubject;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
+
+import org.junit.*;
+import org.junit.runner.*;
+import org.mockito.*;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.util.ActivityController;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import io.reactivex.Observable;
+import io.reactivex.observers.TestObserver;
+import io.reactivex.subjects.PublishSubject;
+
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = Build.VERSION_CODES.M)

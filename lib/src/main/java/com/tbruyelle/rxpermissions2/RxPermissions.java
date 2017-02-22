@@ -50,7 +50,7 @@ public class RxPermissions {
             fragmentManager
                     .beginTransaction()
                     .add(rxPermissionsFragment, TAG)
-                    .commit();
+                    .commitAllowingStateLoss();
             fragmentManager.executePendingTransactions();
         }
         return rxPermissionsFragment;

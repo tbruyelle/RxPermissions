@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.2'
+        classpath 'com.android.tools.build:gradle:2.2.3'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.1'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
     }
@@ -40,7 +40,7 @@ ext {
     publishedGroupId = 'com.tbruyelle.rxpermissions2'
     artifact = 'rxpermissions'
     libraryName = 'RxPermissions'
-    libraryVersion = '0.9.1'
+    libraryVersion = '0.9.2'
 
     libraryDescription = 'A wrapper for Android 6.0 permissions'
 
