@@ -2,6 +2,7 @@
 <manifest
     package="com.tbruyelle.rxpermissions2.sample"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     >
 
     <uses-permission android:name="android.permission.CAMERA"/>
@@ -12,6 +13,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+        tools:ignore="GoogleAppIndexingWarning"
         >
         <activity
             android:name="com.tbruyelle.rxpermissions2.sample.MainActivity"
