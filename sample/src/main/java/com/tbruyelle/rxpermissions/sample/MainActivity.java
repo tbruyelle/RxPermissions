@@ -9,6 +9,7 @@ import android.view.SurfaceView;
 import android.widget.Toast;
 
 import com.jakewharton.rxbinding.view.RxView;
+import com.tbruyelle.rxpermissions.Permission;
 import com.tbruyelle.rxpermissions.RxPermissions;
 
 import java.io.IOException;
@@ -22,12 +23,11 @@ public class MainActivity extends AppCompatActivity {
 
     private Camera camera;
     private SurfaceView surfaceView;
-    private RxPermissions rxPermissions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        rxPermissions = RxPermissions.getInstance(this);
+        RxPermissions rxPermissions = new RxPermissions(this);
         rxPermissions.setLogging(true);
 
         setContentView(R.layout.act_main);
@@ -35,12 +35,12 @@ public class MainActivity extends AppCompatActivity {
 
         RxView.clicks(findViewById(R.id.enableCamera))
                 // Ask for permissions when button is clicked
-                .compose(rxPermissions.ensure(Manifest.permission.CAMERA))
-                .subscribe(new Action1<Boolean>() {
+                .compose(rxPermissions.ensureEach(Manifest.permission.CAMERA))
+                .subscribe(new Action1<Permission>() {
                                @Override
-                               public void call(Boolean granted) {
-                                   Log.i(TAG, "Permission result " + granted);
-                                   if (granted) {
+                               public void call(Permission permission) {
+                                   Log.i(TAG, "Permission result " + permission);
+                                   if (permission.granted) {
                                        releaseCamera();
                                        camera = Camera.open(0);
                                        try {
@@ -49,7 +49,14 @@ public class MainActivity extends AppCompatActivity {
                                        } catch (IOException e) {
                                            Log.e(TAG, "Error while trying to display the camera preview", e);
                                        }
+                                   } else if (permission.shouldShowRequestPermissionRationale) {
+                                       // Denied permission without ask never again
+                                       Toast.makeText(MainActivity.this,
+                                               "Denied permission without ask never again",
+                                               Toast.LENGTH_SHORT).show();
                                    } else {
+                                       // Denied permission with ask never again
+                                       // Need to go to the settings
                                        Toast.makeText(MainActivity.this,
                                                "Permission denied, can't enable the camera",
                                                Toast.LENGTH_SHORT).show();
@@ -82,4 +89,5 @@ public class MainActivity extends AppCompatActivity {
             camera = null;
         }
     }
+
 }

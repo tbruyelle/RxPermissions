@@ -29,9 +29,13 @@ android {
 
 dependencies {
     compile rootProject.ext.rxJava
+    compile rootProject.ext.supportAnnotations
 
     testCompile rootProject.ext.junit
     testCompile rootProject.ext.mockito
+    testCompile rootProject.ext.robolectric
+    testCompile rootProject.ext.robolectricShadowsSupport
+    testCompile rootProject.ext.khronosOpenGLApi
 }
 
 apply from: 'install.gradle'

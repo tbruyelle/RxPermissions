@@ -17,12 +17,18 @@ package com.tbruyelle.rxpermissions;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
-import org.junit.*;
-import org.mockito.*;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Matchers;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
+import org.robolectric.util.ActivityController;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,26 +39,33 @@ import rx.observers.TestSubscriber;
 import rx.subjects.PublishSubject;
 
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@RunWith(RobolectricTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = Build.VERSION_CODES.M)
 public class RxPermissionsTest {
 
-    @Mock
-    Context mCtx;
+    private Activity mActivity;
 
-    RxPermissions mRxPermissions;
+    private RxPermissions mRxPermissions;
 
     @Before
     public void setup() {
-        MockitoAnnotations.initMocks(this);
-        when(mCtx.getApplicationContext()).thenReturn(mCtx);
-        mRxPermissions = spy(new RxPermissions(mCtx));
-        RxPermissions.sSingleton = mRxPermissions;
-        doNothing().when(mRxPermissions).startShadowActivity(any(String[].class));
+        ActivityController<Activity> activityController = Robolectric.buildActivity(Activity.class);
+        mActivity = spy(activityController.setup().get());
+        mRxPermissions = spy(new RxPermissions(mActivity));
+        mRxPermissions.mRxPermissionsFragment = spy(mRxPermissions.mRxPermissionsFragment);
+        when(mRxPermissions.mRxPermissionsFragment.getActivity()).thenReturn(mActivity);
         // Default deny all permissions
         doReturn(false).when(mRxPermissions).isGranted(anyString());
         // Default no revoked permissions
@@ -87,7 +100,7 @@ public class RxPermissionsTest {
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED};
 
         trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub);
-        mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
+        mRxPermissions.onRequestPermissionsResult(new String[]{permission}, result);
 
         sub.assertNoErrors();
         sub.assertTerminalEvent();
@@ -104,7 +117,7 @@ public class RxPermissionsTest {
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED};
 
         trigger().compose(mRxPermissions.ensureEach(permission)).subscribe(sub);
-        mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
+        mRxPermissions.onRequestPermissionsResult(new String[]{permission}, result);
 
         sub.assertNoErrors();
         sub.assertTerminalEvent();
@@ -151,7 +164,7 @@ public class RxPermissionsTest {
         int[] result = new int[]{PackageManager.PERMISSION_DENIED};
 
         trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub);
-        mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
+        mRxPermissions.onRequestPermissionsResult(new String[]{permission}, result);
 
         sub.assertNoErrors();
         sub.assertTerminalEvent();
@@ -168,7 +181,7 @@ public class RxPermissionsTest {
         int[] result = new int[]{PackageManager.PERMISSION_DENIED};
 
         trigger().compose(mRxPermissions.ensureEach(permission)).subscribe(sub);
-        mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
+        mRxPermissions.onRequestPermissionsResult(new String[]{permission}, result);
 
         sub.assertNoErrors();
         sub.assertTerminalEvent();
@@ -215,7 +228,7 @@ public class RxPermissionsTest {
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED, PackageManager.PERMISSION_GRANTED};
 
         trigger().compose(mRxPermissions.ensure(permissions)).subscribe(sub);
-        mRxPermissions.onRequestPermissionsResult(0, permissions, result);
+        mRxPermissions.onRequestPermissionsResult(permissions, result);
 
         sub.assertNoErrors();
         sub.assertTerminalEvent();
@@ -232,7 +245,7 @@ public class RxPermissionsTest {
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED, PackageManager.PERMISSION_GRANTED};
 
         trigger().compose(mRxPermissions.ensureEach(permissions)).subscribe(sub);
-        mRxPermissions.onRequestPermissionsResult(0, permissions, result);
+        mRxPermissions.onRequestPermissionsResult(permissions, result);
 
         sub.assertNoErrors();
         sub.assertTerminalEvent();
@@ -252,7 +265,7 @@ public class RxPermissionsTest {
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED, PackageManager.PERMISSION_DENIED};
 
         trigger().compose(mRxPermissions.ensure(permissions)).subscribe(sub);
-        mRxPermissions.onRequestPermissionsResult(0, permissions, result);
+        mRxPermissions.onRequestPermissionsResult(permissions, result);
 
         sub.assertNoErrors();
         sub.assertTerminalEvent();
@@ -269,7 +282,7 @@ public class RxPermissionsTest {
         when(mRxPermissions.isRevoked(Manifest.permission.CAMERA)).thenReturn(true);
 
         trigger().compose(mRxPermissions.ensure(permissions)).subscribe(sub);
-        mRxPermissions.onRequestPermissionsResult(0,
+        mRxPermissions.onRequestPermissionsResult(
                 new String[]{Manifest.permission.READ_PHONE_STATE},
                 new int[]{PackageManager.PERMISSION_GRANTED});
 
@@ -288,7 +301,7 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted(Manifest.permission.CAMERA)).thenReturn(true);
 
         trigger().compose(mRxPermissions.ensureEach(permissions)).subscribe(sub);
-        mRxPermissions.onRequestPermissionsResult(0,
+        mRxPermissions.onRequestPermissionsResult(
                 new String[]{Manifest.permission.READ_PHONE_STATE},
                 new int[]{PackageManager.PERMISSION_GRANTED});
 
@@ -300,7 +313,7 @@ public class RxPermissionsTest {
         ps.add(new Permission(permissions[1], true));
         sub.assertReceivedOnNext(ps);
         ArgumentCaptor<String[]> requestedPermissions = ArgumentCaptor.forClass(String[].class);
-        verify(mRxPermissions).startShadowActivity(requestedPermissions.capture());
+        verify(mRxPermissions).requestPermissionsFromFragment(requestedPermissions.capture());
         assertEquals(1, requestedPermissions.getValue().length);
         assertEquals(Manifest.permission.READ_PHONE_STATE, requestedPermissions.getValue()[0]);
     }
@@ -314,7 +327,7 @@ public class RxPermissionsTest {
         int[] result = new int[]{PackageManager.PERMISSION_GRANTED, PackageManager.PERMISSION_DENIED};
 
         trigger().compose(mRxPermissions.ensureEach(permissions)).subscribe(sub);
-        mRxPermissions.onRequestPermissionsResult(0, permissions, result);
+        mRxPermissions.onRequestPermissionsResult(permissions, result);
 
         sub.assertNoErrors();
         sub.assertTerminalEvent();
@@ -334,7 +347,7 @@ public class RxPermissionsTest {
         when(mRxPermissions.isRevoked(Manifest.permission.CAMERA)).thenReturn(true);
 
         trigger().compose(mRxPermissions.ensureEach(permissions)).subscribe(sub);
-        mRxPermissions.onRequestPermissionsResult(0,
+        mRxPermissions.onRequestPermissionsResult(
                 new String[]{Manifest.permission.READ_PHONE_STATE},
                 new int[]{PackageManager.PERMISSION_GRANTED});
 
@@ -358,7 +371,7 @@ public class RxPermissionsTest {
 
         trigger.compose(mRxPermissions.ensure(permission)).subscribe(sub);
         trigger.onNext(null);
-        mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
+        mRxPermissions.onRequestPermissionsResult(new String[]{permission}, result);
 
         sub.assertNoErrors();
         sub.assertNoTerminalEvent();
@@ -376,7 +389,7 @@ public class RxPermissionsTest {
 
         trigger.compose(mRxPermissions.ensureEach(permission)).subscribe(sub);
         trigger.onNext(null);
-        mRxPermissions.onRequestPermissionsResult(0, new String[]{permission}, result);
+        mRxPermissions.onRequestPermissionsResult(new String[]{permission}, result);
 
         sub.assertNoErrors();
         sub.assertNoTerminalEvent();
@@ -480,7 +493,7 @@ public class RxPermissionsTest {
         // unmock isGranted
         doCallRealMethod().when(mRxPermissions).isGranted(anyString());
         doReturn(true).when(mRxPermissions).isMarshmallow();
-        when(mCtx.checkSelfPermission("p")).thenReturn(PackageManager.PERMISSION_GRANTED);
+        when(mActivity.checkSelfPermission("p")).thenReturn(PackageManager.PERMISSION_GRANTED);
 
         boolean granted = mRxPermissions.isGranted("p");
 
@@ -493,7 +506,7 @@ public class RxPermissionsTest {
         // unmock isGranted
         doCallRealMethod().when(mRxPermissions).isGranted(anyString());
         doReturn(true).when(mRxPermissions).isMarshmallow();
-        when(mCtx.checkSelfPermission("p")).thenReturn(PackageManager.PERMISSION_DENIED);
+        when(mActivity.checkSelfPermission("p")).thenReturn(PackageManager.PERMISSION_DENIED);
 
         boolean granted = mRxPermissions.isGranted("p");
 
@@ -518,7 +531,7 @@ public class RxPermissionsTest {
         doCallRealMethod().when(mRxPermissions).isRevoked(anyString());
         doReturn(true).when(mRxPermissions).isMarshmallow();
         PackageManager pm = mock(PackageManager.class);
-        when(mCtx.getPackageManager()).thenReturn(pm);
+        when(mActivity.getPackageManager()).thenReturn(pm);
         when(pm.isPermissionRevokedByPolicy(eq("p"), anyString())).thenReturn(true);
 
         boolean revoked = mRxPermissions.isRevoked("p");
@@ -533,7 +546,7 @@ public class RxPermissionsTest {
         doCallRealMethod().when(mRxPermissions).isRevoked(anyString());
         doReturn(true).when(mRxPermissions).isMarshmallow();
         PackageManager pm = mock(PackageManager.class);
-        when(mCtx.getPackageManager()).thenReturn(pm);
+        when(mActivity.getPackageManager()).thenReturn(pm);
         when(pm.isPermissionRevokedByPolicy(eq("p"), anyString())).thenReturn(false);
 
         boolean revoked = mRxPermissions.isRevoked("p");

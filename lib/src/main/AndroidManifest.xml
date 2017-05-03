@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    package="com.tbruyelle.rxpermissions"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    >
+<manifest package="com.tbruyelle.rxpermissions">
 
-    <application>
-        <activity
-            android:name="ShadowActivity"
-            android:launchMode="singleTop"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            />
-    </application>
+    <application />
+
 </manifest>
