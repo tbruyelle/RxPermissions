@@ -17,8 +17,11 @@ package com.tbruyelle.rxpermissions;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
@@ -249,6 +252,21 @@ public class RxPermissions {
     }
 
     /**
+     * Returns true if the permission is already granted.
+     * <p>
+     * Always true if SDK &lt; 23.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static boolean isGranted(Context context, String permission) {
+        return !isMarshmallowImplementation() || isGrantedImplementation(context, permission);
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private static boolean isGrantedImplementation(Context context, String permission) {
+        return context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    /**
      * Returns true if the permission has been revoked by a policy.
      * <p>
      * Always false if SDK &lt; 23.
@@ -258,7 +276,27 @@ public class RxPermissions {
         return isMarshmallow() && mRxPermissionsFragment.isRevoked(permission);
     }
 
+    /**
+     * Returns true if the permission has been revoked by a policy.
+     * <p>
+     * Always false if SDK &lt; 23.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static boolean isRevoked(Context context, String permission) {
+        return isMarshmallowImplementation() && isRevokedImplementation(context, permission);
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private static boolean isRevokedImplementation(Context context, String permission) {
+        return context.getPackageManager().isPermissionRevokedByPolicy(permission, context.getPackageName());
+    }
+
+    @VisibleForTesting
     boolean isMarshmallow() {
+        return isMarshmallowImplementation();
+    }
+
+    private static boolean isMarshmallowImplementation() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
     }
 
