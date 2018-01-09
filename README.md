@@ -112,6 +112,24 @@ rxPermissions
     });
 ```
 
+You can also get combined detailed result with `requestEachCombined` or `ensureEachCombined` :
+
+```java
+rxPermissions
+    .requestEachCombined(Manifest.permission.CAMERA,
+             Manifest.permission.READ_PHONE_STATE)
+    .subscribe(permission -> { // will emit 1 Permission object
+        if (permission.granted) {
+           // All permissions are granted !
+        } else if (permission.shouldShowRequestPermissionRationale)
+           // At least one denied permission without ask never again
+        } else {
+           // At least one denied permission with ask never again
+           // Need to go to the settings
+        }
+    });
+```
+
 Look at the `sample` app for more.
 
 ## Important read

@@ -27,6 +27,9 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.ObservableTransformer;
+import io.reactivex.Single;
+import io.reactivex.SingleSource;
+import io.reactivex.SingleTransformer;
 import io.reactivex.functions.Function;
 import io.reactivex.subjects.PublishSubject;
 
@@ -119,6 +122,32 @@ public class RxPermissions {
     }
 
     /**
+     * Map emitted items from the source observable into one combined {@link Permission} object. Only if all permissions are granted,
+     * permission also will be granted. If any permission has {@code shouldShowRationale} checked, than result also has it checked.
+     * <p>
+     * If one or several permissions have never been requested, invoke the related framework method
+     * to ask the user if he allows the permissions.
+     */
+    public <T> ObservableTransformer<T, Permission> ensureEachCombined(final String... permissions) {
+        return new ObservableTransformer<T, Permission>() {
+            @Override
+            public ObservableSource<Permission> apply(Observable<T> o) {
+                return request(o, permissions)
+                        .buffer(permissions.length)
+                        .flatMap(new Function<List<Permission>, ObservableSource<Permission>>() {
+                            @Override
+                            public ObservableSource<Permission> apply(List<Permission> permissions) throws Exception {
+                                if (permissions.isEmpty()) {
+                                    return Observable.empty();
+                                }
+                                return Observable.just(new Permission(permissions));
+                            }
+                        });
+            }
+        };
+    }
+
+    /**
      * Request permissions immediately, <b>must be invoked during initialization phase
      * of your application</b>.
      */
@@ -134,6 +163,14 @@ public class RxPermissions {
     @SuppressWarnings({"WeakerAccess", "unused"})
     public Observable<Permission> requestEach(final String... permissions) {
         return Observable.just(TRIGGER).compose(ensureEach(permissions));
+    }
+
+    /**
+     * Request permissions immediately, <b>must be invoked during initialization phase
+     * of your application</b>.
+     */
+    public Observable<Permission> requestEachCombined(final String... permissions){
+        return Observable.just(TRIGGER).compose(ensureEachCombined(permissions));
     }
 
     private Observable<Permission> request(final Observable<?> trigger, final String... permissions) {
