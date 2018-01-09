@@ -21,7 +21,7 @@ ext {
     targetSdkVersion = compileSdkVersion
     buildToolsVersion = '25.0.2'
 
-    rxJava = 'io.reactivex.rxjava2:rxjava:2.0.6'
+    rxJava = 'io.reactivex.rxjava2:rxjava:2.1.8'
     supportLibraryVersion = '25.2.0'
     appCompat = "com.android.support:appcompat-v7:$supportLibraryVersion"
     supportAnnotations = "com.android.support:support-annotations:$supportLibraryVersion"
