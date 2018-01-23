@@ -8,35 +8,10 @@ This library allows the usage of RxJava with the new Android M permission model.
 
 To use this library your `minSdkVersion` must be >= 11.
 
-In your build.gradle :
-
-```gradle
-repositories {
-    jcenter() // If not already there
-}
-
-dependencies {
-    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.9.4@aar'
-}
-```
-
-## Setup for RxJava2
-
-Thanks to @vanniktech, RxPermissions now supports RxJava2, just change the package name to `com.tbruyelle.rxpermissions2`.
-
 ```gradle
 dependencies {
-    compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar'
+    compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
 }
-```
-
-## Migration to 0.9
-
-Version 0.9 now uses a retained fragment to trigger the permission request from the framework. As a result, the `RxPermissions` class is no more a singleton.
-To migrate from 0.8 or earlier, just replace the following :
-
-```java
-RxPermissions.getInstance(this) -> new RxPermissions(this) // where this is an Activity instance
 ```
 
 ## Usage
@@ -107,6 +82,24 @@ rxPermissions
            // Denied permission without ask never again
         } else {
            // Denied permission with ask never again
+           // Need to go to the settings
+        }
+    });
+```
+
+You can also get combined detailed result with `requestEachCombined` or `ensureEachCombined` :
+
+```java
+rxPermissions
+    .requestEachCombined(Manifest.permission.CAMERA,
+             Manifest.permission.READ_PHONE_STATE)
+    .subscribe(permission -> { // will emit 1 Permission object
+        if (permission.granted) {
+           // All permissions are granted !
+        } else if (permission.shouldShowRequestPermissionRationale)
+           // At least one denied permission without ask never again
+        } else {
+           // At least one denied permission with ask never again
            // Need to go to the settings
         }
     });

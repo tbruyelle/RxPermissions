@@ -21,7 +21,7 @@ ext {
     targetSdkVersion = compileSdkVersion
     buildToolsVersion = '25.0.2'
 
-    rxJava = 'io.reactivex:rxjava:1.2.9'
+    rxJava = 'io.reactivex.rxjava2:rxjava:2.1.8'
     supportLibraryVersion = '25.2.0'
     appCompat = "com.android.support:appcompat-v7:$supportLibraryVersion"
     supportAnnotations = "com.android.support:support-annotations:$supportLibraryVersion"
@@ -35,12 +35,12 @@ ext {
     khronosOpenGLApi = "org.khronos:opengl-api:gl1.1-android-2.1_r1"
 
     bintrayRepo = 'tbruyelle'
-    bintrayName = 'RxPermissions'
+    bintrayName = 'RxPermissions2'
 
-    publishedGroupId = 'com.tbruyelle.rxpermissions'
+    publishedGroupId = 'com.tbruyelle.rxpermissions2'
     artifact = 'rxpermissions'
     libraryName = 'RxPermissions'
-    libraryVersion = '0.9.4'
+    libraryVersion = '0.9.5'
 
     libraryDescription = 'A wrapper for Android 6.0 permissions'
 

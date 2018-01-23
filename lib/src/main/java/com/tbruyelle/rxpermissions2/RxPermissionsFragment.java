@@ -1,4 +1,4 @@
-package com.tbruyelle.rxpermissions;
+package com.tbruyelle.rxpermissions2;
 
 import android.annotation.TargetApi;
 import android.app.Fragment;
@@ -7,11 +7,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
-
+import io.reactivex.subjects.PublishSubject;
 import java.util.HashMap;
 import java.util.Map;
-
-import rx.subjects.PublishSubject;
 
 public class RxPermissionsFragment extends Fragment {
 
@@ -64,7 +62,7 @@ public class RxPermissionsFragment extends Fragment {
             mSubjects.remove(permissions[i]);
             boolean granted = grantResults[i] == PackageManager.PERMISSION_GRANTED;
             subject.onNext(new Permission(permissions[i], granted, shouldShowRequestPermissionRationale[i]));
-            subject.onCompleted();
+            subject.onComplete();
         }
     }
 

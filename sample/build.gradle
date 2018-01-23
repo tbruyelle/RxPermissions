@@ -12,6 +12,10 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    packagingOptions {
+        exclude 'META-INF/rxjava.properties'
+    }
 }
 
 dependencies {
@@ -19,6 +23,7 @@ dependencies {
 
     compile rootProject.ext.appCompat
     compile 'com.jakewharton.rxbinding:rxbinding:0.4.0'
+    compile 'com.github.akarnokd:rxjava2-interop:0.8.0'
 
     testCompile rootProject.ext.junit
     testCompile rootProject.ext.mockito
