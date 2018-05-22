@@ -17,11 +17,14 @@ package com.tbruyelle.rxpermissions2;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -38,10 +41,14 @@ public class RxPermissions {
     static final String TAG = "RxPermissions";
     static final Object TRIGGER = new Object();
 
+    private static List<String> mRegisteredInManifestPermissions;
     RxPermissionsFragment mRxPermissionsFragment;
 
     public RxPermissions(@NonNull Activity activity) {
         mRxPermissionsFragment = getRxPermissionsFragment(activity);
+        if (mRegisteredInManifestPermissions == null) {
+            mRegisteredInManifestPermissions = getRegisteredInManifestPermissions(activity);
+        }
     }
 
     private RxPermissionsFragment getRxPermissionsFragment(Activity activity) {
@@ -57,6 +64,23 @@ public class RxPermissions {
             fragmentManager.executePendingTransactions();
         }
         return rxPermissionsFragment;
+    }
+
+    private List<String> getRegisteredInManifestPermissions(Activity activity) {
+        if (activity == null) {
+            return null;
+        }
+        List<String> list = new ArrayList<>();
+        try {
+            PackageInfo packageInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), PackageManager.GET_PERMISSIONS);
+            String[] permissions = packageInfo.requestedPermissions;
+            if (permissions != null) {
+                list.addAll(Arrays.asList(permissions));
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            return null;
+        }
+        return list;
     }
 
     private RxPermissionsFragment findRxPermissionsFragment(Activity activity) {
@@ -174,9 +198,7 @@ public class RxPermissions {
     }
 
     Observable<Permission> request(final Observable<?> trigger, final String... permissions) {
-        if (permissions == null || permissions.length == 0) {
-            throw new IllegalArgumentException("RxPermissions.request/requestEach requires at least one input permission");
-        }
+        checkPermissions(permissions);
         return oneOf(trigger, pending(permissions))
                 .flatMap(new Function<Object, Observable<Permission>>() {
                     @Override
@@ -296,6 +318,17 @@ public class RxPermissions {
     @SuppressWarnings("WeakerAccess")
     public boolean isRevoked(String permission) {
         return isMarshmallow() && mRxPermissionsFragment.isRevoked(permission);
+    }
+
+    void checkPermissions(String... permissions) {
+        if (permissions == null || permissions.length == 0) {
+            throw new IllegalArgumentException("RxPermissions.request/requestEach requires at least one input permission");
+        }
+        for (String p : permissions) {
+            if (!mRegisteredInManifestPermissions.contains(p)) {
+                throw new IllegalStateException("the permission \"" + p + "\" is not registered in manifest.xml");
+            }
+        }
     }
 
     boolean isMarshmallow() {
