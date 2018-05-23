@@ -317,7 +317,7 @@ public class RxPermissions {
         return isMarshmallow() && mRxPermissionsFragment.isRevoked(permission);
     }
 
-    private void checkPermissions(String... permissions) {
+    void checkPermissions(String... permissions) {
         if (permissions == null || permissions.length == 0) {
             throw new IllegalArgumentException("RxPermissions.request/requestEach requires at least one input permission");
         }
