@@ -20,8 +20,6 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
-import com.tbruyelle.rxpermissions.BuildConfig;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
