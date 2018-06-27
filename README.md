@@ -10,7 +10,7 @@ To use this library your `minSdkVersion` must be >= 11.
 
 ```gradle
 dependencies {
-    compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
+    implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
 }
 ```
 
