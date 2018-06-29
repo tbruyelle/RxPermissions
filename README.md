@@ -9,8 +9,15 @@ This library allows the usage of RxJava with the new Android M permission model.
 To use this library your `minSdkVersion` must be >= 11.
 
 ```gradle
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+
 dependencies {
-    implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
+    implementation 'com.github.tbruyelle:rxpermissions:0.9.6'
 }
 ```
 
