@@ -16,9 +16,10 @@ package com.tbruyelle.rxpermissions2;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.FragmentManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
@@ -27,9 +28,6 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.ObservableTransformer;
-import io.reactivex.Single;
-import io.reactivex.SingleSource;
-import io.reactivex.SingleTransformer;
 import io.reactivex.functions.Function;
 import io.reactivex.subjects.PublishSubject;
 
@@ -40,16 +38,16 @@ public class RxPermissions {
 
     RxPermissionsFragment mRxPermissionsFragment;
 
-    public RxPermissions(@NonNull Activity activity) {
+    public RxPermissions(@NonNull FragmentActivity activity) {
         mRxPermissionsFragment = getRxPermissionsFragment(activity);
     }
 
-    private RxPermissionsFragment getRxPermissionsFragment(Activity activity) {
+    private RxPermissionsFragment getRxPermissionsFragment(@NonNull FragmentActivity activity) {
         RxPermissionsFragment rxPermissionsFragment = findRxPermissionsFragment(activity);
         boolean isNewInstance = rxPermissionsFragment == null;
         if (isNewInstance) {
             rxPermissionsFragment = new RxPermissionsFragment();
-            FragmentManager fragmentManager = activity.getFragmentManager();
+            FragmentManager fragmentManager = activity.getSupportFragmentManager();
             fragmentManager
                     .beginTransaction()
                     .add(rxPermissionsFragment, TAG)
@@ -59,8 +57,8 @@ public class RxPermissions {
         return rxPermissionsFragment;
     }
 
-    private RxPermissionsFragment findRxPermissionsFragment(Activity activity) {
-        return (RxPermissionsFragment) activity.getFragmentManager().findFragmentByTag(TAG);
+    private RxPermissionsFragment findRxPermissionsFragment(@NonNull FragmentActivity activity) {
+        return (RxPermissionsFragment) activity.getSupportFragmentManager().findFragmentByTag(TAG);
     }
 
     public void setLogging(boolean logging) {
@@ -84,7 +82,7 @@ public class RxPermissions {
                         .buffer(permissions.length)
                         .flatMap(new Function<List<Permission>, ObservableSource<Boolean>>() {
                             @Override
-                            public ObservableSource<Boolean> apply(List<Permission> permissions) throws Exception {
+                            public ObservableSource<Boolean> apply(List<Permission> permissions) {
                                 if (permissions.isEmpty()) {
                                     // Occurs during orientation change, when the subject receives onComplete.
                                     // In that case we don't want to propagate that empty list to the
@@ -136,7 +134,7 @@ public class RxPermissions {
                         .buffer(permissions.length)
                         .flatMap(new Function<List<Permission>, ObservableSource<Permission>>() {
                             @Override
-                            public ObservableSource<Permission> apply(List<Permission> permissions) throws Exception {
+                            public ObservableSource<Permission> apply(List<Permission> permissions) {
                                 if (permissions.isEmpty()) {
                                     return Observable.empty();
                                 }
@@ -169,18 +167,18 @@ public class RxPermissions {
      * Request permissions immediately, <b>must be invoked during initialization phase
      * of your application</b>.
      */
-    public Observable<Permission> requestEachCombined(final String... permissions){
+    public Observable<Permission> requestEachCombined(final String... permissions) {
         return Observable.just(TRIGGER).compose(ensureEachCombined(permissions));
     }
 
-    Observable<Permission> request(final Observable<?> trigger, final String... permissions) {
+    private Observable<Permission> request(final Observable<?> trigger, final String... permissions) {
         if (permissions == null || permissions.length == 0) {
             throw new IllegalArgumentException("RxPermissions.request/requestEach requires at least one input permission");
         }
         return oneOf(trigger, pending(permissions))
                 .flatMap(new Function<Object, Observable<Permission>>() {
                     @Override
-                    public Observable<Permission> apply(Object o) throws Exception {
+                    public Observable<Permission> apply(Object o) {
                         return requestImplementation(permissions);
                     }
                 });
@@ -203,7 +201,7 @@ public class RxPermissions {
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    Observable<Permission> requestImplementation(final String... permissions) {
+    private Observable<Permission> requestImplementation(final String... permissions) {
         List<Observable<Permission>> list = new ArrayList<>(permissions.length);
         List<String> unrequestedPermissions = new ArrayList<>();
 
