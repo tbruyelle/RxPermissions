@@ -18,6 +18,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
@@ -36,7 +37,8 @@ public class RxPermissions {
     static final String TAG = RxPermissions.class.getSimpleName();
     static final Object TRIGGER = new Object();
 
-    private final Lazy<RxPermissionsFragment> mRxPermissionsFragment;
+    @VisibleForTesting
+    Lazy<RxPermissionsFragment> mRxPermissionsFragment;
 
     public RxPermissions(@NonNull final FragmentActivity activity) {
         mRxPermissionsFragment = getLazySingleton(activity);

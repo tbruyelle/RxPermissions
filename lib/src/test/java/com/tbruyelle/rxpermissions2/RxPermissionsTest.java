@@ -61,7 +61,9 @@ public class RxPermissionsTest {
         mActivity = spy(activityController.setup().get());
         mRxPermissions = spy(new RxPermissions(mActivity));
         mRxPermissions.mRxPermissionsFragment = spy(mRxPermissions.mRxPermissionsFragment);
-        when(mRxPermissions.mRxPermissionsFragment.getActivity()).thenReturn(mActivity);
+        final RxPermissionsFragment rxPermissionsFragment = spy(mRxPermissions.mRxPermissionsFragment.get());
+        when(rxPermissionsFragment.getActivity()).thenReturn(mActivity);
+        when(mRxPermissions.mRxPermissionsFragment.get()).thenReturn(rxPermissionsFragment);
         // Default deny all permissions
         doReturn(false).when(mRxPermissions).isGranted(anyString());
         // Default no revoked permissions
