@@ -17,7 +17,7 @@ allprojects {
 }
 
 dependencies {
-    implementation 'com.github.tbruyelle:rxpermissions:0.10.1'
+    implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
 }
 ```
 
@@ -26,8 +26,10 @@ dependencies {
 Create a `RxPermissions` instance :
 
 ```java
-RxPermissions rxPermissions = new RxPermissions(this); // where this is an Activity instance
+final RxPermissions rxPermissions = new RxPermissions(this); // where this is an Activity or Fragment instance
 ```
+
+**NOTE:** `new RxPermissions(this)` the `this` parameter can be an Activity or a Fragment. If you are using `RxPermissions` inside of a fragment you should pass the fragment instance(`new RxPermissions(this)`) as constructor parameter rather than `new RxPermissions(fragment.getActivity())` or you could face a `java.lang.IllegalStateException: FragmentManager is already executing transactions`.  
 
 Example : request the CAMERA permission (with Retrolambda for brevity, but not required)
 

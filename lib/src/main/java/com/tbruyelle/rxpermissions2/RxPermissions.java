@@ -19,6 +19,7 @@ import android.app.Activity;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
@@ -41,11 +42,15 @@ public class RxPermissions {
     Lazy<RxPermissionsFragment> mRxPermissionsFragment;
 
     public RxPermissions(@NonNull final FragmentActivity activity) {
-        mRxPermissionsFragment = getLazySingleton(activity);
+        mRxPermissionsFragment = getLazySingleton(activity.getSupportFragmentManager());
+    }
+
+    public RxPermissions(@NonNull final Fragment fragment) {
+        mRxPermissionsFragment = getLazySingleton(fragment.getChildFragmentManager());
     }
 
     @NonNull
-    private Lazy<RxPermissionsFragment> getLazySingleton(@NonNull final FragmentActivity activity) {
+    private Lazy<RxPermissionsFragment> getLazySingleton(@NonNull final FragmentManager fragmentManager) {
         return new Lazy<RxPermissionsFragment>() {
 
             private RxPermissionsFragment rxPermissionsFragment;
@@ -53,7 +58,7 @@ public class RxPermissions {
             @Override
             public synchronized RxPermissionsFragment get() {
                 if (rxPermissionsFragment == null) {
-                    rxPermissionsFragment = getRxPermissionsFragment(activity);
+                    rxPermissionsFragment = getRxPermissionsFragment(fragmentManager);
                 }
                 return rxPermissionsFragment;
             }
@@ -61,12 +66,11 @@ public class RxPermissions {
         };
     }
 
-    private RxPermissionsFragment getRxPermissionsFragment(@NonNull FragmentActivity activity) {
-        RxPermissionsFragment rxPermissionsFragment = findRxPermissionsFragment(activity);
+    private RxPermissionsFragment getRxPermissionsFragment(@NonNull final FragmentManager fragmentManager) {
+        RxPermissionsFragment rxPermissionsFragment = findRxPermissionsFragment(fragmentManager);
         boolean isNewInstance = rxPermissionsFragment == null;
         if (isNewInstance) {
             rxPermissionsFragment = new RxPermissionsFragment();
-            FragmentManager fragmentManager = activity.getSupportFragmentManager();
             fragmentManager
                     .beginTransaction()
                     .add(rxPermissionsFragment, TAG)
@@ -75,8 +79,8 @@ public class RxPermissions {
         return rxPermissionsFragment;
     }
 
-    private RxPermissionsFragment findRxPermissionsFragment(@NonNull FragmentActivity activity) {
-        return (RxPermissionsFragment) activity.getSupportFragmentManager().findFragmentByTag(TAG);
+    private RxPermissionsFragment findRxPermissionsFragment(@NonNull final FragmentManager fragmentManager) {
+        return (RxPermissionsFragment) fragmentManager.findFragmentByTag(TAG);
     }
 
     public void setLogging(boolean logging) {
