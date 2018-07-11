@@ -41,6 +41,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -68,6 +69,9 @@ public class RxPermissionsTest {
         doReturn(false).when(mRxPermissions).isGranted(anyString());
         // Default no revoked permissions
         doReturn(false).when(mRxPermissions).isRevoked(anyString());
+
+        doNothing().when(mRxPermissions).checkPermissions(anyString());
+        doNothing().when(mRxPermissions).checkPermissions(anyString(),anyString());
     }
 
     private Observable<Object> trigger() {

@@ -16,6 +16,8 @@ package com.tbruyelle.rxpermissions2;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
@@ -25,6 +27,7 @@ import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -37,16 +40,23 @@ public class RxPermissions {
 
     static final String TAG = RxPermissions.class.getSimpleName();
     static final Object TRIGGER = new Object();
+    static List<String> mRegisteredInManifestPermissions;
 
     @VisibleForTesting
     Lazy<RxPermissionsFragment> mRxPermissionsFragment;
 
     public RxPermissions(@NonNull final FragmentActivity activity) {
         mRxPermissionsFragment = getLazySingleton(activity.getSupportFragmentManager());
+        if (mRegisteredInManifestPermissions == null) {
+            mRegisteredInManifestPermissions = getRegisteredInManifestPermissions(activity);
+        }
     }
 
     public RxPermissions(@NonNull final Fragment fragment) {
         mRxPermissionsFragment = getLazySingleton(fragment.getChildFragmentManager());
+        if (mRegisteredInManifestPermissions == null) {
+            mRegisteredInManifestPermissions = getRegisteredInManifestPermissions(fragment.getActivity());
+        }
     }
 
     @NonNull
@@ -77,6 +87,23 @@ public class RxPermissions {
                     .commitNow();
         }
         return rxPermissionsFragment;
+    }
+
+    private List<String> getRegisteredInManifestPermissions(Activity activity) {
+        if (activity == null) {
+            return null;
+        }
+        List<String> list = new ArrayList<>();
+        try {
+            PackageInfo packageInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), PackageManager.GET_PERMISSIONS);
+            String[] permissions = packageInfo.requestedPermissions;
+            if (permissions != null) {
+                list.addAll(Arrays.asList(permissions));
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            return null;
+        }
+        return list;
     }
 
     private RxPermissionsFragment findRxPermissionsFragment(@NonNull final FragmentManager fragmentManager) {
@@ -194,9 +221,7 @@ public class RxPermissions {
     }
 
     private Observable<Permission> request(final Observable<?> trigger, final String... permissions) {
-        if (permissions == null || permissions.length == 0) {
-            throw new IllegalArgumentException("RxPermissions.request/requestEach requires at least one input permission");
-        }
+        checkPermissions(permissions);
         return oneOf(trigger, pending(permissions))
                 .flatMap(new Function<Object, Observable<Permission>>() {
                     @Override
@@ -320,6 +345,17 @@ public class RxPermissions {
 
     boolean isMarshmallow() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+    }
+
+    void checkPermissions(String... permissions) {
+        if (permissions == null || permissions.length == 0) {
+            throw new IllegalArgumentException("RxPermissions.request/requestEach requires at least one input permission");
+        }
+        for (String p : permissions) {
+            if (!mRegisteredInManifestPermissions.contains(p)) {
+                throw new IllegalStateException("the permission \"" + p + "\" is not registered in manifest.xml");
+            }
+        }
     }
 
     void onRequestPermissionsResult(String permissions[], int[] grantResults) {
