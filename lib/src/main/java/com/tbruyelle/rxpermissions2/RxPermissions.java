@@ -198,7 +198,9 @@ public class RxPermissions {
     }
 
     Observable<Permission> request(final Observable<?> trigger, final String... permissions) {
-        checkPermissions(permissions);
+        if (permissions == null || permissions.length == 0) {
+            throw new IllegalArgumentException("RxPermissions.request/requestEach requires at least one input permission");
+        }
         return oneOf(trigger, pending(permissions))
                 .flatMap(new Function<Object, Observable<Permission>>() {
                     @Override
