@@ -1,15 +1,12 @@
 apply plugin: 'com.android.library'
+apply from: 'jitpack.gradle'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 12
-        version = rootProject.ext.libraryVersion
-        group = rootProject.ext.publishedGroupId + rootProject.ext.artifact
     }
     buildTypes {
         release {
@@ -28,15 +25,17 @@ android {
 }
 
 dependencies {
-    compile rootProject.ext.rxJava
-    compile rootProject.ext.supportAnnotations
+    implementation rootProject.ext.rxJava
+    implementation rootProject.ext.supportAnnotations
+    implementation rootProject.ext.supportFragment
 
-    testCompile rootProject.ext.junit
-    testCompile rootProject.ext.mockito
-    testCompile rootProject.ext.robolectric
-    testCompile rootProject.ext.robolectricShadowsSupport
-    testCompile rootProject.ext.khronosOpenGLApi
+    testImplementation rootProject.ext.junit
+    testImplementation rootProject.ext.mockito
+    testImplementation rootProject.ext.robolectric
+    testImplementation rootProject.ext.robolectricShadowsSupport
+    testImplementation rootProject.ext.khronosOpenGLApi
 }
 
-apply from: 'install.gradle'
-apply from: 'bintray.gradle'
+// Commented to use JitPack instead of bintray
+//apply from: 'install.gradle'
+//apply from: 'bintray.gradle'

@@ -19,8 +19,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Build;
-
-import com.tbruyelle.rxpermissions.BuildConfig;
+import android.support.v4.app.FragmentActivity;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,8 +28,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.Config;
-import org.robolectric.util.ActivityController;
 
 import io.reactivex.Observable;
 import io.reactivex.observers.TestObserver;
@@ -52,17 +51,19 @@ import static org.mockito.Mockito.when;
 @Config(constants = BuildConfig.class, sdk = Build.VERSION_CODES.M)
 public class RxPermissionsTest {
 
-    private Activity mActivity;
+    private FragmentActivity mActivity;
 
     private RxPermissions mRxPermissions;
 
     @Before
     public void setup() {
-        ActivityController<Activity> activityController = Robolectric.buildActivity(Activity.class);
+        ActivityController<FragmentActivity> activityController = Robolectric.buildActivity(FragmentActivity.class);
         mActivity = spy(activityController.setup().get());
         mRxPermissions = spy(new RxPermissions(mActivity));
         mRxPermissions.mRxPermissionsFragment = spy(mRxPermissions.mRxPermissionsFragment);
-        when(mRxPermissions.mRxPermissionsFragment.getActivity()).thenReturn(mActivity);
+        final RxPermissionsFragment rxPermissionsFragment = spy(mRxPermissions.mRxPermissionsFragment.get());
+        when(rxPermissionsFragment.getActivity()).thenReturn(mActivity);
+        when(mRxPermissions.mRxPermissionsFragment.get()).thenReturn(rxPermissionsFragment);
         // Default deny all permissions
         doReturn(false).when(mRxPermissions).isGranted(anyString());
         // Default no revoked permissions
@@ -523,7 +524,7 @@ public class RxPermissionsTest {
         when(activity.shouldShowRequestPermissionRationale(anyString())).thenReturn(true);
 
         TestObserver<Boolean> sub = new TestObserver<>();
-        mRxPermissions.shouldShowRequestPermissionRationale(activity, new String[]{"p1", "p2"})
+        mRxPermissions.shouldShowRequestPermissionRationale(activity, "p1", "p2")
                 .subscribe(sub);
 
         sub.assertComplete();
@@ -539,7 +540,7 @@ public class RxPermissionsTest {
         when(activity.shouldShowRequestPermissionRationale("p1")).thenReturn(true);
 
         TestObserver<Boolean> sub = new TestObserver<>();
-        mRxPermissions.shouldShowRequestPermissionRationale(activity, new String[]{"p1", "p2"})
+        mRxPermissions.shouldShowRequestPermissionRationale(activity, "p1", "p2")
                 .subscribe(sub);
 
         sub.assertComplete();
@@ -554,7 +555,7 @@ public class RxPermissionsTest {
         Activity activity = mock(Activity.class);
 
         TestObserver<Boolean> sub = new TestObserver<>();
-        mRxPermissions.shouldShowRequestPermissionRationale(activity, new String[]{"p1", "p2"})
+        mRxPermissions.shouldShowRequestPermissionRationale(activity, "p1", "p2")
                 .subscribe(sub);
 
         sub.assertComplete();
@@ -571,7 +572,7 @@ public class RxPermissionsTest {
         when(activity.shouldShowRequestPermissionRationale("p2")).thenReturn(true);
 
         TestObserver<Boolean> sub = new TestObserver<>();
-        mRxPermissions.shouldShowRequestPermissionRationale(activity, new String[]{"p1", "p2"})
+        mRxPermissions.shouldShowRequestPermissionRationale(activity, "p1", "p2")
                 .subscribe(sub);
 
         sub.assertComplete();
@@ -587,7 +588,7 @@ public class RxPermissionsTest {
         when(mRxPermissions.isGranted("p2")).thenReturn(true);
 
         TestObserver<Boolean> sub = new TestObserver<>();
-        mRxPermissions.shouldShowRequestPermissionRationale(activity, new String[]{"p1", "p2"})
+        mRxPermissions.shouldShowRequestPermissionRationale(activity, "p1", "p2")
                 .subscribe(sub);
 
         sub.assertComplete();

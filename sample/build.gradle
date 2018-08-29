@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         applicationId "com.tbruyelle.rxpermissions.sample"
@@ -19,12 +18,11 @@ android {
 }
 
 dependencies {
-    compile project(':rxpermissions')
+    implementation project(':rxpermissions')
 
-    compile rootProject.ext.appCompat
-    compile 'com.jakewharton.rxbinding:rxbinding:0.4.0'
-    compile 'com.github.akarnokd:rxjava2-interop:0.8.0'
+    implementation rootProject.ext.appCompat
+    implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
 
-    testCompile rootProject.ext.junit
-    testCompile rootProject.ext.mockito
+    testImplementation rootProject.ext.junit
+    testImplementation rootProject.ext.mockito
 }

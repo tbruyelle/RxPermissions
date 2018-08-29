@@ -1,12 +1,14 @@
 package com.tbruyelle.rxpermissions2;
 
 import android.annotation.TargetApi;
-import android.app.Fragment;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+
 import io.reactivex.subjects.PublishSubject;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -74,12 +76,20 @@ public class RxPermissionsFragment extends Fragment {
 
     @TargetApi(Build.VERSION_CODES.M)
     boolean isGranted(String permission) {
-        return getActivity().checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
+        final FragmentActivity fragmentActivity = getActivity();
+        if (fragmentActivity == null) {
+            throw new IllegalStateException("This fragment must be attached to an activity.");
+        }
+        return fragmentActivity.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
     }
 
     @TargetApi(Build.VERSION_CODES.M)
     boolean isRevoked(String permission) {
-        return getActivity().getPackageManager().isPermissionRevokedByPolicy(permission, getActivity().getPackageName());
+        final FragmentActivity fragmentActivity = getActivity();
+        if (fragmentActivity == null) {
+            throw new IllegalStateException("This fragment must be attached to an activity.");
+        }
+        return fragmentActivity.getPackageManager().isPermissionRevokedByPolicy(permission, getActivity().getPackageName());
     }
 
     public void setLogging(boolean logging) {
@@ -94,8 +104,8 @@ public class RxPermissionsFragment extends Fragment {
         return mSubjects.containsKey(permission);
     }
 
-    public PublishSubject<Permission> setSubjectForPermission(@NonNull String permission, @NonNull PublishSubject<Permission> subject) {
-        return mSubjects.put(permission, subject);
+    public void setSubjectForPermission(@NonNull String permission, @NonNull PublishSubject<Permission> subject) {
+        mSubjects.put(permission, subject);
     }
 
     void log(String message) {

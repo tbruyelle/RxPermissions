@@ -1,6 +1,6 @@
 # RxPermissions
 
-[![Build Status](https://api.travis-ci.org/tbruyelle/RxPermissions.svg?branch=master)](https://travis-ci.org/tbruyelle/RxPermissions)
+[![](https://jitpack.io/v/tbruyelle/RxPermissions.svg)](https://jitpack.io/#tbruyelle/RxPermissions) [![BuildVersion](https://buildstats.info/nuget/RxPermissions)](https://www.nuget.org/packages/RxPermissions/) [![Build Status](https://api.travis-ci.org/tbruyelle/RxPermissions.svg?branch=master)](https://travis-ci.org/tbruyelle/RxPermissions)
 
 This library allows the usage of RxJava with the new Android M permission model.
 
@@ -9,8 +9,15 @@ This library allows the usage of RxJava with the new Android M permission model.
 To use this library your `minSdkVersion` must be >= 11.
 
 ```gradle
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+
 dependencies {
-    compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
+    implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
 }
 ```
 
@@ -19,8 +26,10 @@ dependencies {
 Create a `RxPermissions` instance :
 
 ```java
-RxPermissions rxPermissions = new RxPermissions(this); // where this is an Activity instance
+final RxPermissions rxPermissions = new RxPermissions(this); // where this is an Activity or Fragment instance
 ```
+
+**NOTE:** `new RxPermissions(this)` the `this` parameter can be an Activity or a Fragment. If you are using `RxPermissions` inside of a fragment you should pass the fragment instance(`new RxPermissions(this)`) as constructor parameter rather than `new RxPermissions(fragment.getActivity())` or you could face a `java.lang.IllegalStateException: FragmentManager is already executing transactions`.  
 
 Example : request the CAMERA permission (with Retrolambda for brevity, but not required)
 
