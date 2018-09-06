@@ -19,6 +19,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 import org.junit.Before;
@@ -31,6 +32,8 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.Config;
 
+import java.lang.reflect.Field;
+import androidx.fragment.app.FragmentHostCallback;
 import io.reactivex.Observable;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.PublishSubject;
@@ -62,12 +65,34 @@ public class RxPermissionsTest {
         mRxPermissions = spy(new RxPermissions(mActivity));
         mRxPermissions.mRxPermissionsFragment = spy(mRxPermissions.mRxPermissionsFragment);
         final RxPermissionsFragment rxPermissionsFragment = spy(mRxPermissions.mRxPermissionsFragment.get());
-        when(rxPermissionsFragment.getActivity()).thenReturn(mActivity);
+        forceMockedActivity(rxPermissionsFragment);
         when(mRxPermissions.mRxPermissionsFragment.get()).thenReturn(rxPermissionsFragment);
         // Default deny all permissions
         doReturn(false).when(mRxPermissions).isGranted(anyString());
         // Default no revoked permissions
         doReturn(false).when(mRxPermissions).isRevoked(anyString());
+    }
+
+    /**
+     * We should use reflection here, while robolectric shadows can't work properly with androidx
+     * https://github.com/robolectric/robolectric/issues/3985
+     */
+    private void forceMockedActivity(RxPermissionsFragment rxPermissionsFragment) {
+        //We should replace mActivity field in Fragment.mHost.mActivity with our mocked mActivity
+        Class<Fragment> fragmentClass = Fragment.class;
+        try {
+            Field hostField = fragmentClass.getDeclaredField("mHost");
+            hostField.setAccessible(true);
+            Object hostValue = hostField.get(rxPermissionsFragment);
+            Field activityField = FragmentHostCallback.class.getDeclaredField("mActivity");
+            activityField.setAccessible(true);
+            activityField.set(hostValue, mActivity);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        //This documented approach seems to be not working
+        //when(rxPermissionsFragment.getActivity()).thenReturn(mActivity);
     }
 
     private Observable<Object> trigger() {
