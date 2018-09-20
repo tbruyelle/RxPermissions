@@ -1,18 +1,23 @@
 package com.tbruyelle.rxpermissions2;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subjects.Subject;
+
+import static com.tbruyelle.rxpermissions2.RxPermissions.TRIGGER;
 
 public class RxPermissionsFragment extends Fragment {
 
@@ -22,6 +27,7 @@ public class RxPermissionsFragment extends Fragment {
     // Once granted or denied, they are removed from it.
     private Map<String, PublishSubject<Permission>> mSubjects = new HashMap<>();
     private boolean mLogging;
+    private Subject<Object> mCreateSubject = PublishSubject.create();
 
     public RxPermissionsFragment() {
     }
@@ -30,6 +36,20 @@ public class RxPermissionsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mCreateSubject.onNext(TRIGGER);
+        mCreateSubject.onComplete();
+    }
+
+    Observable<Object> transformer() {
+        if (isAdded()) {
+            return Observable.just(TRIGGER);
+        }
+        return mCreateSubject;
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -70,21 +90,13 @@ public class RxPermissionsFragment extends Fragment {
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    boolean isGranted(String permission) {
-        final FragmentActivity fragmentActivity = getActivity();
-        if (fragmentActivity == null) {
-            throw new IllegalStateException("This fragment must be attached to an activity.");
-        }
-        return fragmentActivity.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
+    boolean isGranted(Activity activity, String permission) {
+        return activity != null && activity.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    boolean isRevoked(String permission) {
-        final FragmentActivity fragmentActivity = getActivity();
-        if (fragmentActivity == null) {
-            throw new IllegalStateException("This fragment must be attached to an activity.");
-        }
-        return fragmentActivity.getPackageManager().isPermissionRevokedByPolicy(permission, getActivity().getPackageName());
+    boolean isRevoked(Activity activity, String permission) {
+        return activity != null && activity.getPackageManager().isPermissionRevokedByPolicy(permission, activity.getPackageName());
     }
 
     public void setLogging(boolean logging) {
