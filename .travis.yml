@@ -1,9 +1,12 @@
 language: android
 
+before_install:
+  - yes | sdkmanager "platforms;android-28"
+
 android:
   components:
     - tools
-    - build-tools-27.0.3
+    - build-tools-28.0.2
     - android-28
     - extra-android-m2repository
 
