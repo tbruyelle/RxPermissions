@@ -21,7 +21,7 @@ dependencies {
     implementation project(':rxpermissions')
 
     implementation rootProject.ext.appCompat
-    implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
+    implementation 'com.jakewharton.rxbinding2:rxbinding:2.2.0'
 
     testImplementation rootProject.ext.junit
     testImplementation rootProject.ext.mockito
