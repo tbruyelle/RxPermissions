@@ -15,6 +15,11 @@ android {
     packagingOptions {
         exclude 'META-INF/rxjava.properties'
     }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
 }
 
 dependencies {
