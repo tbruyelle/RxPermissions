@@ -19,7 +19,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import androidx.fragment.app.FragmentActivity;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +30,11 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.Config;
 
+import java.lang.reflect.Field;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentHostCallback;
 import io.reactivex.Observable;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.PublishSubject;
@@ -62,7 +66,18 @@ public class RxPermissionsTest {
         mRxPermissions = spy(new RxPermissions(mActivity));
         mRxPermissions.mRxPermissionsFragment = spy(mRxPermissions.mRxPermissionsFragment);
         final RxPermissionsFragment rxPermissionsFragment = spy(mRxPermissions.mRxPermissionsFragment.get());
-        when(rxPermissionsFragment.getActivity()).thenReturn(mActivity);
+//        when(rxPermissionsFragment.getActivity()).thenReturn(mActivity);
+        try {
+            Field mHostField = Fragment.class.getDeclaredField("mHost");
+            Field mActivityField = FragmentHostCallback.class.getDeclaredField("mActivity");
+            mHostField.setAccessible(true);
+            mActivityField.setAccessible(true);
+            Object mHost = mHostField.get(rxPermissionsFragment);
+            mActivityField.set(mHost, mActivity);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         when(mRxPermissions.mRxPermissionsFragment.get()).thenReturn(rxPermissionsFragment);
         // Default deny all permissions
         doReturn(false).when(mRxPermissions).isGranted(anyString());
