@@ -227,10 +227,13 @@ public class RxPermissions {
         List<Observable<Permission>> list = new ArrayList<>(permissions.length);
         List<String> unrequestedPermissions = new ArrayList<>();
 
+        final RxPermissionsFragment f = mRxPermissionsFragment.get();
+        f.prepareRequest();
+
         // In case of multiple permissions, we create an Observable for each of them.
         // At the end, the observables are combined to have a unique response.
         for (String permission : permissions) {
-            mRxPermissionsFragment.get().log("Requesting permission " + permission);
+            f.log("Requesting permission " + permission);
             if (isGranted(permission)) {
                 // Already granted, or not Android M
                 // Return a granted Permission object.
@@ -244,16 +247,18 @@ public class RxPermissions {
                 continue;
             }
 
-            PublishSubject<Permission> subject = mRxPermissionsFragment.get().getSubjectByPermission(permission);
+            PublishSubject<Permission> subject = f.getSubjectByPermission(permission);
             // Create a new subject if not exists
             if (subject == null) {
                 unrequestedPermissions.add(permission);
                 subject = PublishSubject.create();
-                mRxPermissionsFragment.get().setSubjectForPermission(permission, subject);
+                f.setSubjectForPermission(permission, subject);
             }
 
             list.add(subject);
         }
+
+        f.finishRequest();
 
         if (!unrequestedPermissions.isEmpty()) {
             String[] unrequestedPermissionsArray = unrequestedPermissions.toArray(new String[unrequestedPermissions.size()]);
@@ -322,8 +327,11 @@ public class RxPermissions {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
     }
 
+    @VisibleForTesting
     void onRequestPermissionsResult(String permissions[], int[] grantResults) {
-        mRxPermissionsFragment.get().onRequestPermissionsResult(permissions, grantResults, new boolean[permissions.length]);
+        final RxPermissionsFragment f = mRxPermissionsFragment.get();
+        final int requestCode = f.getPermissionRequestCode();
+        f.onRequestPermissionsResult(requestCode, permissions, grantResults, new boolean[permissions.length]);
     }
 
     @FunctionalInterface
