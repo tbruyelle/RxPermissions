@@ -5,14 +5,17 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subjects.Subject;
 
 public class RxPermissionsFragment extends Fragment {
 
@@ -43,13 +46,17 @@ public class RxPermissionsFragment extends Fragment {
 
         if (requestCode != PERMISSIONS_REQUEST_CODE) return;
 
-        boolean[] shouldShowRequestPermissionRationale = new boolean[permissions.length];
+        if (permissions.length > 0) {
+            boolean[] shouldShowRequestPermissionRationale = new boolean[permissions.length];
 
-        for (int i = 0; i < permissions.length; i++) {
-            shouldShowRequestPermissionRationale[i] = shouldShowRequestPermissionRationale(permissions[i]);
+            for (int i = 0; i < permissions.length; i++) {
+                shouldShowRequestPermissionRationale[i] = shouldShowRequestPermissionRationale(permissions[i]);
+            }
+
+            onRequestPermissionsResult(permissions, grantResults, shouldShowRequestPermissionRationale);
+        } else {
+            onRequestPermissionsCanceled();
         }
-
-        onRequestPermissionsResult(permissions, grantResults, shouldShowRequestPermissionRationale);
     }
 
     void onRequestPermissionsResult(String permissions[], int[] grantResults, boolean[] shouldShowRequestPermissionRationale) {
@@ -65,6 +72,17 @@ public class RxPermissionsFragment extends Fragment {
             mSubjects.remove(permissions[i]);
             boolean granted = grantResults[i] == PackageManager.PERMISSION_GRANTED;
             subject.onNext(new Permission(permissions[i], granted, shouldShowRequestPermissionRationale[i]));
+            subject.onComplete();
+        }
+    }
+
+    void onRequestPermissionsCanceled() {
+        final Map<String, PublishSubject<Permission>> subjects = new HashMap<>(mSubjects);
+        mSubjects.clear();
+        for (Map.Entry<String, PublishSubject<Permission>> entry : subjects.entrySet()) {
+            final String permission = entry.getKey();
+            final PublishSubject<Permission> subject = entry.getValue();
+            subject.onNext(new Permission(permission, false, false));
             subject.onComplete();
         }
     }
@@ -101,6 +119,11 @@ public class RxPermissionsFragment extends Fragment {
 
     public void setSubjectForPermission(@NonNull String permission, @NonNull PublishSubject<Permission> subject) {
         mSubjects.put(permission, subject);
+    }
+
+    @VisibleForTesting
+    Map<String, ? extends Subject<Permission>> getSubjects() {
+        return new LinkedHashMap<>(mSubjects);
     }
 
     void log(String message) {
