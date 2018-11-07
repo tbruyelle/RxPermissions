@@ -673,4 +673,12 @@ public class RxPermissionsTest {
 
         assertFalse(revoked);
     }
+
+    // We can't/shouldn't access the fragment from here.
+    // Verify that a call with zero unrequested permissions doesn't impact subsequent requests.
+    @Test
+    public void requestImplementation_shouldNotThrow_whenThereIsAnotherRequestAfterRequestWithNoUnrequestedPermissions() {
+        mRxPermissions.requestImplementation();
+        mRxPermissions.requestImplementation("xxx");
+    }
 }

@@ -54,6 +54,13 @@ public class RxPermissionsFragment extends Fragment {
         mRequestState = State.SEALED;
     }
 
+    final void cancelRequest() {
+        if (mRequestState == State.READY) {
+            throw new IllegalStateException("There is no pending request.");
+        }
+        mRequestState = State.READY;
+    }
+
     @TargetApi(Build.VERSION_CODES.M)
     void requestPermissions(@NonNull String[] permissions) {
         if (mRequestState != State.SEALED) {

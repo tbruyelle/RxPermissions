@@ -223,7 +223,8 @@ public class RxPermissions {
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    private Observable<Permission> requestImplementation(final String... permissions) {
+    @VisibleForTesting
+    final Observable<Permission> requestImplementation(final String... permissions) {
         List<Observable<Permission>> list = new ArrayList<>(permissions.length);
         List<String> unrequestedPermissions = new ArrayList<>();
 
@@ -263,7 +264,10 @@ public class RxPermissions {
         if (!unrequestedPermissions.isEmpty()) {
             String[] unrequestedPermissionsArray = unrequestedPermissions.toArray(new String[unrequestedPermissions.size()]);
             requestPermissionsFromFragment(unrequestedPermissionsArray);
+        } else {
+            f.cancelRequest();
         }
+
         return Observable.concat(Observable.fromIterable(list));
     }
 
