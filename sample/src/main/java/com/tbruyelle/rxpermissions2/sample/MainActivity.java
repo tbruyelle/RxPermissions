@@ -3,7 +3,6 @@ package com.tbruyelle.rxpermissions2.sample;
 import android.Manifest.permission;
 import android.hardware.Camera;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.widget.Toast;
@@ -14,6 +13,7 @@ import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.io.IOException;
 
+import androidx.appcompat.app.AppCompatActivity;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;

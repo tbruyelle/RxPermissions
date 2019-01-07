@@ -4,7 +4,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.3'
+        classpath 'com.android.tools.build:gradle:3.2.1'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
     }
@@ -19,14 +19,14 @@ allprojects {
 
 ext {
     minSdkVersion = 11
-    compileSdkVersion = 27
+    compileSdkVersion = 28
     targetSdkVersion = compileSdkVersion
 
     rxJava = 'io.reactivex.rxjava2:rxjava:2.1.16'
-    supportLibraryVersion = '27.1.1'
-    appCompat = "com.android.support:appcompat-v7:$supportLibraryVersion"
-    supportAnnotations = "com.android.support:support-annotations:$supportLibraryVersion"
-    supportFragment = "com.android.support:support-fragment:$supportLibraryVersion"
+    supportLibraryVersion = '1.0.0'
+    appCompat = "androidx.appcompat:appcompat:$supportLibraryVersion"
+    supportAnnotations = "androidx.annotation:annotation:$supportLibraryVersion"
+    supportFragment = "androidx.fragment:fragment:$supportLibraryVersion"
     junit = 'junit:junit:4.12'
     mockito = 'org.mockito:mockito-core:1.10.19'
 
