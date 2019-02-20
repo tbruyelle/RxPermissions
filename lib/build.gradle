@@ -35,7 +35,3 @@ dependencies {
     testImplementation rootProject.ext.robolectricShadowsSupport
     testImplementation rootProject.ext.khronosOpenGLApi
 }
-
-// Commented to use JitPack instead of bintray
-//apply from: 'install.gradle'
-//apply from: 'bintray.gradle'
