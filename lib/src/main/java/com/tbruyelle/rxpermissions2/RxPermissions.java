@@ -14,6 +14,7 @@
 
 package com.tbruyelle.rxpermissions2;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
@@ -305,7 +306,20 @@ public class RxPermissions {
      */
     @SuppressWarnings("WeakerAccess")
     public boolean isGranted(String permission) {
-        return !isMarshmallow() || mRxPermissionsFragment.get().isGranted(permission);
+        return !isMarshmallow() || mRxPermissionsFragment.get().isGranted(permission) || isOreoRequestInstallPackagesGranted(permission);
+    }
+
+    /**
+     * Returns true if the permission.REQUEST_INSTALL_PACKAGES is already granted in API level 26 or higher.
+     * <p>
+     * checkSelfPermission(permission.REQUEST_INSTALL_PACKAGES) works well in API 23~25, but always return false in API level 26 or higher.
+     * So does requestPermissions(), always return PERMISSION_DENIED when permission.REQUEST_INSTALL_PACKAGES in API level 26 or higher.
+     */
+    @TargetApi(Build.VERSION_CODES.O)
+    boolean isOreoRequestInstallPackagesGranted(String permission) {
+        return isOreo()
+                && Manifest.permission.REQUEST_INSTALL_PACKAGES.equals(permission)
+                && mRxPermissionsFragment.get().getContext().getPackageManager().canRequestPackageInstalls();
     }
 
     /**
@@ -320,6 +334,10 @@ public class RxPermissions {
 
     boolean isMarshmallow() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+    }
+
+    boolean isOreo() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
     }
 
     void onRequestPermissionsResult(String permissions[], int[] grantResults) {
