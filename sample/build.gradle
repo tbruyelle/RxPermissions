@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -25,4 +27,8 @@ dependencies {
 
     testImplementation rootProject.ext.junit
     testImplementation rootProject.ext.mockito
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+repositories {
+    mavenCentral()
 }
