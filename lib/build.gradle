@@ -1,41 +1,37 @@
 apply plugin: 'com.android.library'
-apply from: 'jitpack.gradle'
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdkVersion 27
 
     defaultConfig {
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdkVersion 11
+        targetSdkVersion 27
+        versionCode 100
+        versionName "1.0.0"
     }
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
         }
     }
+}
 
-    testOptions.unitTests.all {
-        // unitTests.returnDefaultValues = true
-        // Always show the result of every unit test, even if it passes.
-        testLogging {
-            events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
-        }
-    }
+apply from: 'bintray.gradle'
+repositories {
+    mavenCentral()
 }
 
 dependencies {
-    implementation rootProject.ext.rxJava
-    implementation rootProject.ext.supportAnnotations
-    implementation rootProject.ext.supportFragment
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.16'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation "com.android.support:support-annotations:27.1.1"
+    implementation "com.android.support:support-fragment:27.1.1"
 
-    testImplementation rootProject.ext.junit
-    testImplementation rootProject.ext.mockito
-    testImplementation rootProject.ext.robolectric
-    testImplementation rootProject.ext.robolectricShadowsSupport
-    testImplementation rootProject.ext.khronosOpenGLApi
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.mockito:mockito-core:1.10.19'
+    testImplementation "org.robolectric:robolectric:3.3.2"
+    testImplementation "org.robolectric:shadows-support-v4:3.3.2"
 }
-
-// Commented to use JitPack instead of bintray
-//apply from: 'install.gradle'
-//apply from: 'bintray.gradle'

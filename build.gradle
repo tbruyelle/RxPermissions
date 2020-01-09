@@ -1,59 +1,20 @@
 buildscript {
     repositories {
+        mavenCentral()
         google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.3'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
+        classpath 'com.android.tools.build:gradle:3.1.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.5'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
     }
 }
 
 allprojects {
     repositories {
+        mavenCentral()
         google()
         jcenter()
     }
-}
-
-ext {
-    minSdkVersion = 11
-    compileSdkVersion = 27
-    targetSdkVersion = compileSdkVersion
-
-    rxJava = 'io.reactivex.rxjava2:rxjava:2.1.16'
-    supportLibraryVersion = '27.1.1'
-    appCompat = "com.android.support:appcompat-v7:$supportLibraryVersion"
-    supportAnnotations = "com.android.support:support-annotations:$supportLibraryVersion"
-    supportFragment = "com.android.support:support-fragment:$supportLibraryVersion"
-    junit = 'junit:junit:4.12'
-    mockito = 'org.mockito:mockito-core:1.10.19'
-
-    robolectricVersion = '3.3.2'
-    robolectric = "org.robolectric:robolectric:$robolectricVersion"
-    robolectricShadowsSupport = "org.robolectric:shadows-support-v4:$robolectricVersion"
-    // Workaround for https://github.com/robolectric/robolectric/issues/1932
-    khronosOpenGLApi = "org.khronos:opengl-api:gl1.1-android-2.1_r1"
-
-    bintrayRepo = 'tbruyelle'
-    bintrayName = 'RxPermissions2'
-
-    publishedGroupId = 'com.tbruyelle.rxpermissions2'
-    artifact = 'rxpermissions'
-    libraryName = 'RxPermissions'
-    libraryVersion = '0.9.5'
-
-    libraryDescription = 'A wrapper for Android 6.0 permissions'
-
-    siteUrl = 'https://github.com/tbruyelle/RxPermissions'
-    gitUrl = 'https://github.com/tbruyelle/RxPermissions.git'
-
-    developerId = 'tbruyelle'
-    developerName = 'Thomas Bruyelle'
-    developerEmail = 'thomas.bruyelle@gmail.com'
-
-    licenseName = 'The Apache Software License, Version 2.0'
-    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-    allLicenses = ["Apache-2.0"]
 }
