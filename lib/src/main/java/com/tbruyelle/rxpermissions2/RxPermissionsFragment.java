@@ -38,7 +38,7 @@ public class RxPermissionsFragment extends Fragment {
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode != PERMISSIONS_REQUEST_CODE) return;
@@ -52,7 +52,7 @@ public class RxPermissionsFragment extends Fragment {
         onRequestPermissionsResult(permissions, grantResults, shouldShowRequestPermissionRationale);
     }
 
-    void onRequestPermissionsResult(String permissions[], int[] grantResults, boolean[] shouldShowRequestPermissionRationale) {
+    void onRequestPermissionsResult(String[] permissions, int[] grantResults, boolean[] shouldShowRequestPermissionRationale) {
         for (int i = 0, size = permissions.length; i < size; i++) {
             log("onRequestPermissionsResult  " + permissions[i]);
             // Find the corresponding subject
@@ -66,6 +66,16 @@ public class RxPermissionsFragment extends Fragment {
             boolean granted = grantResults[i] == PackageManager.PERMISSION_GRANTED;
             subject.onNext(new Permission(permissions[i], granted, shouldShowRequestPermissionRationale[i]));
             subject.onComplete();
+        }
+        // 适配小米手机"MI 9"，此手机的permissions返回值为空数组，特此判断一下，直接把map中的对象全部返回
+        if (permissions.length == 0) {
+            for (Map.Entry<String, PublishSubject<Permission>> entry : mSubjects.entrySet()) {
+                PublishSubject<Permission> subject = entry.getValue();
+                boolean granted = isGranted(entry.getKey());
+                subject.onNext(new Permission(entry.getKey(), granted, shouldShowRequestPermissionRationale(entry.getKey())));
+                subject.onComplete();
+            }
+            mSubjects.clear();
         }
     }
 
