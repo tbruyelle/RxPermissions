@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
-    package="com.tbruyelle.rxpermissions2.sample"
+    package="com.tbruyelle.rxpermissions3.sample"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     >
@@ -16,7 +16,7 @@
         tools:ignore="GoogleAppIndexingWarning"
         >
         <activity
-            android:name="com.tbruyelle.rxpermissions2.sample.MainActivity"
+            android:name="com.tbruyelle.rxpermissions3.sample.MainActivity"
             android:label="@string/app_name"
             >
             <intent-filter>

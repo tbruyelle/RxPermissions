@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package com.tbruyelle.rxpermissions2;
+package com.tbruyelle.rxpermissions3;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -27,11 +27,11 @@ import android.text.TextUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
-import io.reactivex.ObservableTransformer;
-import io.reactivex.functions.Function;
-import io.reactivex.subjects.PublishSubject;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableSource;
+import io.reactivex.rxjava3.core.ObservableTransformer;
+import io.reactivex.rxjava3.functions.Function;
+import io.reactivex.rxjava3.subjects.PublishSubject;
 
 public class RxPermissions {
 

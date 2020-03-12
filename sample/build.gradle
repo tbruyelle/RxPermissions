@@ -3,13 +3,17 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    defaultConfig {
-        applicationId "com.tbruyelle.rxpermissions.sample"
-        minSdkVersion 14
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
 
+    defaultConfig {
+        applicationId 'com.tbruyelle.rxpermissions.sample'
+        minSdkVersion 24
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName '1.0'
     }
 
     packagingOptions {
@@ -20,8 +24,16 @@ android {
 dependencies {
     implementation project(':rxpermissions')
 
+    implementation rootProject.ext.rxJava
     implementation rootProject.ext.appCompat
-    implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
+
+    /*
+     * Using rxBinding3 (rxJava2) with rxJavaBridge, update to rxBinding4 (rxJava3) once the corresponding PR is merged
+     * See: https://github.com/JakeWharton/RxBinding/pull/532
+     */
+    implementation 'com.jakewharton.rxbinding3:rxbinding:3.1.0'
+    implementation 'com.github.akarnokd:rxjava3-bridge:3.0.0'
+
 
     testImplementation rootProject.ext.junit
     testImplementation rootProject.ext.mockito

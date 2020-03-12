@@ -1,4 +1,4 @@
-package com.tbruyelle.rxpermissions2.sample;
+package com.tbruyelle.rxpermissions3.sample;
 
 import android.Manifest.permission;
 import android.hardware.Camera;
@@ -8,15 +8,16 @@ import android.util.Log;
 import android.view.SurfaceView;
 import android.widget.Toast;
 
-import com.jakewharton.rxbinding2.view.RxView;
-import com.tbruyelle.rxpermissions2.Permission;
-import com.tbruyelle.rxpermissions2.RxPermissions;
+import com.jakewharton.rxbinding3.view.RxView;
+import hu.akarnokd.rxjava3.bridge.RxJavaBridge;
+import com.tbruyelle.rxpermissions3.Permission;
+import com.tbruyelle.rxpermissions3.RxPermissions;
 
 import java.io.IOException;
 
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.functions.Action;
+import io.reactivex.rxjava3.functions.Consumer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.act_main);
         surfaceView = findViewById(R.id.surfaceView);
 
-        disposable = RxView.clicks(findViewById(R.id.enableCamera))
+        disposable = RxJavaBridge.toV3Observable(RxView.clicks(findViewById(R.id.enableCamera)))
                 // Ask for permissions when button is clicked
                 .compose(rxPermissions.ensureEach(permission.CAMERA))
                 .subscribe(new Consumer<Permission>() {

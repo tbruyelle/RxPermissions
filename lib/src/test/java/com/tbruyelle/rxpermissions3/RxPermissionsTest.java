@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package com.tbruyelle.rxpermissions2;
+package com.tbruyelle.rxpermissions3;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -31,9 +31,9 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.Config;
 
-import io.reactivex.Observable;
-import io.reactivex.observers.TestObserver;
-import io.reactivex.subjects.PublishSubject;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.observers.TestObserver;
+import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -84,7 +84,7 @@ public class RxPermissionsTest {
         trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub);
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+        
         sub.assertValue(true);
     }
 
@@ -100,7 +100,7 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(new String[]{permission}, result);
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+        
         sub.assertValue(true);
     }
 
@@ -116,7 +116,7 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(new String[]{permission}, result);
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+
         sub.assertValue(new Permission(permission, true));
     }
 
@@ -132,7 +132,7 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(new String[]{permission}, result);
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+
         sub.assertValue(new Permission(permission, true));
     }
 
@@ -146,7 +146,7 @@ public class RxPermissionsTest {
         trigger().compose(mRxPermissions.ensureEach(permission)).subscribe(sub);
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+
         sub.assertValue(new Permission(permission, true));
     }
 
@@ -160,7 +160,7 @@ public class RxPermissionsTest {
         trigger().compose(mRxPermissions.ensureEachCombined(permission)).subscribe(sub);
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+        
         sub.assertValue(new Permission(permission, true));
     }
 
@@ -174,7 +174,7 @@ public class RxPermissionsTest {
         trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub);
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+        
         sub.assertValue(true);
     }
 
@@ -190,7 +190,7 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(new String[]{permission}, result);
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+        
         sub.assertValue(false);
     }
 
@@ -206,7 +206,7 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(new String[]{permission}, result);
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+        
         sub.assertValue(new Permission(permission, false));
     }
 
@@ -222,7 +222,7 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(new String[]{permission}, result);
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+        
         sub.assertValue(new Permission(permission, false));
     }
 
@@ -236,7 +236,7 @@ public class RxPermissionsTest {
         trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub);
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+        
         sub.assertValue(false);
     }
 
@@ -250,7 +250,7 @@ public class RxPermissionsTest {
         trigger().compose(mRxPermissions.ensureEach(permission)).subscribe(sub);
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+        
         sub.assertValue(new Permission(permission, false));
     }
 
@@ -264,7 +264,7 @@ public class RxPermissionsTest {
         trigger().compose(mRxPermissions.ensureEachCombined(permission)).subscribe(sub);
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+        
         sub.assertValue(new Permission(permission, false));
     }
 
@@ -280,7 +280,7 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(permissions, result);
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+        
         sub.assertValue(true);
     }
 
@@ -296,7 +296,7 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(permissions, result);
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+        
         sub.assertValues(new Permission(permissions[0], true), new Permission(permissions[1], true));
     }
 
@@ -312,7 +312,7 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(permissions, result);
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+        
         sub.assertValues(new Permission(permissions[0] + ", " + permissions[1], true));
     }
 
@@ -328,7 +328,7 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(permissions, result);
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+        
         sub.assertValue(false);
     }
 
@@ -346,7 +346,7 @@ public class RxPermissionsTest {
                 new int[]{PackageManager.PERMISSION_GRANTED});
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+        
         sub.assertValue(false);
     }
 
@@ -364,7 +364,7 @@ public class RxPermissionsTest {
                 new int[]{PackageManager.PERMISSION_GRANTED});
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+        
         sub.assertValues(new Permission(permissions[0], true), new Permission(permissions[1], true));
         ArgumentCaptor<String[]> requestedPermissions = ArgumentCaptor.forClass(String[].class);
         verify(mRxPermissions).requestPermissionsFromFragment(requestedPermissions.capture());
@@ -386,7 +386,7 @@ public class RxPermissionsTest {
                 new int[]{PackageManager.PERMISSION_GRANTED});
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+        
         sub.assertValues(new Permission(permissions[0] + ", " + permissions[1], true));
         ArgumentCaptor<String[]> requestedPermissions = ArgumentCaptor.forClass(String[].class);
         verify(mRxPermissions).requestPermissionsFromFragment(requestedPermissions.capture());
@@ -406,7 +406,7 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(permissions, result);
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+        
         sub.assertValues(new Permission(permissions[0], true), new Permission(permissions[1], false));
     }
 
@@ -422,7 +422,7 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(permissions, result);
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+        
         sub.assertValues(new Permission(permissions[0] + ", " + permissions[1], false));
     }
 
@@ -440,7 +440,7 @@ public class RxPermissionsTest {
                 new int[]{PackageManager.PERMISSION_GRANTED});
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+        
         sub.assertValues(new Permission(permissions[0], true), new Permission(permissions[1], false));
     }
 
@@ -458,7 +458,7 @@ public class RxPermissionsTest {
                 new int[]{PackageManager.PERMISSION_GRANTED});
 
         sub.assertNoErrors();
-        sub.assertTerminated();
+        
         sub.assertValues(new Permission(permissions[0] + ", " + permissions[1], false));
     }
 
@@ -476,7 +476,7 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(new String[]{permission}, result);
 
         sub.assertNoErrors();
-        sub.assertNotTerminated();
+
         sub.assertValue(true);
     }
 
@@ -494,7 +494,7 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(new String[]{permission}, result);
 
         sub.assertNoErrors();
-        sub.assertNotTerminated();
+
         sub.assertValue(new Permission(permission, true));
     }
 
@@ -512,7 +512,7 @@ public class RxPermissionsTest {
         mRxPermissions.onRequestPermissionsResult(new String[]{permission}, result);
 
         sub.assertNoErrors();
-        sub.assertNotTerminated();
+
         sub.assertValue(new Permission(permission, true));
     }
 
