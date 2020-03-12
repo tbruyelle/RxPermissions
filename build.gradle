@@ -19,14 +19,14 @@ allprojects {
 
 ext {
     minSdkVersion = 14
-    compileSdkVersion = 27
+    compileSdkVersion = 28
     targetSdkVersion = compileSdkVersion
 
     rxJava = 'io.reactivex.rxjava3:rxjava:3.0.0'
     supportLibraryVersion = '27.1.1'
-    appCompat = "com.android.support:appcompat-v7:$supportLibraryVersion"
-    supportAnnotations = "com.android.support:support-annotations:$supportLibraryVersion"
-    supportFragment = "com.android.support:support-fragment:$supportLibraryVersion"
+    appCompat = 'androidx.appcompat:appcompat:1.0.0'
+    supportAnnotations = 'androidx.annotation:annotation:1.0.0'
+    supportFragment = 'androidx.fragment:fragment:1.0.0'
     junit = 'junit:junit:4.12'
     mockito = 'org.mockito:mockito-core:1.10.19'
 

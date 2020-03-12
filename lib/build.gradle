@@ -28,6 +28,7 @@ dependencies {
     implementation rootProject.ext.rxJava
     implementation rootProject.ext.supportAnnotations
     implementation rootProject.ext.supportFragment
+    implementation rootProject.ext.appCompat
 
     testImplementation rootProject.ext.junit
     testImplementation rootProject.ext.mockito
