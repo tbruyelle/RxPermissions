@@ -9,11 +9,11 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.tbruyelle.rxpermissions.sample"
+        applicationId 'com.tbruyelle.rxpermissions.sample'
         minSdkVersion 24
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName '1.0'
     }
 
     packagingOptions {
@@ -26,6 +26,11 @@ dependencies {
 
     implementation rootProject.ext.rxJava
     implementation rootProject.ext.appCompat
+
+    /*
+     * Using rxBinding3 (rxJava2) with rxJavaBridge, update to rxBinding4 (rxJava3) once the corresponding PR is merged
+     * See: https://github.com/JakeWharton/RxBinding/pull/532
+     */
     implementation 'com.jakewharton.rxbinding3:rxbinding:3.1.0'
     implementation 'com.github.akarnokd:rxjava3-bridge:3.0.0'
 
