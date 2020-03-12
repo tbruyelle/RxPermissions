@@ -16,10 +16,11 @@ package com.tbruyelle.rxpermissions3;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.support.v4.app.FragmentActivity;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -520,7 +521,7 @@ public class RxPermissionsTest {
     @TargetApi(Build.VERSION_CODES.M)
     public void shouldShowRequestPermissionRationale_allDenied_allRationale() {
         when(mRxPermissions.isMarshmallow()).thenReturn(true);
-        Activity activity = mock(Activity.class);
+        AppCompatActivity activity = mock(AppCompatActivity.class);
         when(activity.shouldShowRequestPermissionRationale(anyString())).thenReturn(true);
 
         TestObserver<Boolean> sub = new TestObserver<>();
@@ -536,7 +537,7 @@ public class RxPermissionsTest {
     @TargetApi(Build.VERSION_CODES.M)
     public void shouldShowRequestPermissionRationale_allDenied_oneRationale() {
         when(mRxPermissions.isMarshmallow()).thenReturn(true);
-        Activity activity = mock(Activity.class);
+        AppCompatActivity activity = mock(AppCompatActivity.class);
         when(activity.shouldShowRequestPermissionRationale("p1")).thenReturn(true);
 
         TestObserver<Boolean> sub = new TestObserver<>();
@@ -552,7 +553,7 @@ public class RxPermissionsTest {
     @TargetApi(Build.VERSION_CODES.M)
     public void shouldShowRequestPermissionRationale_allDenied_noRationale() {
         when(mRxPermissions.isMarshmallow()).thenReturn(true);
-        Activity activity = mock(Activity.class);
+        AppCompatActivity activity = mock(AppCompatActivity.class);
 
         TestObserver<Boolean> sub = new TestObserver<>();
         mRxPermissions.shouldShowRequestPermissionRationale(activity, "p1", "p2")
@@ -567,7 +568,7 @@ public class RxPermissionsTest {
     @TargetApi(Build.VERSION_CODES.M)
     public void shouldShowRequestPermissionRationale_oneDeniedRationale() {
         when(mRxPermissions.isMarshmallow()).thenReturn(true);
-        Activity activity = mock(Activity.class);
+        AppCompatActivity activity = mock(AppCompatActivity.class);
         when(mRxPermissions.isGranted("p1")).thenReturn(true);
         when(activity.shouldShowRequestPermissionRationale("p2")).thenReturn(true);
 
@@ -584,7 +585,7 @@ public class RxPermissionsTest {
     @TargetApi(Build.VERSION_CODES.M)
     public void shouldShowRequestPermissionRationale_oneDeniedNotRationale() {
         when(mRxPermissions.isMarshmallow()).thenReturn(true);
-        Activity activity = mock(Activity.class);
+        AppCompatActivity activity = mock(AppCompatActivity.class);
         when(mRxPermissions.isGranted("p2")).thenReturn(true);
 
         TestObserver<Boolean> sub = new TestObserver<>();

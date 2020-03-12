@@ -15,14 +15,15 @@
 package com.tbruyelle.rxpermissions3;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -275,7 +276,7 @@ public class RxPermissions {
      * For SDK &lt; 23, the observable will always emit false.
      */
     @SuppressWarnings("WeakerAccess")
-    public Observable<Boolean> shouldShowRequestPermissionRationale(final Activity activity, final String... permissions) {
+    public Observable<Boolean> shouldShowRequestPermissionRationale(final AppCompatActivity activity, final String... permissions) {
         if (!isMarshmallow()) {
             return Observable.just(false);
         }
@@ -283,7 +284,7 @@ public class RxPermissions {
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    private boolean shouldShowRequestPermissionRationaleImplementation(final Activity activity, final String... permissions) {
+    private boolean shouldShowRequestPermissionRationaleImplementation(final AppCompatActivity activity, final String... permissions) {
         for (String p : permissions) {
             if (!isGranted(p) && !activity.shouldShowRequestPermissionRationale(p)) {
                 return false;

@@ -2,8 +2,9 @@ package com.tbruyelle.rxpermissions.sample;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.os.Build;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.tbruyelle.rxpermissions3.Permission;
 import com.tbruyelle.rxpermissions3.RxPermissions;
@@ -23,7 +24,7 @@ import static org.mockito.Mockito.when;
 public class RxPermissionsSampleTest {
 
     @Mock
-    private Activity activity;
+    private AppCompatActivity activity;
     @Mock
     private RxPermissions rxPermissions;
 
