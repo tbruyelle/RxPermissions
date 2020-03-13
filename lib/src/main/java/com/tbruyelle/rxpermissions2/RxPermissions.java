@@ -74,7 +74,7 @@ public class RxPermissions {
             fragmentManager
                     .beginTransaction()
                     .add(rxPermissionsFragment, TAG)
-                    .commitNow();
+                    .commitAllowingStateLoss();
         }
         return rxPermissionsFragment;
     }
@@ -198,6 +198,12 @@ public class RxPermissions {
             throw new IllegalArgumentException("RxPermissions.request/requestEach requires at least one input permission");
         }
         return oneOf(trigger, pending(permissions))
+                .compose(new ObservableTransformer<Object, Object>() {
+                    @Override
+                    public ObservableSource<Object> apply(Observable<Object> upstream) {
+                        return mRxPermissionsFragment.get().transformer();
+                    }
+                })
                 .flatMap(new Function<Object, Observable<Permission>>() {
                     @Override
                     public Observable<Permission> apply(Object o) {
@@ -231,14 +237,14 @@ public class RxPermissions {
         // At the end, the observables are combined to have a unique response.
         for (String permission : permissions) {
             mRxPermissionsFragment.get().log("Requesting permission " + permission);
-            if (isGranted(permission)) {
+            if (isGranted(mRxPermissionsFragment.get().getActivity(), permission)) {
                 // Already granted, or not Android M
                 // Return a granted Permission object.
                 list.add(Observable.just(new Permission(permission, true, false)));
                 continue;
             }
 
-            if (isRevoked(permission)) {
+            if (isRevoked(mRxPermissionsFragment.get().getActivity(), permission)) {
                 // Revoked by a policy, return a denied Permission object.
                 list.add(Observable.just(new Permission(permission, false, false)));
                 continue;
@@ -285,7 +291,7 @@ public class RxPermissions {
     @TargetApi(Build.VERSION_CODES.M)
     private boolean shouldShowRequestPermissionRationaleImplementation(final Activity activity, final String... permissions) {
         for (String p : permissions) {
-            if (!isGranted(p) && !activity.shouldShowRequestPermissionRationale(p)) {
+            if (!isGranted(activity, p) && !activity.shouldShowRequestPermissionRationale(p)) {
                 return false;
             }
         }
@@ -304,8 +310,8 @@ public class RxPermissions {
      * Always true if SDK &lt; 23.
      */
     @SuppressWarnings("WeakerAccess")
-    public boolean isGranted(String permission) {
-        return !isMarshmallow() || mRxPermissionsFragment.get().isGranted(permission);
+    public boolean isGranted(Activity activity, String permission) {
+        return !isMarshmallow() || mRxPermissionsFragment.get().isGranted(activity, permission);
     }
 
     /**
@@ -314,8 +320,8 @@ public class RxPermissions {
      * Always false if SDK &lt; 23.
      */
     @SuppressWarnings("WeakerAccess")
-    public boolean isRevoked(String permission) {
-        return isMarshmallow() && mRxPermissionsFragment.get().isRevoked(permission);
+    public boolean isRevoked(Activity activity, String permission) {
+        return isMarshmallow() && mRxPermissionsFragment.get().isRevoked(activity, permission);
     }
 
     boolean isMarshmallow() {
