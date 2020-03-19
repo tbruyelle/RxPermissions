@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import io.reactivex.subjects.PublishSubject;
@@ -101,6 +102,16 @@ public class RxPermissionsFragment extends Fragment {
 
     public void setSubjectForPermission(@NonNull String permission, @NonNull PublishSubject<Permission> subject) {
         mSubjects.put(permission, subject);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        String message = "These permission requests cleared with onStop called";
+        for (PublishSubject<Permission> permissionPublishSubject : mSubjects.values()) {
+            permissionPublishSubject.onError(new CancelPermissionRequestException(message));
+        }
+        mSubjects.clear();
     }
 
     void log(String message) {
