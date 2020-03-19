@@ -1,15 +1,23 @@
 package com.tbruyelle.rxpermissions2;
 
+import android.Manifest;
 import android.annotation.TargetApi;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.reactivex.subjects.PublishSubject;
@@ -17,6 +25,7 @@ import io.reactivex.subjects.PublishSubject;
 public class RxPermissionsFragment extends Fragment {
 
     private static final int PERMISSIONS_REQUEST_CODE = 42;
+    private static final int PERMISSION_REQUEST_INSTALL_PACKAGES_REQUEST_CODE = 9527;
 
     // Contains all the current permission requests.
     // Once granted or denied, they are removed from it.
@@ -34,7 +43,29 @@ public class RxPermissionsFragment extends Fragment {
 
     @TargetApi(Build.VERSION_CODES.M)
     void requestPermissions(@NonNull String[] permissions) {
-        requestPermissions(permissions, PERMISSIONS_REQUEST_CODE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            for (int i = 0; i < permissions.length; i++) {
+                if (Manifest.permission.REQUEST_INSTALL_PACKAGES.equals(permissions[i])) {
+                    List<String> list = new ArrayList<>(Arrays.asList(permissions));
+                    list.remove(i);
+                    permissions = list.toArray(new String[0]);
+
+                    try {
+                        Uri uri = Uri.fromParts("package", getContext().getPackageName(), null);
+                        Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, uri);
+                        startActivityForResult(intent, PERMISSION_REQUEST_INSTALL_PACKAGES_REQUEST_CODE);
+                    } catch (ActivityNotFoundException exc) {
+                        Log.e(RxPermissions.TAG, "Settings activity not found for action: " + Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
+                    }
+                    break;
+                }
+            }
+            if (permissions.length != 0) {
+                requestPermissions(permissions, PERMISSIONS_REQUEST_CODE);
+            }
+        } else {
+            requestPermissions(permissions, PERMISSIONS_REQUEST_CODE);
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -67,6 +98,24 @@ public class RxPermissionsFragment extends Fragment {
             subject.onNext(new Permission(permissions[i], granted, shouldShowRequestPermissionRationale[i]));
             subject.onComplete();
         }
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != PERMISSION_REQUEST_INSTALL_PACKAGES_REQUEST_CODE) return;
+        log("onActivityResult  " + Manifest.permission.REQUEST_INSTALL_PACKAGES);
+        PublishSubject<Permission> subject = mSubjects.get(Manifest.permission.REQUEST_INSTALL_PACKAGES);
+        if (subject == null) {
+            // No subject found
+            Log.e(RxPermissions.TAG, "RxPermissions.onActivityResult invoked but didn't find android.permission.REQUEST_INSTALL_PACKAGES request.");
+            return;
+        }
+        mSubjects.remove(Manifest.permission.REQUEST_INSTALL_PACKAGES);
+        boolean granted = getContext().getPackageManager().canRequestPackageInstalls();
+        subject.onNext(new Permission(Manifest.permission.REQUEST_INSTALL_PACKAGES, granted, false));
+        subject.onComplete();
     }
 
     @TargetApi(Build.VERSION_CODES.M)
