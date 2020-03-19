@@ -55,10 +55,12 @@ public class RxPermissionsTest {
 
     private RxPermissions mRxPermissions;
 
+    private ActivityController<FragmentActivity> mActivityController;
+
     @Before
     public void setup() {
-        ActivityController<FragmentActivity> activityController = Robolectric.buildActivity(FragmentActivity.class);
-        mActivity = spy(activityController.setup().get());
+        mActivityController = Robolectric.buildActivity(FragmentActivity.class);
+        mActivity = spy(mActivityController.setup().get());
         mRxPermissions = spy(new RxPermissions(mActivity));
         mRxPermissions.mRxPermissionsFragment = spy(mRxPermissions.mRxPermissionsFragment);
         final RxPermissionsFragment rxPermissionsFragment = spy(mRxPermissions.mRxPermissionsFragment.get());
@@ -672,5 +674,20 @@ public class RxPermissionsTest {
         boolean revoked = mRxPermissions.isRevoked("p");
 
         assertFalse(revoked);
+    }
+
+    @Test
+    @TargetApi(Build.VERSION_CODES.M)
+    public void subscription_activityLifecycleOnStop_requestEndWithExceptionAndCleared() {
+        TestObserver<Boolean> sub = new TestObserver<>();
+        String permission = Manifest.permission.READ_PHONE_STATE;
+        when(mRxPermissions.isGranted(permission)).thenReturn(false);
+
+        trigger().compose(mRxPermissions.ensure(permission)).subscribe(sub);
+        mActivityController.stop();
+
+        sub.assertError(CancelPermissionRequestException.class);
+        sub.assertTerminated();
+        sub.assertNoValues();
     }
 }
