@@ -15,15 +15,14 @@
 package com.tbruyelle.rxpermissions3;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.VisibleForTesting;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -132,7 +131,6 @@ public class RxPermissions {
      * If one or several permissions have never been requested, invoke the related framework method
      * to ask the user if he allows the permissions.
      */
-    @SuppressWarnings("WeakerAccess")
     public <T> ObservableTransformer<T, Permission> ensureEach(final String... permissions) {
         return new ObservableTransformer<T, Permission>() {
             @Override
@@ -172,7 +170,7 @@ public class RxPermissions {
      * Request permissions immediately, <b>must be invoked during initialization phase
      * of your application</b>.
      */
-    @SuppressWarnings({"WeakerAccess", "unused"})
+    @SuppressWarnings({"unused"})
     public Observable<Boolean> request(final String... permissions) {
         return Observable.just(TRIGGER).compose(ensure(permissions));
     }
@@ -181,7 +179,7 @@ public class RxPermissions {
      * Request permissions immediately, <b>must be invoked during initialization phase
      * of your application</b>.
      */
-    @SuppressWarnings({"WeakerAccess", "unused"})
+    @SuppressWarnings({"unused"})
     public Observable<Permission> requestEach(final String... permissions) {
         return Observable.just(TRIGGER).compose(ensureEach(permissions));
     }
@@ -276,7 +274,7 @@ public class RxPermissions {
      * For SDK &lt; 23, the observable will always emit false.
      */
     @SuppressWarnings("WeakerAccess")
-    public Observable<Boolean> shouldShowRequestPermissionRationale(final AppCompatActivity activity, final String... permissions) {
+    public Observable<Boolean> shouldShowRequestPermissionRationale(final Activity activity, final String... permissions) {
         if (!isMarshmallow()) {
             return Observable.just(false);
         }
@@ -284,7 +282,7 @@ public class RxPermissions {
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    private boolean shouldShowRequestPermissionRationaleImplementation(final AppCompatActivity activity, final String... permissions) {
+    private boolean shouldShowRequestPermissionRationaleImplementation(final Activity activity, final String... permissions) {
         for (String p : permissions) {
             if (!isGranted(p) && !activity.shouldShowRequestPermissionRationale(p)) {
                 return false;
@@ -323,7 +321,7 @@ public class RxPermissions {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
     }
 
-    void onRequestPermissionsResult(String permissions[], int[] grantResults) {
+    void onRequestPermissionsResult(String[] permissions, int[] grantResults) {
         mRxPermissionsFragment.get().onRequestPermissionsResult(permissions, grantResults, new boolean[permissions.length]);
     }
 
