@@ -41,6 +41,14 @@ public class RxPermissions {
     @VisibleForTesting
     Lazy<RxPermissionsFragment> mRxPermissionsFragment;
 
+    public static RxPermissions with(@NonNull final FragmentActivity activity){
+        return new RxPermissions(activity);
+    }
+
+    public static RxPermissions with(@NonNull final Fragment fragment){
+        return new RxPermissions(fragment);
+    }
+
     public RxPermissions(@NonNull final FragmentActivity activity) {
         mRxPermissionsFragment = getLazySingleton(activity.getSupportFragmentManager());
     }

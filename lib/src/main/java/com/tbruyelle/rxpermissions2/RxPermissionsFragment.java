@@ -2,11 +2,13 @@ package com.tbruyelle.rxpermissions2;
 
 import android.annotation.TargetApi;
 import android.content.pm.PackageManager;
+import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.PermissionChecker;
 import android.util.Log;
 
 import java.util.HashMap;
@@ -75,7 +77,21 @@ public class RxPermissionsFragment extends Fragment {
         if (fragmentActivity == null) {
             throw new IllegalStateException("This fragment must be attached to an activity.");
         }
-        return fragmentActivity.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
+
+        // when targetSdkVersion < Build.VERSION_CODES.M(23), calling like below:
+        // ContextWrapper.checkSelfPermission or Context.checkSelfPermission ,
+        // it will always return PERMISSION_GRANTED
+        boolean permissionGranted;
+        if (fragmentActivity.getApplicationInfo().targetSdkVersion < Build.VERSION_CODES.M) {
+//            permissionGranted = PermissionChecker.checkPermission(fragmentActivity, permission,
+//                    Binder.getCallingPid(), Binder.getCallingUid(), fragmentActivity.getPackageName())
+//                    == PackageManager.PERMISSION_GRANTED;
+            permissionGranted = PermissionChecker.checkSelfPermission(fragmentActivity, permission)
+                    == PackageManager.PERMISSION_GRANTED;
+        } else {
+            permissionGranted = fragmentActivity.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
+        }
+        return permissionGranted;
     }
 
     @TargetApi(Build.VERSION_CODES.M)
