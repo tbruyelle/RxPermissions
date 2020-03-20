@@ -28,12 +28,14 @@ dependencies {
     implementation rootProject.ext.appCompat
 
     /*
-     * Using rxBinding2 (rxJava2) with rxJavaBridge, update to rxBinding4 (rxJava3) and remove rxJavaBridge once the corresponding PR is merged
+     * Using rxBinding2 (rxJava2) with rxJavaBridge, update to rxBinding4 (rxJava3) and remove rxJavaBridge and RxJava2 once the corresponding PR is merged
      * See: https://github.com/JakeWharton/RxBinding/pull/532
      */
     implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
     implementation 'com.github.akarnokd:rxjava3-bridge:3.0.0'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.17'
 
     testImplementation rootProject.ext.junit
     testImplementation rootProject.ext.mockito
+    testImplementation rootProject.ext.objenesis
 }

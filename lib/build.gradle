@@ -31,6 +31,7 @@ dependencies {
 
     testImplementation rootProject.ext.junit
     testImplementation rootProject.ext.mockito
+    testImplementation rootProject.ext.objenesis
     testImplementation rootProject.ext.robolectric
     testImplementation rootProject.ext.robolectricShadowsSupport
     testImplementation rootProject.ext.khronosOpenGLApi

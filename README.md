@@ -143,7 +143,7 @@ in `Activity.onRequestPermissionsResult()`.
 
 - All what RX provides about transformation, filter, chaining...
 
-# License
+## License
 
 ```
 Copyright (C) 2015 Thomas Bruyelle
