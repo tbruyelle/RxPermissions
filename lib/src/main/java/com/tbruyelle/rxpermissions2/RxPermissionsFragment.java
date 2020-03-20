@@ -9,10 +9,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import io.reactivex.subjects.PublishSubject;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class RxPermissionsFragment extends Fragment {
 
@@ -20,7 +19,7 @@ public class RxPermissionsFragment extends Fragment {
 
     // Contains all the current permission requests.
     // Once granted or denied, they are removed from it.
-    private Map<String, PublishSubject<Permission>> mSubjects = new HashMap<>();
+    private Map<String, PublishSubject<Permission>> mSubjects = new LinkedHashMap<>();
     private boolean mLogging;
 
     public RxPermissionsFragment() {
@@ -42,6 +41,12 @@ public class RxPermissionsFragment extends Fragment {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode != PERMISSIONS_REQUEST_CODE) return;
+
+        if (permissions.length == 0 || grantResults.length == 0){
+            log("onRequestPermissionsResult permissions empty, request again");
+            requestPermissions(mSubjects.keySet().toArray(new String[mSubjects.size()]));
+            return;
+        }
 
         boolean[] shouldShowRequestPermissionRationale = new boolean[permissions.length];
 
