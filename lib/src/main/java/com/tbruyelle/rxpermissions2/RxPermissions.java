@@ -17,12 +17,13 @@ package com.tbruyelle.rxpermissions2;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -322,7 +323,7 @@ public class RxPermissions {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
     }
 
-    void onRequestPermissionsResult(String permissions[], int[] grantResults) {
+    void onRequestPermissionsResult(String[] permissions, int[] grantResults) {
         mRxPermissionsFragment.get().onRequestPermissionsResult(permissions, grantResults, new boolean[permissions.length]);
     }
 
