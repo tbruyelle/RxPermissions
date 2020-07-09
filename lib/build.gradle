@@ -4,6 +4,10 @@ apply from: 'jitpack.gradle'
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
@@ -14,7 +18,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
+    testOptions.unitTests.includeAndroidResources = true
     testOptions.unitTests.all {
         // unitTests.returnDefaultValues = true
         // Always show the result of every unit test, even if it passes.
@@ -26,13 +30,13 @@ android {
 
 dependencies {
     implementation rootProject.ext.rxJava
-    implementation rootProject.ext.supportAnnotations
-    implementation rootProject.ext.supportFragment
+    implementation rootProject.ext.androidXFragment
+    implementation rootProject.ext.androidXAnnotation
+    implementation rootProject.ext.androidXAppcompat
 
-    testImplementation rootProject.ext.junit
+    testImplementation 'junit:junit:4.13'
     testImplementation rootProject.ext.mockito
     testImplementation rootProject.ext.robolectric
-    testImplementation rootProject.ext.robolectricShadowsSupport
     testImplementation rootProject.ext.khronosOpenGLApi
 }
 

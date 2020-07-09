@@ -20,9 +20,9 @@ android {
 dependencies {
     implementation project(':rxpermissions')
 
-    implementation rootProject.ext.appCompat
-    implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
+    implementation 'com.jakewharton.rxbinding2:rxbinding:2.2.0'
+    implementation rootProject.ext.androidXAppcompat
 
-    testImplementation rootProject.ext.junit
+    testImplementation 'junit:junit:4.13'
     testImplementation rootProject.ext.mockito
 }
