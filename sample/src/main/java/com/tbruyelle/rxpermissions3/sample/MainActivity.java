@@ -1,4 +1,4 @@
-package com.tbruyelle.rxpermissions2.sample;
+package com.tbruyelle.rxpermissions3.sample;
 
 import android.Manifest.permission;
 import android.hardware.Camera;
@@ -9,15 +9,16 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.jakewharton.rxbinding2.view.RxView;
-import com.tbruyelle.rxpermissions2.Permission;
-import com.tbruyelle.rxpermissions2.RxPermissions;
+import com.jakewharton.rxbinding4.view.RxView;
+import com.tbruyelle.rxpermissions3.Permission;
+import com.tbruyelle.rxpermissions3.RxPermissions;
 
 import java.io.IOException;
 
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.functions.Action;
+import io.reactivex.rxjava3.functions.Consumer;
+
 
 public class MainActivity extends AppCompatActivity {
 

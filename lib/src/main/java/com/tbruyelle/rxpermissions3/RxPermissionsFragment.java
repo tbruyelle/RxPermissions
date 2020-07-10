@@ -1,4 +1,4 @@
-package com.tbruyelle.rxpermissions2;
+package com.tbruyelle.rxpermissions3;
 
 import android.annotation.TargetApi;
 import android.content.pm.PackageManager;
@@ -13,7 +13,8 @@ import androidx.fragment.app.FragmentActivity;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.reactivex.subjects.PublishSubject;
+import io.reactivex.rxjava3.subjects.PublishSubject;
+
 
 public class RxPermissionsFragment extends Fragment {
 

@@ -3,6 +3,11 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     defaultConfig {
         applicationId "com.tbruyelle.rxpermissions.sample"
         minSdkVersion 14
@@ -20,7 +25,7 @@ android {
 dependencies {
     implementation project(':rxpermissions')
 
-    implementation 'com.jakewharton.rxbinding2:rxbinding:2.2.0'
+    implementation 'com.jakewharton.rxbinding4:rxbinding:4.0.0'
     implementation rootProject.ext.androidXAppcompat
 
     testImplementation 'junit:junit:4.13'
