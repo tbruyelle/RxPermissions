@@ -5,15 +5,16 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
 
-import com.tbruyelle.rxpermissions2.Permission;
-import com.tbruyelle.rxpermissions2.RxPermissions;
+import com.tbruyelle.rxpermissions3.Permission;
+import com.tbruyelle.rxpermissions3.RxPermissions;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import io.reactivex.Observable;
+
+import io.reactivex.rxjava3.core.Observable;
 
 import static org.mockito.Mockito.when;
 
@@ -22,8 +23,6 @@ import static org.mockito.Mockito.when;
  */
 public class RxPermissionsSampleTest {
 
-    @Mock
-    private Activity activity;
     @Mock
     private RxPermissions rxPermissions;
 

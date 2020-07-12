@@ -5,8 +5,8 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.0.0'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
     }
 }
 
@@ -22,8 +22,8 @@ ext {
     compileSdkVersion = 29
     targetSdkVersion = compileSdkVersion
 
-    rxJava = 'io.reactivex.rxjava2:rxjava:2.2.19'
-    junit = 'junit:junit:4.12'
+    rxJava = 'io.reactivex.rxjava3:rxjava:3.0.4'
+    junit = 'junit:junit:4.13'
     mockito = 'org.mockito:mockito-core:3.3.3'
 
     androidXFragment = 'androidx.fragment:fragment:1.2.5'
@@ -37,9 +37,9 @@ ext {
     khronosOpenGLApi = "org.khronos:opengl-api:gl1.1-android-2.1_r1"
 
     bintrayRepo = 'tbruyelle'
-    bintrayName = 'RxPermissions2'
+    bintrayName = 'RxPermissions3'
 
-    publishedGroupId = 'com.tbruyelle.rxpermissions2'
+    publishedGroupId = 'com.tbruyelle.rxpermissions3'
     artifact = 'rxpermissions'
     libraryName = 'RxPermissions'
     libraryVersion = '0.9.5'
