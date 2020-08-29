@@ -28,6 +28,6 @@ dependencies {
     implementation 'com.jakewharton.rxbinding4:rxbinding:4.0.0'
     implementation rootProject.ext.androidXAppcompat
 
-    testImplementation 'junit:junit:4.13'
+    testImplementation rootProject.ext.junit
     testImplementation rootProject.ext.mockito
 }

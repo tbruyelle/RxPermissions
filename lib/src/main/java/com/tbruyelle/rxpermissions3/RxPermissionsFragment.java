@@ -86,7 +86,7 @@ public class RxPermissionsFragment extends Fragment {
         if (fragmentActivity == null) {
             throw new IllegalStateException("This fragment must be attached to an activity.");
         }
-        return fragmentActivity.getPackageManager().isPermissionRevokedByPolicy(permission, getActivity().getPackageName());
+        return fragmentActivity.getPackageManager().isPermissionRevokedByPolicy(permission, fragmentActivity.getPackageName());
     }
 
     public void setLogging(boolean logging) {
