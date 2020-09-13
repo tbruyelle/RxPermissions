@@ -2,7 +2,6 @@ package com.tbruyelle.rxpermissions.sample;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.os.Build;
 
 import com.tbruyelle.rxpermissions3.Permission;
@@ -28,7 +27,7 @@ public class RxPermissionsSampleTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test

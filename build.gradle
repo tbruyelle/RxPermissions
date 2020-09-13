@@ -4,8 +4,8 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.0'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
+        classpath 'com.android.tools.build:gradle:4.0.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
     }
 }
@@ -22,15 +22,15 @@ ext {
     compileSdkVersion = 29
     targetSdkVersion = compileSdkVersion
 
-    rxJava = 'io.reactivex.rxjava3:rxjava:3.0.4'
+    rxJava = 'io.reactivex.rxjava3:rxjava:3.0.6'
     junit = 'junit:junit:4.13'
-    mockito = 'org.mockito:mockito-core:3.3.3'
+    mockito = 'org.mockito:mockito-core:3.5.10'
 
     androidXFragment = 'androidx.fragment:fragment:1.2.5'
     androidXAnnotation = 'androidx.annotation:annotation:1.1.0'
-    androidXAppcompat =  'androidx.appcompat:appcompat:1.1.0'
+    androidXAppcompat =  'androidx.appcompat:appcompat:1.2.0'
 
-    robolectricVersion = '4.3.1'
+    robolectricVersion = '4.4'
     robolectric = "org.robolectric:robolectric:$robolectricVersion"
     robolectricShadowsSupport = "org.robolectric:shadows-support-v4:$robolectricVersion"
     // Workaround for https://github.com/robolectric/robolectric/issues/1932
