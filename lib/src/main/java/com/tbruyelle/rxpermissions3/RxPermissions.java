@@ -198,29 +198,7 @@ public class RxPermissions {
         if (permissions == null || permissions.length == 0) {
             throw new IllegalArgumentException("RxPermissions.request/requestEach requires at least one input permission");
         }
-        return oneOf(trigger, pending(permissions))
-                .flatMap(new Function<Object, Observable<Permission>>() {
-                    @Override
-                    public Observable<Permission> apply(Object o) {
-                        return requestImplementation(permissions);
-                    }
-                });
-    }
-
-    private Observable<?> pending(final String... permissions) {
-        for (String p : permissions) {
-            if (!mRxPermissionsFragment.get().containsByPermission(p)) {
-                return Observable.empty();
-            }
-        }
-        return Observable.just(TRIGGER);
-    }
-
-    private Observable<?> oneOf(Observable<?> trigger, Observable<?> pending) {
-        if (trigger == null) {
-            return Observable.just(TRIGGER);
-        }
-        return Observable.merge(trigger, pending);
+        return trigger.flatMap( o -> requestImplementation(permissions));
     }
 
     @TargetApi(Build.VERSION_CODES.M)
