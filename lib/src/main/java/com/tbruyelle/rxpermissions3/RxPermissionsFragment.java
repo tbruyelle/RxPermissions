@@ -97,10 +97,6 @@ public class RxPermissionsFragment extends Fragment {
         return mSubjects.get(permission);
     }
 
-    public boolean containsByPermission(@NonNull String permission) {
-        return mSubjects.containsKey(permission);
-    }
-
     public void setSubjectForPermission(@NonNull String permission, @NonNull PublishSubject<Permission> subject) {
         mSubjects.put(permission, subject);
     }
