@@ -41,7 +41,7 @@ rxPermissions
         if (granted) { // Always true pre-M
            // I can control the camera now
         } else {
-           // Oups permission denied
+           // Oops permission denied
         }
     });
 ```
