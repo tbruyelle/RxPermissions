@@ -75,7 +75,12 @@ public class RxPermissions {
             fragmentManager
                     .beginTransaction()
                     .add(rxPermissionsFragment, TAG)
-                    .commitNow();
+                    .commit();
+            try {
+                fragmentManager.executePendingTransactions();
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
         }
         return rxPermissionsFragment;
     }
