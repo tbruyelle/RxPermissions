@@ -34,7 +34,7 @@ dependencies {
     implementation rootProject.ext.androidXAnnotation
     implementation rootProject.ext.androidXAppcompat
 
-    testImplementation 'junit:junit:4.13'
+    testImplementation 'junit:junit:4.13.2'
     testImplementation rootProject.ext.mockito
     testImplementation rootProject.ext.robolectric
     testImplementation rootProject.ext.khronosOpenGLApi

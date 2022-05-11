@@ -1,5 +1,7 @@
 package com.tbruyelle.rxpermissions3;
 
+import androidx.annotation.NonNull;
+
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
@@ -50,6 +52,7 @@ public class Permission {
         return result;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Permission{" +

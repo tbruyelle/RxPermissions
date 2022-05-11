@@ -19,6 +19,7 @@ import android.app.Activity;
 import android.os.Build;
 import android.text.TextUtils;
 
+import androidx.annotation.ChecksSdkIntAtLeast;
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.fragment.app.FragmentActivity;
@@ -27,6 +28,7 @@ import androidx.fragment.app.FragmentManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableSource;
@@ -235,7 +237,7 @@ public class RxPermissions {
         }
 
         if (!unrequestedPermissions.isEmpty()) {
-            String[] unrequestedPermissionsArray = unrequestedPermissions.toArray(new String[unrequestedPermissions.size()]);
+            String[] unrequestedPermissionsArray = unrequestedPermissions.toArray(new String[0]);
             requestPermissionsFromFragment(unrequestedPermissionsArray);
         }
         return Observable.concat(Observable.fromIterable(list));
@@ -297,12 +299,13 @@ public class RxPermissions {
         return isMarshmallow() && mRxPermissionsFragment.get().isRevoked(permission);
     }
 
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.M)
     boolean isMarshmallow() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
     }
 
-    void onRequestPermissionsResult(String[] permissions, int[] grantResults) {
-        mRxPermissionsFragment.get().onRequestPermissionsResult(permissions, grantResults, new boolean[permissions.length]);
+    void onRequestPermissionsResult(Map<String, Boolean> result) {
+        mRxPermissionsFragment.get().onRequestPermissionsResult(result);
     }
 
     @FunctionalInterface
